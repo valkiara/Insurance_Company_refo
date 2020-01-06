@@ -1,0 +1,814 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_index.cshtml";
+}
+
+<style>
+    .form-control {
+        /*width: 100%;*/
+    }
+
+    .set-header {
+        background-color: #1caf9a;
+        height: 30px;
+        padding: 2px;
+        /*margin-bottom: 15px;*/
+    }
+
+    .set-header-property {
+        background-color: #e47080;
+        height: 30px;
+        padding: 2px;
+        /*margin-bottom: 15px;*/
+    }
+
+    .set-header-scope {
+        background-color: #e4a670;
+        height: 30px;
+        padding: 2px;
+        /*margin-bottom: 15px;*/
+    }
+    /*------------------Popup---------------------*/
+    @@media screen and (max-width: 1024px) {
+        .app-modal-window-property .modal-dialog {
+            width: 95%;
+        }
+
+        /*.app-modal-window-scopes .modal-dialog {
+            width: 95%;
+        }*/
+    }
+
+    @@media screen and (min-width: 1024px) {
+        .app-modal-window-property .modal-dialog {
+            width: 80%;
+        }
+
+        /*.app-modal-window-scopes .modal-dialog {
+            width: 70%;
+        }*/
+    }
+    /*------------------Popup---------------------*/
+</style>
+
+<script src="~/Scripts/ng/Controllers/LocalAdmissionController.js"></script>
+@*<script src="~/Scripts/ng/Services/LocalAdmissionService.js"></script>*@
+<script src="~/Scripts/ng/Services/AgentService.js"></script>
+<script src="~/Scripts/ng/Services/LocalAdmissionService.js"></script>
+<script src="~/Scripts/ng/Services/testLocalAdmissionService.js"></script>
+
+<div class="breadcrumb-line">
+    <ul class="breadcrumb">
+        <li><a href="/Dashboard/Dashboard"><i class="icon-home2 position-left"></i>Home</a></li>
+        <li>Transaction</li>
+        <li>Admission</li>
+        <li class="active"><b>Local Admission</b></li>
+    </ul>
+</div>
+
+<div class="content" ng-app="IBMSAPP">
+    <div ng-controller="LocalAdmissionController" ng-init="init()" ng-cloak>
+        <div class="page-content-wrap">
+            <div class="panel panel-default tabs">
+                @* Top tab *@
+                <ul class="nav nav-tabs" role="tablist">
+                    <li id="list-tab-1" class="active"><a href="#tab-1" role="tab" data-toggle="tab" ng-click="activateAdmissionListTab()">View</a></li>
+                    <li id="list-tab-2"><a href="#tab-2" role="tab" data-toggle="tab" ng-click="activateNewAdmissionTab()">New</a></li>
+                </ul>
+
+                @* Main tab part will start here  *@
+                <div class="panel-body tab-content">
+                    @* View Tab  *@
+                    <div class="tab-pane active" id="tab-1">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">
+                                    <strong>Customer Requests</strong>
+                                </h3>
+                                <ul class="panel-controls">
+                                    <li><input type="text" style="font-size: 12px;width: 100%;border-radius: 0px;margin-right:2px;" class="form-control" placeholder="Search Customer Request ..." ng-model="search_query" ng-change="searchTextChange(search_query)"></li>
+                                    <li><a href="#" ng-click="refreshContent()"><span class="fa fa-refresh"></span></a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="panel-body">
+                            <div class="col-md-2">Show records per page </div>
+                            <div class="col=md-10">
+                                <select class="form-control" style="width:100px;"
+                                        ng-model="viewby"
+                                        ng-change="setItemsPerPage(viewby)">
+                                    
+                                    <option>10</option>
+                                    <option>20</option>
+                                    <option>30</option>
+                                    <option>40</option>
+                                    <option>50</option>
+                                </select>
+                            </div>
+                            <div><br></div>
+                            <table class="table table-responsive" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th>Reference No</th>
+                                        <th>Patient Name</th>
+                                        <th>Hospital</th>
+                                        <th>Passport</th>
+                                        <th>BHT Number</th>
+                                        <th>Admission Date</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody ng-repeat="LocalAdmission in data.slice(((currentPage-1)*itemsPerPage), ((currentPage)*itemsPerPage))">
+                                    <tr id="view{{LocalAdmission.ReferenceNo}}">
+                                        <td>{{LocalAdmission.ReferenceNo}}</td>
+                                        <td>{{LocalAdmission.PatientName}}</td>
+                                        <td>{{LocalAdmission.Hospital}}</td>
+                                        <td>{{LocalAdmission.PassportNumber}}</td>
+                                        <td>{{LocalAdmission.BHTNumber}}</td>
+                                        <td>{{LocalAdmission.AdmissionDate | date:'yyyy-MM-dd' }}</td>
+                                        <td>
+                                            @*<button class="btn btn-info" style="width:70px;padding:1px;" ng-click="editClientRequest(ClientRequest.ClientRequestHeaderID,ClientRequest.ClientID)">Edit or view</button>&nbsp;&nbsp;*@
+                                            @*<button class="btn btn-info" style="width:100px;padding:1px;background-color:#1caf9a;border:0px;" ng-click="getAdmissionByRefNo(LocalAdmission.ReferenceNo)">View or Edit</button>&nbsp;&nbsp;*@
+                                            <button class="btn btn-info" style="width:100px;padding:1px;" ng-click="getAdmissionByRefNo(LocalAdmission.ReferenceNo)">View or Edit</button>&nbsp;&nbsp;
+                                            <button class="btn btn-success"style="width:140px;padding:1px;background-color:##58D68D ;border:0px;" ng-click="(LocalAdmission.ReferenceNo)">Manage Payments</button>
+                                       </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <pagination total-items="totalItems"
+                                        ng-model="currentPage"
+                                        max-size="maxSize"
+                                        class="pagination-sm pull-left"
+                                        boundary-links="true"
+                                        rotate="false"
+                                        num-pages="numPages"
+                                        items-per-page="itemsPerPage"></pagination>
+                        </div>
+                    </div>
+
+                    @* New Tab Start *@
+                    <div class="tab-pane" id="tab-2">
+                        <form name="newAdmission" class="form-horizontal col-md-12" role="form">
+                            @* new admission form start *@
+                            <ng-form name="newAdmission">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <h3 class="panel-title">
+                                            <strong>Local Admission Details</strong>
+                                        </h3>
+                                    </div>
+                                </div>
+
+                                @* Refrence no *@
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label">Reference No</label>
+                                    <div class="col-md-8">
+                                        <input type="text" name="referenceNo" class="form-control" ng-model="admission.ReferenceNo" value="" ng-required="true" />
+                                        <span class="help-block" style="color:red" ng-show="newAdmission.referenceNo.$error.required">Required Field *</span>
+                                    </div>
+                                </div>
+
+                                @* NAME OF THE PATIENT*@
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label">Patient Name</label>
+                                    <div class="col-md-8">
+                                        <input type="text" name="patientName" class="form-control" ng-model="admission.PatientName" value="" ng-required="true" />
+                                        <span class="help-block" style="color:red" ng-show="newAdmission.referenceNo.$error.required">Required Field *</span>
+                                    </div>
+                                </div>
+                                @* Date of birth *@
+                                @*<div class="form-group">
+                    <label class="col-md-4 control-label">Date Of Birth</label>
+                    <div class="col-md-8">
+                        <input type="text" name="dateOfBirth" class="form-control" ng-model="admission.DateOfBirth" value="" ng-required="true" />
+                        <span class="help-block" style="color:red" ng-show="newAdmission.dateOfBirth.$error.required">Required Field *</span>
+                    </div>
+                </div>*@
+
+                                <div class="form-group row">
+                                    <label class="col-md-4 control-label">Date Of Birth</label>
+                                    <div class="col-md-8">
+                                        <input type="text"
+                                               name="dateOfBirth"
+                                               class="form-control date"
+                                               ng-click="reqDate=true"
+                                               datepicker-popup="dd/MM/yyyy"
+                                               ng-model="admission.DateOfBirth"
+                                               is-open="reqDate"
+                                               datepicker-options="dateOptions"
+                                               placeholder="Date Of Birth"
+                                               ng-required="true"
+                                               close-text="Close">
+                                        @*<span class="input-group-btn">
+                            <button class="btn btn-default glyphicon glyphicon-calendar" ng-click="reqDate=true;$event.stopPropagation();"></button>
+                        </span>*@
+                                        <span class="help-block" style="color:red" ng-show="newAdmission.dateOfBirth.$error.required">
+                                            Required Field *
+                                        </span>
+                                    </div>
+
+                                </div>
+
+
+
+                                @* P P Number  *@
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label">Passport Number</label>
+                                    <div class="col-md-8">
+                                        <input type="text" name="passportNumber" class="form-control" ng-model="admission.PassportNumber" value="" ng-required="true" />
+                                    </div>
+                                </div>
+
+                                @* Scheme *@
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label">Scheme</label>
+                                    <div class="col-md-8">
+                                        <input type="text" name="scheme" class="form-control" ng-model="admission.Scheme" value="" ng-required="true" />
+                                        <span class="help-block" style="color:red" ng-show="newAdmission.scheme.$error.required">Required Field *</span>
+                                    </div>
+                                </div>
+
+                                @* INCEPTION DATE *@
+                                @*<div class="form-group">
+                    <label class="col-md-4 control-label">Inception Date</label>
+                    <div class="col-md-8">
+                        <input type="text" name="inceptionDate" class="form-control" ng-model="admission.InceptionDate" value="" ng-required="true" pattern="dd/MM/YYYY"/>
+                        <span class="help-block" style="color:red" ng-show="newAdmission.InceptionDate.$error.required">Required Field *</span>
+                    </div>
+                </div>*@
+
+                                <div class="form-group row">
+                                    <label class="col-md-4 control-label">Inception Date</label>
+                                    <div class="col-md-8">
+                                        <input type="text"
+                                               name="inceptionDate"
+                                               class="form-control date"
+                                               ng-click="reqDate2=true"
+                                               datepicker-popup="dd/MM/yyyy"
+                                               ng-model="admission.InceptionDate"
+                                               is-open="reqDate2"
+                                               datepicker-options="dateOptions"
+                                               placeholder="Inception Date"
+                                               ng-required="true"
+                                               close-text="Close">
+
+                                        <span class="help-block" style="color:red" ng-show="newAdmission.inceptionDate.$error.required">
+                                            Required Field *
+                                        </span>
+                                    </div>
+                                </div>
+
+
+                                @* DEDUCTIBLE *@
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label">Deductible</label>
+                                    <div class="col-md-8">
+                                        <input type="number" name="deductible" class="form-control" ng-model="admission.Deductible" value="" ng-required="true" />
+                                        <span class="help-block" style="color:red" ng-show="newAdmission.deductible.$error.required">Required Field *</span>
+                                    </div>
+                                </div>
+
+                                @* DEDUCTIBLE USED FOR THE YEAR *@
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label">Deductible Used For The Year</label>
+                                    <div class="col-md-8">
+                                        <input type="number" name="deductibleUsedForTheYear" class="form-control" ng-model="admission.DeductibleUsedForTheYear" value="" ng-required="true" />
+                                        <span class="help-block" style="color:red" ng-show="newAdmission.deductibleUsedForTheYear.$error.required">Required Field *</span>
+                                    </div>
+                                </div>
+
+                                @* EXCLUSIONS *@
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label">Exclusions</label>
+                                    <div class="col-md-8">
+                                        <input type="number" name="exclusions" class="form-control" ng-model="admission.Exclusions" value="" ng-required="false" />
+                                        <span class="help-block" style="color:red" ng-show="newAdmission.exclusions.$error.required">Required Field *</span>
+                                    </div>
+                                </div>
+
+                                @* Hospital *@
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label">Hospital</label>
+                                    <div class="col-md-8">
+                                        <input type="text" name="hospital" class="form-control" ng-model="admission.Hospital" value="" ng-required="false" />
+                                        <span class="help-block" style="color:red" ng-show="newAdmission.hospital.$error.required">Required Field *</span>
+                                    </div>
+                                </div>
+
+                                @* ADMISSION DATE *@
+                                @*<div class="form-group">
+                    <label class="col-md-4 control-label">Admission Date</label>
+                    <div class="col-md-8">
+                        <input type="text" name="admissionDate" class="form-control" ng-model="admission.AdmissionDate" value="" ng-required="false" />
+                        <span class="help-block" style="color:red" ng-show="newAdmission.admissionDate.$error.required">Required Field *</span>
+                    </div>
+                </div>*@
+
+                                <div class="form-group row">
+                                    <label class="col-md-4 control-label">Admission Date</label>
+                                    <div class="col-md-8">
+                                        <input type="text"
+                                               name="admissionDate"
+                                               class="form-control date"
+                                               ng-click="reqDateAdmission=true"
+                                               datepicker-popup="dd/MM/yyyy"
+                                               ng-model="admission.AdmissionDate"
+                                               is-open="reqDateAdmission"
+                                               datepicker-options="dateOptions"
+                                               placeholder="Admission Date"
+                                               ng-required="true"
+                                               close-text="Close">
+
+                                        <span class="help-block" style="color:red" ng-show="newAdmission.admissionDate.$error.required">
+                                            Required Field *
+                                        </span>
+                                    </div>
+                                </div>
+
+                                @* DISCHARGED DATE *@
+                                @*<div class="form-group">
+                    <label class="col-md-4 control-label">Discharged Date</label>
+                    <div class="col-md-8">
+                        <input type="text" name="dischargedDate" class="form-control" ng-model="admission.DischargedDate" value="" ng-required="false" />
+                        <span class="help-block" style="color:red" ng-show="newAdmission.dischargedDate.$error.required">Required Field *</span>
+                    </div>
+                </div>*@
+
+                                <div class="form-group row">
+                                    <label class="col-md-4 control-label">Discharged Date</label>
+                                    <div class="col-md-8">
+                                        <input type="text"
+                                               name="dischargedDate"
+                                               class="form-control date"
+                                               ng-click="reqDateDischarge=true"
+                                               datepicker-popup="dd/MM/yyyy"
+                                               ng-model="admission.DischargedDate"
+                                               is-open="reqDateDischarge"
+                                               datepicker-options="dateOptions"
+                                               placeholder="Discharge Date"
+                                               ng-required="true"
+                                               close-text="Close">
+
+                                        <span class="help-block" style="color:red" ng-show="newAdmission.dischargedDate.$error.required">
+                                            Required Field *
+                                        </span>
+                                    </div>
+                                </div>
+
+                                @* BHT NUMBER *@
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label">BHT Number</label>
+                                    <div class="col-md-8">
+                                        <input type="text" name="bhtNumber" class="form-control" ng-model="admission.BHTNumber" value="" ng-required="false" />
+                                        <span class="help-block" style="color:red" ng-show="newAdmission.bhtNumber.$error.required">Required Field *</span>
+                                    </div>
+                                </div>
+
+                                @* ILLNESS *@
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label">Illness</label>
+                                    <div class="col-md-8">
+                                        <input type="text" name="illness" class="form-control" ng-model="admission.Illness" value="" ng-required="false" />
+                                        <span class="help-block" style="color:red" ng-show="newAdmission.illness.$error.required">Required Field *</span>
+                                    </div>
+                                </div>
+
+                                @* CONSULTANT'S NAME *@
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label">Consultans Name</label>
+                                    <div class="col-md-8">
+                                        <input type="text" name="consultantName" class="form-control" ng-model="admission.ConsultantName" value="" ng-required="false" />
+                                        <span class="help-block" style="color:red" ng-show="newAdmission.consultantName.$error.required">Required Field *</span>
+                                    </div>
+                                </div>
+
+                                @* INFORMED BY *@
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label">Informed By</label>
+                                    <div class="col-md-8">
+                                        <input type="text" name="informedBy" class="form-control" ng-model="admission.InformedBy" value="" ng-required="true" />
+                                        <span class="help-block" style="color:red" ng-show="newAdmission.informedBy.$error.required">Required Field *</span>
+                                    </div>
+                                </div>
+
+                                @*  GOP  AMOUNT *@
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label">GOP Amount</label>
+                                    <div class="col-md-8">
+                                        <input type="number" name="gopAmount" class="form-control" ng-model="admission.GOPAmount" value="" ng-required="true" />
+                                        <span class="help-block" style="color:red" ng-show="newAdmission.gopAmount.$error.required">Required Field *</span>
+                                    </div>
+                                </div>
+
+                                @*  GOP CONFIRMED BY *@
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label">GOP Confirmed By</label>
+                                    <div class="col-md-8">
+                                        <input type="text" name="gopConfirmBy" class="form-control" ng-model="admission.GOPConfirmBy" value="" ng-required="true" />
+                                        <span class="help-block" style="color:red" ng-show="newAdmission.gopConfirmBy.$error.required">Required Field *</span>
+                                    </div>
+                                </div>
+
+                                @* GOP ISSUED DATE *@
+                                @*<div class="form-group">
+                    <label class="col-md-4 control-label">GOP Issue Date</label>
+                    <div class="col-md-8">
+                        <input type="text" name="gopIssueDate" class="form-control" ng-model="admission.GOPIssueDate" value="" ng-required="true" />
+                        <span class="help-block" style="color:red" ng-show="newAdmission.gopIssueDate.$error.required">Required Field *</span>
+                    </div>
+                </div>*@
+
+                                <div class="form-group row">
+                                    <label class="col-md-4 control-label">GOP Issue Date</label>
+                                    <div class="col-md-8">
+                                        <input type="text"
+                                               name="gopIssueDate"
+                                               class="form-control date"
+                                               ng-click="gopDate=true"
+                                               datepicker-popup="dd/MM/yyyy"
+                                               ng-model="admission.GOPIssueDate"
+                                               is-open="gopDate"
+                                               datepicker-options="dateOptions"
+                                               placeholder="GOP Issue Date"
+                                               ng-required="true"
+                                               close-text="Close">
+
+                                        <span class="help-block" style="color:red" ng-show="newAdmission.gopIssueDate.$error.required">
+                                            Required Field *
+                                        </span>
+                                    </div>
+                                </div>
+
+                                @* EXENDED GOP *@
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label">Extended GOP</label>
+                                    <div class="col-md-8">
+                                        <input type="number" name="extendedGop" class="form-control" ng-model="admission.ExtendedGOP" value="" ng-required="true" />
+                                        <span class="help-block" style="color:red" ng-show="newAdmission.extendedGop.$error.required">Required Field *</span>
+                                    </div>
+                                </div>
+
+                                @* HANDDLED BY (CMA) *@
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label">Handled By</label>
+                                    <div class="col-md-8">
+                                        <input type="text" name="handledBy" class="form-control" ng-model="admission.HandledBy" value="" ng-required="true" />
+                                        <span class="help-block" style="color:red" ng-show="newAdmission.handledBy.$error.required">Required Field *</span>
+                                    </div>
+                                </div>
+
+                                @* FINAL BILL AMOUNT *@
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label">Final Amount</label>
+                                    <div class="col-md-8">
+                                        <input type="number" name="finalAmount" class="form-control" ng-model="admission.FinalAmount" value="" ng-required="true" />
+                                        <span class="help-block" style="color:red" ng-show="newAdmission.finalAmount.$error.required">Required Field *</span>
+                                    </div>
+                                </div>
+
+                                @* CONSULTNT'S FEE *@
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label">Consultant Fee</label>
+                                    <div class="col-md-8">
+                                        <input type="number" name="consultantFee" class="form-control" ng-model="admission.ConsultantFee" value="" ng-required="true" />
+                                        <span class="help-block" style="color:red" ng-show="newAdmission.consultantFee.$error.required">Required Field *</span>
+                                    </div>
+                                </div>
+
+                                @* FINAL BILL RECEIVED DATE *@
+                                @*<div class="form-group">
+                    <label class="col-md-4 control-label">Final Bill Recieved Date</label>
+                    <div class="col-md-8">
+                        <input type="text" name="finalBillRecievedDate" class="form-control" ng-model="admission.FinalBillRecievedDate" value="" ng-required="true" />
+                        <span class="help-block" style="color:red" ng-show="newAdmission.finalBillRecievedDate.$error.required">Required Field *</span>
+                    </div>
+                </div>*@
+
+                                <div class="form-group row">
+                                    <label class="col-md-4 control-label">Final Bill Recieved Date</label>
+                                    <div class="col-md-8">
+                                        <input type="text"
+                                               name="finalBillRecievedDate"
+                                               class="form-control date"
+                                               ng-click="reqDateFinalBillRecieved=true"
+                                               datepicker-popup="dd/MM/yyyy"
+                                               ng-model="admission.FinalBillRecievedDate"
+                                               is-open="reqDateFinalBillRecieved"
+                                               datepicker-options="dateOptions"
+                                               placeholder="Discharge Date"
+                                               ng-required="true"
+                                               close-text="Close">
+
+                                        <span class="help-block" style="color:red" ng-show="newAdmission.finalBillRecievedDate.$error.required">
+                                            Required Field *
+                                        </span>
+                                    </div>
+                                </div>
+
+
+                                @* FINAL BILLS GIVEN TO SGS *@
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label">Final Bill Given To SGS</label>
+                                    <div class="col-md-8">
+                                        <input type="number" name="finalBillGivenToSgs" class="form-control" ng-model="admission.FinalBillGivenToSgs" value="" ng-required="true" />
+                                        <span class="help-block" style="color:red" ng-show="newAdmission.finalBillGivenToSgs.$error.required">Required Field *</span>
+                                    </div>
+                                </div>
+
+                                @* CLAIM DCS SENT TO AVIVA *@
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label">Claims DCS Sent To Aviva</label>
+                                    <div class="col-md-8">
+                                        <input type="number" name="claimsDcsSentToAviva" class="form-control" ng-model="admission.ClaimsDcsSentToAviva" value="" ng-required="true" />
+                                        <span class="help-block" style="color:red" ng-show="newAdmission.claimsDcsSentToAviva.$error.required">Required Field *</span>
+                                    </div>
+                                </div>
+
+                                @*CLAIM SETTLED DATE*@
+                                @*<div class="form-group">
+                    <label class="col-md-4 control-label">Claim Settled Date</label>
+                    <div class="col-md-8">
+                        <input type="text" name="claimSettledDate" class="form-control" ng-model="admission.ClaimSettledDate" value="" ng-required="true" />
+                        <span class="help-block" style="color:red" ng-show="newAdmission.claimSettledDate.$error.required">Required Field *</span>
+                    </div>
+                </div>*@
+
+
+                                <div class="form-group row">
+                                    <label class="col-md-4 control-label">Claim Settled Date</label>
+                                    <div class="col-md-8">
+                                        <input type="text"
+                                               name="claimSettledDate"
+                                               class="form-control date"
+                                               ng-click="claimSettledDate=true"
+                                               datepicker-popup="dd/MM/yyyy"
+                                               ng-model="admission.ClaimSettledDate"
+                                               is-open="claimSettledDate"
+                                               datepicker-options="dateOptions"
+                                               placeholder="Discharge Date"
+                                               ng-required="true"
+                                               close-text="Close">
+
+                                        <span class="help-block" style="color:red" ng-show="newAdmission.claimSettledDate.$error.required">
+                                            Required Field *
+                                        </span>
+                                    </div>
+                                </div>
+
+
+                                @*REFFERAL FEE*@
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label">Referal Fee</label>
+                                    <div class="col-md-8">
+                                        <input type="number" name="referalFee" class="form-control" ng-model="admission.ReferalFee" value="" ng-required="true" />
+                                        <span class="help-block" style="color:red" ng-show="newAdmission.referalFee.$error.required">Required Field *</span>
+                                    </div>
+                                </div>
+
+                                @*REFFERAL  FEE RECEIVED DATE*@
+                                @*<div class="form-group">
+                    <label class="col-md-4 control-label">Referal Fee Received Date</label>
+                    <div class="col-md-8">
+                        <input type="text" name="referalFeeReceivedDate" class="form-control" ng-model="admission.ReferalFeeReceivedDate" value="" ng-required="true" />
+                        <span class="help-block" style="color:red" ng-show="newAdmission.referalFeeReceivedDate.$error.required">Required Field *</span>
+                    </div>
+                </div>*@
+
+                                <div class="form-group row">
+                                    <label class="col-md-4 control-label">Referal Fee Received Date</label>
+                                    <div class="col-md-8">
+                                        <input type="text"
+                                               name="referalFeeReceivedDate"
+                                               class="form-control date"
+                                               ng-click="referalFeeReceived=true"
+                                               datepicker-popup="dd/MM/yyyy"
+                                               ng-model="admission.ReferalFeeReceivedDate"
+                                               is-open="referalFeeReceived"
+                                               datepicker-options="dateOptions"
+                                               placeholder="Referal Fee Received Date"
+                                               ng-required="true"
+                                               close-text="Close">
+
+                                        <span class="help-block" style="color:red" ng-show="newAdmission.referalFeeReceivedDate.$error.required">
+                                            Required Field *
+                                        </span>
+                                    </div>
+                                </div>
+
+
+                                @*REFFERAL  FEE RECEIVED Bank*@
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label">Referal Fee Received Bank</label>
+                                    <div class="col-md-8">
+                                        <input type="text" name="referalFeeReceivedBank" class="form-control" ng-model="admission.ReferalFeeReceivedBank" value="" ng-required="true" />
+                                        <span class="help-block" style="color:red" ng-show="newAdmission.referalFeeReceivedBank.$error.required">Required Field *</span>
+                                    </div>
+                                </div>
+
+                                @*REFFERAL  FEE RECEIVED Cheque Number*@
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label">Referal Fee Received Cheque Number</label>
+                                    <div class="col-md-8">
+                                        <input type="text" name="referalFeeReceivedChequeNumber" class="form-control" ng-model="admission.ReferalFeeReceivedChequeNumber" value="" ng-required="true" />
+                                        <span class="help-block" style="color:red" ng-show="newAdmission.referalFeeReceivedChequeNumber.$error.required">Required Field *</span>
+                                    </div>
+                                </div>
+
+                                @*REFFERAL  FEE RECEIVED TT Transfer*@
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label">Referal Fee Received TT Transfer</label>
+                                    <div class="col-md-8">
+                                        <input type="text" name="referalFeeReceivedTtTransfer" class="form-control" ng-model="admission.ReferalFeeReceivedTtTransfer" value="" ng-required="true" />
+                                        <span class="help-block" style="color:red" ng-show="newAdmission.referalFeeReceivedTtTransfer.$error.required">Required Field *</span>
+                                    </div>
+                                </div>
+
+                                @*PAYMENT GIVEN TO ACCOUNTS *@
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label">Payment Given To Account</label>
+                                    <div class="col-md-8">
+                                        <input type="number" name="paymentGivenToAccount" class="form-control" ng-model="admission.PaymentGivenToAccount" value="" ng-required="true" />
+                                        <span class="help-block" style="color:red" ng-show="newAdmission.paymentGivenToAccount.$error.required">Required Field *</span>
+                                    </div>
+                                </div>
+
+                                @*Remark *@
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label">Remark</label>
+                                    <div class="col-md-8">
+                                        <input type="text" name="remark" class="form-control" ng-model="admission.Remark" value="" ng-required="false" />
+                                        <span class="help-block" style="color:red" ng-show="newAdmission.remark.$error.required">Required Field *</span>
+                                    </div>
+                                </div>
+                                <button ng-click="printDiv('printable');">Print Div</button>
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label"></label>
+                                    <div class="col-md-8">
+                                        @*<div class="btn btn-primary" ng-disabled="!newAdmission.$valid" ng-click="Save()">Save Admission <span class="fa fa-floppy-o fa-right"></span></div>
+                        <button type="button" class="btn btn-default" ng-click="Save()">Clear<span class="glyphicon glyphicon-erase fa-right"></span></button>*@
+
+                                        <div class="btn btn-primary" ng-disabled="!newAdmission.$valid" ng-click="Save()" ng-show="!isUpdate">Save Admission <span class="fa fa-floppy-o fa-right"></span></div>
+                                        <div class="btn btn-primary" ng-disabled="!isUpdate" ng-click="Save()" ng-show="isUpdate">Update Admission <span class="fa fa-floppy-o fa-right"></span></div>
+                                        <button type="button" class="btn btn-default" ng-click="cancelAdmission()">Clear<span class="glyphicon glyphicon-erase fa-right"></span></button>
+                                    </div>
+                                </div>
+                            </ng-form>
+
+                            @* new admission form end *@
+                            <ng-form name="adminissionDetail" novalidate>
+                                <div class="panel panel-default" ng-if="isShowTransctionDet">
+                                    <div class="panel-heading">
+                                        <h3 class="panel-title">
+                                            <strong>Admission Details</strong>
+                                        </h3>
+                                    </div>
+                                </div>
+                            </ng-form>
+
+                            <script type="text/ng-template" id="ngTemplateBank">
+                                <div class="modal-header bg-primary" style="background-color:#1caf9a !important">
+                                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true" ng-click="cancel()">x</button>
+                                    <h4> Payment Details</h4>
+                                </div>
+                                <div class="modal-body">
+                                    <ng-form name="managePayment" novalidate>
+                                        <div class="content">
+                                            <div id="printable" name="printableArea">
+                                                <div class="row">
+                                                    <div class="col-md-12">
+                                                        <div class="panel-body no-padding" align="center">
+                                                            <h3 label style="color:red"><b>Net Premium : US$ {{bankObj.PremiumAmount | number : 2}}</b></h3>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <br />
+                                                <div class="row">
+                                                    <label class="col-md-3 ">Client Name</label>
+                                                    <div class="col-md-9">
+                                                        <h5 label style="color:black"><b>{{bankObj.ClientName}}</b></h5>
+                                                        @*<span class="help-block" style="color:red" ng-show="managePolicyInfoRecording.inputCauseOfLoss.$error.required">Required Field *</span>*@
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <label class="col-md-3 ">Email</label>
+                                                    <div class="col-md-9">
+                                                        <h5 label style="color:red"><b>{{bankObj.Email}}</b></h5>
+                                                        @*<span class="help-block" style="color:red" ng-show="managePolicyInfoRecording.inputCauseOfLoss.$error.required">Required Field *</span>*@
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <label class="col-md-3 ">Address</label>
+                                                    <div class="col-md-9">
+                                                        <h5 label style="color:black"><b>{{bankObj.ClientAddress}}</b></h5>
+                                                        @*<span class="help-block" style="color:red" ng-show="managePolicyInfoRecording.inputCauseOfLoss.$error.required">Required Field *</span>*@
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <label class="col-md-3 ">Contact Infomation</label>
+                                                    <div class="col-md-9">
+                                                        <h5 label style="color:black"><b>{{bankObj.ContactNo}}/{{bankObj.FixedLine}}</b></h5>
+                                                        @*<span class="help-block" style="color:red" ng-show="managePolicyInfoRecording.inputCauseOfLoss.$error.required">Required Field *</span>*@
+                                                    </div>
+                                                </div>
+                                                <br />
+                                                <div class="row">
+                                                    <label class="col-md-3">Select Payment Method</label>
+                                                    <div class="col-md-9">
+                                                        @*<div class="form-group">*@
+                                                        <selectize placeholder="Select Payment Method" style="width:200px" name="inputPayment" options="availablePaymentMethods" config="{maxItems: 1}" ng-model="bankObj.PaymentMethodID" ng-change="loadPaymentByID(bankObj.PaymentMethodID)" ng-required="true"></selectize>
+                                                        <span class="help-block" style="color:red" ng-show="managePayment.inputPayment.$error.required">
+                                                            Required Field *
+                                                        </span>
+                                                        @*</div>*@
+                                                    </div>
+                                                </div>
+                                                <br />
+                                                <div class="row" ng-show="IsBankVisible">
+                                                    <label class="col-md-3">Select Bank</label>
+                                                    <div class="col-md-9">
+                                                        @*<div class="form-group">*@
+                                                        <selectize placeholder="Select Bank" style="width:200px" name="inputResidentCountry" options="availableBanks" config="{maxItems: 1}" ng-model="bankObj.BankID" ng-change="loadBankByID(bankObj.BankID)" ng-required="true"></selectize>
+                                                        <span class="help-block" style="color:red" ng-show="managePayment.inputResidentCountry.$error.required">
+                                                            Required Field *
+                                                        </span>
+                                                        @*</div>*@
+                                                    </div>
+                                                </div>
+                                                <br />
+                                                <div class="row" ng-show="IsTextBoxvisible">
+                                                    <label class="col-md-3">{{bankObj.textBoxName}}</label>
+                                                    <div class="col-md-9">
+                                                        @*<div class="form-group">*@
+                                                        <input type="text" placeholder="" style="width:200px" name="inputDraftNo" ng-model="bankObj.DraftNo" class="form-control" ng-required="true" />
+                                                        <span class="help-block" style="color:red" ng-show="managePayment.inputDraftNo.$error.required">Required Field *</span>
+                                                        @*</div>*@
+                                                    </div>
+                                                </div>
+                                                <br />
+                                                <div class="row" ng-show="IsAgentAvailabe">
+                                                    <label class="col-md-3 ">Agent Rate</label>
+                                                    <div class="col-md-9">
+                                                        <h5 label style="color:red"><b>{{bankObj.AgentRate}}%</b></h5>
+                                                        @*<span class="help-block" style="color:red" ng-show="managePolicyInfoRecording.inputCauseOfLoss.$error.required">Required Field *</span>*@
+                                                    </div>
+                                                </div>
+                                                <br />
+                                                <div class="row" ng-show="IsAgentAvailabe">
+                                                    <label class="col-md-3 ">Agent Commision</label>
+                                                    <div class="col-md-9">
+                                                        <h5 label style="color:red"><b>{{bankObj.AgentAmount | number : 2}}</b></h5>
+                                                        @*<span class="help-block" style="color:red" ng-show="managePolicyInfoRecording.inputCauseOfLoss.$error.required">Required Field *</span>*@
+                                                    </div>
+                                                </div>
+                                                <br />
+                                                <div class="row">
+                                                    <label class="col-md-3 ">IBS Commision</label>
+                                                    <div class="col-md-9">
+                                                        <h5 label style="color:red"><b>{{bankObj.IBSAmount | number : 2}}</b></h5>
+                                                        @*<span class="help-block" style="color:red" ng-show="managePolicyInfoRecording.inputCauseOfLoss.$error.required">Required Field *</span>*@
+                                                    </div>
+                                                </div>
+                                                <br />
+                                                <div class="row">
+                                                    <label class="col-md-3 ">SGS Commision</label>
+                                                    <div class="col-md-9">
+                                                        <h5 label style="color:red"><b>{{bankObj.SGSAmount | number : 2}}</b></h5>
+                                                        @*<span class="help-block" style="color:red" ng-show="managePolicyInfoRecording.inputCauseOfLoss.$error.required">Required Field *</span>*@
+                                                    </div>
+                                                </div>
+
+                                                @*<div class="row">
+                                <label class="col-md-3 control-label"></label>
+                                <div class="col-md-9">
+                                    <div class="form-group">
+                                        <button type="button" class="btn btn-success" ng-click="managePolicyInfoChargeDetails(ClientRequest.BusinessUnitID)">Bank Details </button>
+                                    </div>
+                                </div>
+                            </div>*@
+                                                <br />
+                                            </div>
+                                            <button ng-click="printDiv('printable');">Print Div</button>
+                                            <div class="row">
+                                                <div class="col-md-12 modal-footer">
+                                                    <button class="btn btn-primary" ng-disabled="!managePayment.$valid" ng-show="!IsPayment" ng-click="saveBankDetails()">Add Payment Details</button>
+                                                    <button class="btn btn-primary" @*ng-disabled="!managePayment.$valid"*@ style="visibility:hidden" ng-show="IsPayment" ng-click="updateBankDetails()">Update Payment Details</button>
+                                                    <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </ng-form>
+                                </div>
+                                <div id="divLoading" ng-show="showLoader"></div>
+                            </script>
+
+
+                    </form>
+                    </div>
+                    @* New Tab End *@
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

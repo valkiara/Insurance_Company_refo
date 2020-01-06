@@ -1,0 +1,14 @@
+
+Log Entry : 
+10/2/2019 11:24:07 AM
+Error in: http://localhost:39705/api/ClientRequest/loadPaymentDetails.
+Error Message:Index was out of range. Must be non-negative and less than the size of the collection.
+Parameter name: index
+__________________________
+
+Log Entry : 
+10/2/2019 4:37:30 PM
+Error in: http://localhost:39705/api/ClientRequest/loadPaymentDetails.
+Error Message:Index was out of range. Must be non-negative and less than the size of the collection.
+Parameter name: index
+__________________________

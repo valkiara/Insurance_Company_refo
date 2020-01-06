@@ -1,0 +1,246 @@
+﻿@{
+    ViewBag.Title = "Profile";
+    Layout = "~/Views/Shared/_index.cshtml";
+}
+
+<style>
+    .panel-heading {
+        background: #1caf9a;
+    }
+</style>
+
+<script src="~/Scripts/ng/Excel/Excel.js"></script>
+<script src="~/Scripts/ng/Services/IntegrationService.js"></script>
+<script src="~/Scripts/ng/Services/AgentService.js"></script>
+<script src="~/Scripts/ng/Controllers/IntegrationController.js"></script>
+
+<div class="breadcrumb-line">
+    <ul class="breadcrumb">
+        <li>
+            <a href="/Dashboard/Index"><i class="icon-home2 position-left"></i>Home</a>
+        </li>
+        <li>Transaction</li>
+        <li>BUPA Transaction</li>
+        <li class="active">
+            <b>Export Transaction To SAP</b>
+        </li>
+    </ul>
+</div>
+
+<div class="content" ng-app="IBMSAPP">
+    <div ng-controller="IntegrationController" ng-init="init()" ng-cloak>
+        <div class="row">
+            <div class="col-md-7">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <h6 class="panel-title">Transaction Information</h6>
+                    </div>
+                    <div class="panel-body">
+                        <ng-form name="profileData" novalidate>
+
+                            <div class="form-group">
+                                <div class="row">
+                                    <label class="col-md-3 control-label">From Date</label>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <div class="input-group">
+                                                <input type="text"
+                                                       name="fromDate"
+                                                       class="form-control date"
+                                                       ng-click="fromDate=true"
+                                                       datepicker-popup="dd/MM/yyyy"
+                                                       ng-model="filterObj.fromDate"
+                                                       is-open="fromDate"
+                                                       datepicker-options="dateOptions"
+                                                       placeholder="From Date"
+                                                       ng-required="true"
+                                                       close-text="Close">
+                                                <span class="input-group-btn">
+                                                    <button class="btn btn-default glyphicon glyphicon-calendar" ng-click="fromDate=true;$event.stopPropagation();"></button>
+                                                </span>
+                                            </div>
+
+                                            <span class="help-block" style="color:red" ng-show="manageCustomer.fromDate.$error.required">
+                                                Required Field *
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="row">
+                                    <label class="col-md-3 control-label">To Date</label>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <div class="input-group">
+                                                <input type="text"
+                                                       name="toDate"
+                                                       class="form-control date"
+                                                       ng-click="toDate=true"
+                                                       datepicker-popup="dd/MM/yyyy"
+                                                       ng-model="filterObj.toDate"
+                                                       is-open="toDate"
+                                                       datepicker-options="dateOptions"
+                                                       placeholder="To Date"
+                                                       ng-required="true"
+                                                       close-text="Close">
+                                                <span class="input-group-btn">
+                                                    <button class="btn btn-default glyphicon glyphicon-calendar" ng-click="toDate=true;$event.stopPropagation();"></button>
+                                                </span>
+                                            </div>
+                                            <span class="help-block" style="color:red" ng-show="manageCustomer.toDate.$error.required">
+                                                Required Field *
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="row">
+                                    <label class="col-md-3 control-label">Posting Date</label>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <div class="input-group">
+                                                <input type="text"
+                                                       name="selectlPaymentDate"
+                                                       class="form-control date"
+                                                       ng-click="lpaydate=true"
+                                                       datepicker-popup="dd/MM/yyyy"
+                                                       ng-model="filterObj.PaymentDate"
+                                                       is-open="lpaydate"
+                                                       datepicker-options="dateOptions"
+                                                       placeholder="Posting Date"
+                                                       ng-required="true"
+                                                       close-text="Close">
+                                                <span class="input-group-btn">
+                                                    <button class="btn btn-default glyphicon glyphicon-calendar" ng-click="lpaydate=true;$event.stopPropagation();"></button>
+                                                </span>
+                                            </div>
+                                            <span class="help-block" style="color:red" ng-show="manageCustomer.selectlPaymentDate.$error.required">
+                                                Required Field *
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="row">
+                                    <label class="col-md-3"> Type</label>
+                                    <div class="col-md-4">
+                                        <selectize placeholder="Type" style="width:200px" name="inputPayment" options="availableType" config="{maxItems: 1}" ng-model="filterObj.Type" ng-required="true" ng-change="commissionTypeChange()"></selectize>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="row">
+                                    <label class="col-md-3"> Currency Type</label>
+                                    <div class="col-md-4">
+                                        <selectize placeholder="Type" style="width:200px" name="inputPayment" options="availableCurrencyType" config="{maxItems: 1}" ng-model="filterObj.currencyType" ng-required="true"></selectize>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </ng-form>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-4 control-label"></label>
+                        <button type="submit" class="btn btn-primary" ng-click="getAmount()">Submit<i class="icon-arrow-right14 position-right"></i></button>
+                    </div>
+                    <br />
+                </div>
+            </div>
+        </div>
+
+        @* Table *@
+        <div class="page-content-wrap">
+            <div class="panel panel-default tabs">
+                <div class="panel-body tab-content">
+                    <div class="tab-pane active" id="tab-first">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">
+                                    <strong>Transaction Detail</strong>
+                                </h3>
+                                <ul class="panel-controls">
+                                    <li><input type="text" style="font-size: 12px;width: 100%;border-radius: 0px;margin-right:2px;" class="form-control" placeholder="Search Commission...." ng-model="search_query" ng-change="searchTextChange(search_query)"></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="panel-body">
+                            <form class="form-horizontal col-md-12" role="form">
+                                <ng-form name="CommissionPercentagesData">
+                                    <label class="col-md-3 control-label">Show records per page </label>
+                                    <div class="col=md-10">
+                                        <select class="form-control" style="width:100px;" ng-model="viewby"
+                                                ng-change="setItemsPerPage(viewby)">
+                                            <option>5</option>
+                                            <option>10</option>
+                                            <option>20</option>
+                                            <option>30</option>
+                                            <option>40</option>
+                                            <option>50</option>
+                                        </select>
+                                    </div>
+                                    <div></div>
+                                    <br />
+
+                                    <table class="table table-responsive" cellspacing="0" id="list">
+                                        <thead>
+                                            <tr>
+                                                <th>Agent</th>
+                                                <th ng-show="filterObj.Type=='1'">Payment Date</th>
+                                                <th>Amount</th>
+                                                <th>Currency</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody ng-repeat="filterdData in data.slice(((currentPage-1)*itemsPerPage), ((currentPage)*itemsPerPage))">
+                                            <tr>
+                                                <td>{{filterdData.AgentCode}}</td>
+                                                <td ng-show="filterObj.Type=='1'">{{filterdData.PaymentDate | date:'medium'}}</td>
+                                                <td>{{filterdData.Amount}}</td>
+                                                <td>{{filterdData.CurrencyType}}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                    <table class="table table-striped dataTable" id="listHidden" hidden>
+                                        <thead>
+                                            <tr>
+                                                <th>Agent</th>
+                                                <th>Payment Date</th>
+                                                <th>Amount</th>
+                                                <th>Currency</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody ng-repeat="filterdData in detailData">
+                                            <tr>
+                                                <td>{{filterdData.AgentCode}}</td>
+                                                <td>{{filterdData.PaymentDate | date:'medium'}}</td>
+                                                <td>{{filterdData.Amount}}</td>
+                                                <td>{{filterdData.CurrencyType}}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+
+                                    <button ng-show="filterObj.Type=='2'" style="border-radius: 0px;width:19%;" class="btn btn-danger pull-right" ng-click="exportToExcel('#listHidden')">Export to Excel</button>
+
+                                    <pagination total-items="totalItems" ng-model="currentPage" max-size="maxSize" class="pagination-sm pull-left" boundary-links="true" rotate="false" num-pages="numPages" items-per-page="itemsPerPage"></pagination>
+                                    <button style="border-radius: 0px;width:19%;" class="btn btn-danger pull-right" ng-click="SaveConfirmation()">Export to SAP</button>
+                                    &nbsp;
+
+                                </ng-form>
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div id="divLoading" ng-show="showLoader"></div>
+    </div>
+</div>

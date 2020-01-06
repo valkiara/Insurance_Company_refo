@@ -1,0 +1,216 @@
+﻿
+@{
+    ViewBag.Title = "Introducer";
+}
+
+
+<script src="~/Scripts/ng/Services/IntroducerService.js"></script>
+<script src="~/Scripts/ng/Controllers/IntroducerController.js"></script>
+<script>
+
+</script>
+<div class="breadcrumb-line">
+    <ul class="breadcrumb">
+        <li><a href="/Dashboard/Dashboard"><i class="icon-home2 position-left"></i>Home</a></li>
+        <li>Master Details</li><li>Partner</li>
+        <li class="active"><b>Introducer</b></li>
+    </ul>
+</div>
+<div ng-app="IBMSAPP" ng-controller="IntroducerController" ng-cloak>
+
+
+    <div class="page-content-wrap">
+
+        <div class="panel panel-default tabs">
+            <ul class="nav nav-tabs" role="tablist">
+                <li class="active"><a href="#tab-first" role="tab" data-toggle="tab">View</a></li>
+                <li><a href="#tab-second" role="tab" data-toggle="tab">New</a></li>
+                @*<li><a href="#tab-third" role="tab" data-toggle="tab">Edit</a></li>*@
+            </ul>
+            <div class="panel-body tab-content">
+                <div class="tab-pane active" id="tab-first">
+
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">
+                                <strong>Introducer</strong>
+                            </h3>
+                            <ul class="panel-controls">
+                                <li><input type="text" style="font-size: 12px;width: 100%;border-radius: 0px;margin-right:2px;" class="form-control" placeholder="Search Introducer. . . ." ng-model="search_query" ng-change="searchTextChange(search_query)"></li>
+                                <li><a href="#" ng-click="refreshContent()"><span class="fa fa-refresh"></span></a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="col-md-2">Show records per page </div>
+                        <div class="col=md-10">
+                            <select class="form-control" style="width:100px;" ng-model="viewby" ng-change="setItemsPerPage(viewby)">
+                                <option>5</option>
+                                <option>10</option>
+                                <option>20</option>
+                                <option>30</option>
+                                <option>40</option>
+                                <option>50</option>
+                            </select>
+                        </div>
+                        <div></div><br />
+                        <table class="table table-responsive" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th>Introducer ID</th>
+                                    <th>Introducer Name</th>
+                                    <th>Business Units</th>
+                                    <th>Description</th>
+                                    <th>Address</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody ng-repeat="Int in data.slice(((currentPage-1)*itemsPerPage), ((currentPage)*itemsPerPage))">
+                                <!--<tr  >-->
+                                <tr id="view{{Int.IntroducerID}}">
+                                    <td>{{Int.IntroducerID}}</td>
+                                    <td>{{Int.IntroducerName}}</td>
+                                    <td>
+                                        <div ng-repeat="bu in Int.buidList">
+
+                                            <label for="{{bu.BusinessUnitID}}">
+                                                <input type="checkbox" ng-model="bu.IsChecked" name="group" id="{{bu.BusinessUnitID}}" disabled @*ng-change="checkBoxChange(Obj.SelectedRoomCategories)"*@ />
+                                                {{bu.BusinessUnitName}}
+                                            </label>
+                                        </div>
+                                    </td>
+                                    <td>{{Int.Description}}@*{{Int}}*@</td>
+                                    <td>{{Int.Address1}},{{Int.Address2}},{{Int.Address3}}</td>
+                                    <td>
+                                        <div class="fa fa-edit btn btn-success" ng-click="edit(Int)"> Edit</div>&nbsp;&nbsp;
+                                        <div class="fa fa-trash-o btn btn-danger" ng-click="Delete(Int.IntroducerID)"> Delete</div>
+                                    </td>
+
+                                </tr>
+
+                                <tr id="edit{{Int.IntroducerID}}" hidden>
+                                    <td>{{Int.IntroducerID}}</td>
+                                    <td>
+                                        <input type="text" style="font-size: 12px;width: 100%;border-radius: 0px;margin-right:2px;" class="form-control"
+                                               value="{{Int.IntroducerName}}"
+                                               ng-model="Int.IntroducerName">
+                                        <span class="help-block" style="color:red" ng-show="!Int.IntroducerName">Required Field *</span>
+                                    </td>
+                                    <td>
+                                        <div ng-repeat="bu in Int.buidList">
+
+                                            <label for="{{bu.BusinessUnitID}}">
+                                                <input type="checkbox" ng-model="bu.IsChecked" name="group" id="{{bu.BusinessUnitID}}" @*ng-change="checkBoxChange(Obj.SelectedRoomCategories)"*@ />
+                                                {{bu.BusinessUnitName}}
+                                            </label>
+                                        </div>
+
+                                    </td>
+                                    <td>
+                                        <input type="text" style="font-size: 12px;width: 100%;border-radius: 0px;margin-right:2px;" class="form-control"
+                                               value="{{Int.Description}}"
+                                               ng-model="Int.Description">
+                                        <span class="help-block" style="color:red" ng-show="!Int.Description">Required Field *</span>
+                                    </td>
+                                    <td>
+                                        <input type="text" style="font-size: 12px;width: 100%;border-radius: 0px;margin-right:2px;" class="form-control"
+                                               value="{{Int.Address1}}"
+                                               ng-model="Int.Address1">
+                                        <span class="help-block" style="color:red" ng-show="!Int.Address1">Required Field *</span>
+                                        <input type="text" style="font-size: 12px;width: 100%;border-radius: 0px;margin-right:2px;" class="form-control"
+                                               value="{{Int.Address2}}"
+                                               ng-model="Int.Address2">
+                                        <input type="text" style="font-size: 12px;width: 100%;border-radius: 0px;margin-right:2px;" class="form-control"
+                                               value="{{Int.Address3}}"
+                                               ng-model="Int.Address3">
+                                    </td>
+
+                                    <td>
+                                        <div class="fa fa-save btn btn-info" ng-disabled="!(Int.IntroducerName)" ng-click="update(Int)"> Update</div>&nbsp;&nbsp;&nbsp;&nbsp;
+                                        <div ng-click="cancel(Int)" class="fa fa-times btn btn-default"> Cancel</div>
+                                    </td>
+
+
+                                </tr>
+
+
+                            </tbody>
+
+                        </table>
+                        <pagination class="pull-left" total-items="totalItems" ng-model="currentPage" max-size="maxSize" class="pagination-sm" boundary-links="true" rotate="false" num-pages="numPages" items-per-page="itemsPerPage"></pagination>
+
+                    </div>
+
+
+
+                </div>@*</div>*@
+                <div class="tab-pane" id="tab-second">
+                    <form class="form-horizontal col-md-10" role="form">
+                        <ng-form name="introducerData" novalidate>
+
+                            <div class="form-group">
+                                <label class="col-md-4 control-label">Introducer Name</label>
+                                <div class="col-md-8">
+                                    <input name="introducername" type="text" class="form-control" ng-model="Introducers" ng-required="true" /><span class="help-block" style="color:red" ng-show="introducerData.introducername.$error.required">Required Field *</span>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-md-4 control-label">Business Unit</label>
+                                <div class="col-md-8">
+                                    @*{{BusinessTest}}*@
+                                    <div ng-repeat="bu in BusinessTest">
+                                        <label for="{{bu.BusinessUnitID}}">
+                                            <input name="bu" type="checkbox" ng-model="bu.IsChecked" name="group" id="{{bu.BusinessUnitID}}" @*ng-change="checkBoxChange(Obj.SelectedRoomCategories)"*@ />
+                                            {{bu.BusinessUnitName}}
+                                        </label>
+                                    </div>@*<span class="help-block" style="color:red" ng-show="introducerData.bu.$error.required">Required Field *</span>*@
+
+
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-4 control-label">Description</label>
+                                <div class="col-md-8">
+                                    <input name="description" type="text" class="form-control" ng-model="Description" @*ng-required="true"*@ />
+                                    @*<span class="help-block" style="color:red" ng-show="introducerData.description.$error.required">Required Field *</span>*@
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-4 control-label">Address Line 1</label>
+                                <div class="col-md-8">
+                                    <input type="text" name="address" class="form-control" ng-model="Address1" @*ng-required="true"*@ />
+                                    @*<span class="help-block" style="color:red" ng-show="introducerData.address.$error.required">Required Field *</span>*@
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-4 control-label">Address Line 2</label>
+                                <div class="col-md-8">
+                                    <input type="text" class="form-control" ng-model="Address2" />
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-4 control-label">Address Line 3</label>
+                                <div class="col-md-8">
+                                    <input type="text" class="form-control" ng-model="Address3" />
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-4 control-label"></label>
+                                <div class="col-md-8">
+                                    <div class="btn btn-primary" ng-disabled="!introducerData.$valid" ng-click="Save()">Save Introducer <span class="fa fa-floppy-o fa-right"></span></div>
+                                    <button type="button" class="btn btn-default" ng-click="ClearFields()">Clear<span class="glyphicon glyphicon-erase fa-right"></span></button>
+                                </div>
+                            </div>
+                        </ng-form>
+                    </form>
+                </div>
+                @*<div class="tab-pane" id="tab-third">
+                        <p> 3rd</p>
+
+                    </div>*@
+            </div>
+        </div>
+        <div id="divLoading" ng-show="showLoader"></div>
+    </div>
+</div>

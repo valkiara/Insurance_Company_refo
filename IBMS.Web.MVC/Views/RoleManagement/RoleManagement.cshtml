@@ -1,0 +1,165 @@
+﻿
+@{
+    ViewBag.Title = "RoleManagement";
+    Layout = "~/Views/Shared/_index.cshtml";
+}
+
+<script src="~/Scripts/ng/Services/RoleManagementService.js"></script>
+<script src="~/Scripts/ng/Controllers/RoleManagementController.js"></script>
+
+<div class="breadcrumb-line">
+    <ul class="breadcrumb">
+        <li>
+            <a href="/Dashboard/Index"><i class="icon-home2 position-left"></i>Home</a>
+        </li>
+        <li>Administration</li>
+        <li class="active">
+            <b>Role Management</b>
+        </li>
+    </ul>
+</div>
+
+<div class="content" ng-app="IBMSAPP">
+    <div ng-controller="RoleManagementController" ng-init="init()" ng-cloak>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="panel panel-primary">
+
+                    <div class="panel-heading">
+                        <h6 class="panel-title">Role Functions</h6>
+                        @*{{currentUser}}*@
+                    </div>
+                    <div class="panel-body">
+                        <ng-form name="profileData" novalidate>
+
+
+                            <div class="form-group">
+                                <label class="col-md-4 control-label">Access Level</label>
+                                @*<div class="col-md-8">*@
+                                <select name="selectBusinessunit" class="form-control"
+                                        ng-model="AccessLevelTypeID"
+                                        ng-change="getRoleFunction(AccessLevelTypeID)"
+                                        ng-options="Acs.AccessLevelTypeID as Acs.AccessLevelTypeName for Acs in gridOptionsAccessLevel" ng-required="true">
+                                    <option value="">--Select a AccessLevelType--</option>
+                                </select>
+                                @*<select name="selectCompany" id="timeZone" class="form-control" ng-options="Acs.AccessLevelTypeID as Acs.AccessLevelTypeName for Acs in gridOptionsAccessLevel">
+                                        <option value="{{Acs.AccessLevelTypeName}}"></option>
+                                    </select>*@
+
+
+                            </div>
+
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-4 control-label"></label>
+
+                        @*<button type="submit" class="btn btn-primary" ng-disabled="!profileData.$valid" ng-click="getRoleFunction()">Search<i class="icon-arrow-right14 position-right"></i></button>*@
+                    </div>
+
+                    </ng-form><br />
+                    </div>
+                <div class="panel panel-primary">
+                    @*{{RoleFunction}}*@
+                    <div class="container">
+                    <br />
+                        <div class="row">
+                            <div class="col-md-4">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th colspan="2">Master</th>
+
+                                        </tr>
+                                    </thead>
+                                    <tbody ng-repeat="Master in RoleFunction.MasterFunctionDetails">
+                                        <tr>
+                                            <td><input type="checkbox" value="{{Master.IsChecked}}" ng-model="Master.IsChecked" /></td>
+                                            <td>{{Master.FunctionName}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="col-md-4">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th colspan="2">Transaction</th>
+
+                                        </tr>
+                                    </thead>
+                                    <tbody ng-repeat="Transaction in RoleFunction.TransactionFunctionDetails">
+                                        <tr>
+                                            <td><input type="checkbox" value="{{Transaction.IsChecked}}" ng-model="Transaction.IsChecked" /></td>
+                                            <td>{{Transaction.FunctionName}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="col-md-4">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th colspan="2">Enquiry</th>
+
+                                        </tr>
+                                    </thead>
+                                    <tbody ng-repeat="Enquiry in RoleFunction.EnquiryFunctionDetails">
+                                        <tr>
+                                            <td><input type="checkbox" value="{{Enquiry.IsChecked}}" ng-model="Enquiry.IsChecked" /></td>
+                                            <td>{{Enquiry.FunctionName}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                        </div><br />
+                        <div class="row">
+                            <div class="col-md-4">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th colspan="2">Report</th>
+
+                                        </tr>
+                                    </thead>
+                                    <tbody ng-repeat="Report in RoleFunction.ReportFunctionDetails">
+                                        <tr>
+                                            <td><input type="checkbox" value="{{Report.IsChecked}}" ng-model="Report.IsChecked" /></td>
+                                            <td>{{Report.FunctionName}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="col-md-4">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th colspan="2">Admin</th>
+
+                                        </tr>
+                                    </thead>
+                                    <tbody ng-repeat="Admin in RoleFunction.AdminFunctionDetails">
+                                        <tr>
+                                            <td><input type="checkbox" ng-model="Admin.IsChecked" /></td>
+                                            <td>{{Admin.FunctionName}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                            </div>
+                        </div>
+
+                    </div><br>
+                    <div class="form-group">
+                        <label class="col-md-5 control-label"></label>
+
+                        <button type="submit" class="btn btn-primary" ng-click="updateRoleFunction()">Update Roles<i class="icon-arrow-right14 position-right"></i></button>
+                    </div><br />
+                </div>
+            </div>
+        </div>
+        @*</div>*@
+        <div id="divLoading" ng-show="showLoader"></div>
+    </div>
+</div>

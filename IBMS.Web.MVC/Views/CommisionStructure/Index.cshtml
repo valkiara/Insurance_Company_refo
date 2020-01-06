@@ -1,0 +1,249 @@
+﻿
+@{
+    ViewBag.Title = "Commission Structure Line";
+    Layout = "~/Views/Shared/_index.cshtml";
+}
+
+<script src="~/Scripts/ng/Services/CommissionStructureLineService.js"></script>
+<script src="~/Scripts/ng/Controllers/CommissionStructureLineController.js"></script>
+<script type="text/javascript">
+    function IsNumber(evt) {
+        evt = (evt) ? evt : window.event;
+        var charCode = (evt.which) ? evt.which : evt.keyCode;
+        if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+            return false;
+        }
+        return true;
+    }
+
+    function checkInputRate(rateVal) {
+        var regEx = /^[0-9]+\.?[0-9]*$/;
+        if (regEx.test(rateVal.value) == false) {
+            rateVal.value = rateVal.value.substring(0, rateVal.value.length - 1);
+        }
+    }
+</script>
+
+<div class="breadcrumb-line">
+    <ul class="breadcrumb">
+        <li><a href="/Dashboard/Dashboard"><i class="icon-home2 position-left"></i>Home</a></li>
+        <li>Master Details</li>
+        <li>Commission Structure</li>
+        <li class="active"><b>Commission Structure Line</b></li>
+    </ul>
+</div>
+<div class="content" ng-app="IBMSAPP">
+    <div ng-controller="CommissionStructureLineController" ng-init="init()" ng-cloak>
+        <div class="page-content-wrap">
+            <div class="panel panel-default tabs">
+                <ul class="nav nav-tabs" role="tablist">
+                    <li class="active"><a href="#tab-first" role="tab" data-toggle="tab">View</a></li>
+                    <li><a href="#tab-second" role="tab" data-toggle="tab">New</a></li>
+                </ul>
+                <div class="panel-body tab-content" style="background-color:transparent!important">
+                    <div class="tab-pane active" id="tab-first">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">
+                                    <strong>Commission Structure Line</strong>
+                                </h3>
+                                <ul class="panel-controls">
+                                    <li><input type="text" style="font-size: 12px;width: 100%;border-radius: 0px;margin-right:2px;" class="form-control" placeholder="Search CommissionStructureLine ..." ng-model="search_query" ng-change="searchTextChange(search_query)"></li>
+                                    <li><a href="#" ng-click="refreshContent()"><span class="fa fa-refresh"></span></a></li>
+                                    @*<li><a href="#" class="panel-remove"><span class="fa fa-times"></span></a></li>*@
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="panel-body">
+                            <div class="col-md-2">Show record per page </div>
+                            <div class="col=md-10">
+                                <select class="form-control" style="width:100px;" ng-model="viewby" ng-change="setItemsPerPage(viewby)">
+                                    <option>5</option>
+                                    <option>10</option>
+                                    <option>20</option>
+                                    <option>30</option>
+                                    <option>40</option>
+                                    <option>50</option>
+                                </select>
+                            </div>
+                            <div></div>
+                            <br />
+                            <table class="table table-responsive" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th hidden>CommissionStructureLine ID</th>
+                                        <th>Commission Structure Name</th>
+                                        <th>Rate Category</th>
+                                        <th>Is AgeConsider</th>
+                                        <th>Age From</th>
+                                        <th>Age To</th>
+                                        <th>Is Fixed</th>
+                                        <th>Rate Value</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody ng-repeat="COM in filterdData = (data.slice(((currentPage-1)*itemsPerPage), ((currentPage)*itemsPerPage)))">
+                                    <!--<tr  >-->
+                                    <tr id="view{{COM.CommisionStructureLineID}}">
+                                        <td hidden>{{COM.CommisionStructureLineID}}</td>
+                                        <td>{{COM.CommisionStructureName}}</td>
+                                        <td>{{COM.RateCategoryName}}</td>
+                                        <td><input type="checkbox" class="icheckbox" value="{{COM.IsAgeConsider}}" ng-model="COM.IsAgeConsider" disabled></td>
+                                        <td>{{COM.AgeFrom}}</td>
+                                        <td>{{COM.AgeTo}}</td>
+                                        <td><input type="checkbox" class="icheckbox" value="{{COM.IsFixed}}" ng-model="COM.IsFixed" disabled></td>
+                                        <td>{{COM.RateValue}}</td>
+                                        <td>
+                                            <div class="fa fa-edit btn btn-success" ng-click="editCOM(COM)">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Edit</div>&nbsp;&nbsp;
+                                            <div class="fa fa-trash-o btn btn-danger"
+                                                 ng-click="deleteCSL(COM.CommisionStructureLineID)">&nbsp;&nbsp;Delete</div>
+                                        </td>
+                                    </tr>
+                                    <tr id="edit{{COM.CommisionStructureLineID}}" hidden>
+                                        <td hidden>
+                                            <input type="text" hidden class="form-control"
+                                                   value="{{COM.CommisionStructureLineID}}"
+                                                   ng-model="COM.CommisionStructureLineID">
+                                        </td>
+                                        <td>
+                                            <select class="form-control" ng-model="COM.CommisionStructureID" ng-options="BU.CommisionStructureID as BU.CommisionStructureName for BU in availableComStrct" ng-required="true" style="width:100%">
+                                                <option value="">--Select a Commission Structure--</option>
+                                            </select>
+                                            <span class="help-block" style="color:red" ng-show="!COM.CommisionStructureID">Required Field *</span>
+                                        </td>
+                                        <td>
+                                            <select class="form-control" ng-model="COM.RateCategoryID" ng-options="RT.RateCategoryID as RT.RateCategoryName for RT in availableRateCat" ng-required="true" style="width:100%">
+                                                <option value="">--Select a Rate Category--</option>
+                                            </select>
+                                            <span class="help-block" style="color:red" ng-show="!COM.RateCategoryID">Required Field *</span>
+                                        </td>
+                                        <td>
+                                            <lable class="checked">
+                                                <input type="checkbox" class="icheckbox" value="{{COM.IsAgeConsider}}" ng-model="COM.IsAgeConsider" ng-change="ageChange(COM.IsAgeConsider,COM.AgeFrom,COM.AgeTo,COM.RowNumber)">
+                                            </lable>
+                                        </td>
+                                        <td>
+                                            <input type="number" class="form-control" name="inputAgeFrom"
+                                                   onkeypress="return IsNumber(event)" ng-model="COM.AgeFrom" ng-required="true" min="0" style="width:100%" ng-disabled="!COM.IsAgeConsider" ng-change="ageChange(COM.IsAgeConsider,COM.AgeFrom,COM.AgeTo,COM.RowNumber)">
+                                            <span class="help-block" style="color:red" ng-show="!COM.isValidAgeFrom">Required Field *</span>
+                                            <span class='help-block' style="color:red" ng-show='COM.isValidAgeFrom && !COM.isValidAgeRange'>Please Enter valid Age Rage</span>
+                                            @*<div style="color:red" ng-if="{{COM.AgeFrom}}>{{COM.AgeTo}}">Age From should be less than or equal {{comObj.AgeTo}}</div>*@
+
+
+                                        </td>
+                                        <td>
+                                            <input type="number" class="form-control"
+                                                   onkeypress="return IsNumber(event)" ng-model="COM.AgeTo" ng-required="true" min="0" style="width:100%" ng-disabled="!COM.IsAgeConsider" ng-change="ageChange(COM.IsAgeConsider,COM.AgeFrom,COM.AgeTo,COM.RowNumber)">
+                                            <span class="help-block" style="color:red" ng-show="!COM.isValidAgeTo">Required Field *</span>
+                                            <span class='help-block' style="color:red" ng-show='COM.isValidAgeTo && !COM.isValidAgeRange'>Please Enter valid Age Rage</span>
+                                        </td>
+                                        <td>
+                                            <input type="checkbox" class="icheckbox" value="{{COM.IsFixed}}" ng-model="COM.IsFixed">
+
+                                        </td>
+                                        <td>
+                                            <input type="number" class="form-control" ng-model="COM.RateValue" onkeyup="checkInputRate(this);" min="0" ng-required="true" style="width:100%" />
+                                            <span class="help-block" style="color:red" ng-show="!COM.RateValue">Required Field *</span>
+
+                                        </td>
+                                        <td>
+                                            <div class="fa fa-save btn btn-info" ng-disabled="!(COM.CommisionStructureID && COM.RateCategoryID && COM.isValidAgeFrom && COM.isValidAgeTo && COM.RateValue && COM.isValidAgeRange)" ng-click="update(COM)">&nbsp;&nbsp;Update</div>&nbsp;
+                                            <div ng-click="cancel(COM)" class="fa fa-times btn btn-default">&nbsp;&nbsp;Cancel</div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <pagination class="pull-left" total-items="totalItems" ng-model="currentPage" max-size="maxSize" class="pagination-sm" boundary-links="true" rotate="false" num-pages="numPages" items-per-page="itemsPerPage"></pagination>
+                        </div>
+                        <label class="col-md-4 control-label">Commission Structure Header</label>
+                        <div class="col-md-8">
+                            <select name="selectComStructHeader" class="form-control" ng-model="comObj.CommissionStructureID"
+                                    ng-options="CSH.CommisionStructureID as CSH.CommisionStructureName for CSH in availableComStrct"
+                                    ng-required="true">
+                                <option value="">--Select a Commission Structure--</option>
+                            </select>
+                            <span class="help-block" style="color:red" ng-show="comStructLine.selectComStructHeader.$error.required">Required Field *</span>
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="tab-second">
+                        <form class="form-horizontal col-md-10" role="form">
+                            <ng-form name="comStructLine" novalidate>
+                                <div class="form-group">
+                                   
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label">Rate Category</label>
+                                    <div class="col-md-8">
+                                        <select name="selectRateCategory" class="form-control" ng-model="comObj.RateCategoryID"
+                                                ng-options="RT.RateCategoryID as RT.RateCategoryName for RT in availableRateCat"
+                                                ng-required="true">
+                                            <option value="">--Select a Rate Category--</option>
+                                        </select>
+                                        <span class="help-block" style="color:red" ng-show="comStructLine.selectRateCategory.$error.required">Required Field *</span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label">Is Age Consider</label>
+                                    <div class="col-md-8">
+                                        <input type="checkbox" ng-model="comObj.IsAgeConsider" id="isTaxable">
+                                    </div>
+                                </div>
+                                <div class="form-group" ng-show="comObj.IsAgeConsider">
+                                    <label class="col-md-4 control-label">Age From</label>
+                                    <div class="col-md-8">
+                                        <input type="number" name="inputAgeFrom" class="form-control" onkeypress="return IsNumber(event)"
+                                               ng-model="comObj.AgeFrom" min="0" max="{{comObj.AgeTo}}" ng-required="comObj.IsAgeConsider">
+                                        <span class="help-block" style="color:red" ng-show="comStructLine.inputAgeFrom.$error.required">Required Field *</span>
+                                        <span class='help-block' style="color:red" ng-show='comStructLine.inputAgeFrom.$error.max'>Age From should be less than or equal {{comObj.AgeTo}}</span>
+                                    </div>
+                                </div>
+                                <div class="form-group" ng-show="comObj.IsAgeConsider">
+                                    <label class="col-md-4 control-label">Age To</label>
+                                    <div class="col-md-8">
+                                        <input type="number" name="inputAgeTo"
+                                               class="form-control" onkeypress="return IsNumber(event)" ng-model="comObj.AgeTo"
+                                               min="{{comObj.AgeFrom}}" ng-required="comObj.IsAgeConsider">
+                                        <span class="help-block" style="color:red" ng-show="comStructLine.inputAgeTo.$error.required">Required Field *</span>
+                                        <span class='help-block' style="color:red" ng-show='comStructLine.inputAgeTo.$error.min'>Age To should be greater than or equal {{comObj.AgeFrom}}</span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label">Is Fixed</label>
+                                    <div class="col-md-8">
+                                        <input type="checkbox" ng-model="comObj.IsFixed" id="isTaxables">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label">Rate Value</label>
+                                    <div class="col-md-8">
+                                        <input type="number"
+                                               name="inputRate"
+                                               class="form-control"
+                                               ng-model="comObj.RateValue" onkeyup="checkInputRate(this);"
+                                               ng-change="checkInputRateByValue()"
+                                               min="0"
+                                               ng-required="true" />
+                                        <span class="help-block" style="color:red" ng-show="comStructLine.inputRate.$error.required">Required Field *</span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label"></label>
+                                    <div class="col-md-8">
+                                        <div type="button" class="btn btn-primary"
+                                             ng-disabled="!comStructLine.$valid"
+                                             ng-click="addCommisionLine()">Add Commission Structrue Line<i class="icon-arrow-right14 position-right"></i></div>
+                                        <div class="glyphicon glyphicon-refresh btn  btn-default"
+                                             ng-click="ClearFields()">
+                                            Clear<i class="icon-arrow-right14 position-right"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </ng-form>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="divLoading" ng-show="showLoader"></div>
+    </div>
+</div>

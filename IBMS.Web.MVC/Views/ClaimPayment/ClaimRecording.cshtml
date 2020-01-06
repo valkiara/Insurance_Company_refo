@@ -1,0 +1,1417 @@
+﻿@{
+
+    Layout = "~/Views/Shared/_index.cshtml";
+    ViewBag.Title = "Policy Information Recording";
+}
+
+
+@Scripts.Render("~/Scripts/ng/testAPI.js")
+
+<script src="~/Scripts/ng/Controllers/ClaimRecordingController.js"></script>
+<script src="~/Scripts/ng/Services/ClaimRecordingService.js"></script>
+
+
+<style>
+    .form-control 
+    {
+        min-width: 100%;
+        border-radius: 0px;
+    }
+</style>
+
+
+
+
+
+
+<div class="breadcrumb-line">
+    <ul class="breadcrumb">
+        <li><a href="/Dashboard/Index"><i class="icon-home2 position-left"></i>Home</a></li>
+        <li>Transaction</li>
+        <li class="active"><b>Claim  Recording</b></li>
+    </ul>
+</div>
+
+<div ng-app="IBMSAPP">
+    <div ng-controller="ClaimRecordingController" ng-cloak>
+        <!-- START MODEL CLAIM PAYMENT PREVIEW -->
+        <div class="modal fade" id="claimPaymentModel"   tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content" >
+
+                    <div class="modal-body" >
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="col-md-6">
+                                    <h3>Claim Payment</h3>
+                                </div>
+                               
+                            </div>
+                        </div>
+
+                        <div class="row" style="margin-top:10px;">
+                            
+                            <div class="page-content-wrap" >
+                                <div class="panel panel-default tabs" >
+
+                                    <ul class="nav nav-tabs" role="tablist">
+                                        <li class="active" id="tabViewModel"> <a href="#tab-modelfirst" role="tab" data-toggle="tab">View</a></li>
+                                        <li id="tabEditModel"><a href="#tab-secondModel" role="tab" data-toggle="tab">New</a></li>
+                                        @*<li><a href="#tab-third" role="tab" data-toggle="tab">Edit</a></li>*@
+                                    </ul>
+                                    <div class="panel-body tab-content">
+                                        <div class="tab-pane active" id="tab-modelfirst">
+
+                                            <div class="panel panel-default">
+                                                <div class="panel-heading">
+                                                    <h3 class="panel-title">
+                                                        <strong>Claim Payment</strong>
+                                                    </h3>
+                                                    <ul class="panel-controls">
+                                                        @*<li><input type="text" style="font-size: 12px;width: 100%;border-radius: 0px;margin-right:2px;" class="form-control" placeholder="Search Claim Payment ..." ng-model="search_query"></li>*@
+                                                        <li><a href="#" class="panel-refresh" ng-click="refresh()"><span class="fa fa-refresh"></span></a></li>
+                                                        <li><a href="#" class="panel-remove"><span class="fa fa-times"></span></a></li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                            <div class="panel-body">
+                                               
+
+                                                <table class="table table-striped" cellspacing="0" >
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Claim Payment ID</th>
+                                                            <th>Claim Recording ID</th>
+                                                            <th>Claim Amount</th>
+                                                            <th>Paid</th>
+                                                            <th>Notes</th>
+                                                            <th>Action</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr ng-repeat="CH in availableClaimPayment">
+                                                            <td>
+                                                                {{CH.ClaimPaymentID}}
+                                                            </td>
+                                                            <td>
+                                                                {{CH.ClaimRecordingID}}
+                                                            </td>
+                                                            <td>
+                                                                {{CH.ClaimAmount}}
+                                                            </td>
+                                                            <td>
+                                                                {{CH.PaidAmount}}
+                                                            </td>
+                                                            <td>
+                                                                {{CH.Notes}}
+                                                            </td>
+                                                            <td>
+                                                                <button class="btn btn-success" style="width:70px" ng-click="edit(CH)">Edit</button>&nbsp;&nbsp;
+                                                                <button class="btn btn-danger" style="width:70px" ng-click="delete(CH)">Delete</button>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                                <pagination  total-items="totalItems" ng-model="currentPage" max-size="maxSize" class="pull-left pagination-sm" boundary-links="true" rotate="false" num-pages="numPages" items-per-page="itemsPerPage"></pagination>
+                                                @*{{availableClaimPayment}}*@
+                                            </div>
+                                        </div>
+
+                                        <div class="tab-pane " id="tab-secondModel">
+                                       
+                                                <form class="form-horizontal col-md-12" role="form">
+
+                                                    <div class="form-group">
+                                                        <label class="col-md-4 control-label">Payment Date</label>
+                                                        <div class="col-md-8">
+                                                            {{paymentDate | date:'dd/mm/yyyy'}}
+                                                            @* <input type="date" ng-model="paymentDate" class="form-control" ng-required="true" style="width:80%" />*@
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="form-group">
+                                                        <label class="col-md-4 control-label">Claim Amount </label>
+                                                        <div class="col-md-8">
+                                                            <input type="text" ng-model="claimAmount" class="form-control" ng-required="true"  readonly="readonly" />
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="form-group">
+                                                        <label class="col-md-4 control-label">Pay Amount</label>
+                                                        <div class="col-md-6">
+                                                            <input type="number" ng-model="payAmount" class="form-control" />
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <input type="checkbox" ng-checked="true" ng-model="paymentType" ng-false-value="false" ng-true-value="true" /> Final Payment
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="form-group">
+                                                        <label class="col-md-4 control-label">Cheque No</label>
+                                                        <div class="col-md-6">
+                                                            <input type="text" placeholder="Enter Cheque No" ng-model="chequeNo" class="form-control"  />
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <button type="submit" class="btn btn-success" ng-click="addPayment()" ng-disabled="ClaimPaymentForm.$invalid">Add </button>
+                                                            <br /> <br />
+                                                        </div>
+                                                    </div>
+
+                                                
+
+                                                    <div class="form-group">
+                                                        <label class="col-md-4 control-label"></label>
+                                                        <table class="text-center table table-responsive table-striped col-md-8" ng-show="addpayment" >
+                                                            <thead  >
+                                                                <tr>
+                                                                    <th>Date</th>
+                                                                    <th>Paid</th>
+                                                                    <th>Cheque No</th>
+                                                                    <th>Payment Type</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <tr ng-repeat="CHL in claimHeaderLine">
+                                                                    <td>
+                                                                        {{paymentDate | date:'medium'}}
+                                                                    </td>
+                                                                    <td>
+                                                                        {{CHL.PaidAmount}}
+                                                                    </td>
+                                                                    <td>
+                                                                        {{CHL.ChequeNo}}
+                                                                    </td>
+                                                                    <td>
+                                                                        {{CHL.IsFinal}}
+                                                                    </td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                        
+                                                    </div>
+
+                                                    <div ng-show="addpayment" class="form-group">
+                                                        <label class="col-md-4 control-label">Total</label>
+                                                        <div class="col-md-8">
+                                                            <input type="text" placeholder="Total Paid" ng-model="tpay" />
+                                                            
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="form-group">
+                                                        <label class="col-md-4 control-label">Notes </label>
+                                                        <div class="col-md-8">
+                                                            <input type="text" placeholder="Notes" class="form-control"  ng-model="notes" />
+                                                            
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="form-group">
+                                                        <label class="col-md-2 control-label"></label>
+                                                        <div class="col-md-1">
+                                                            <button type="submit"    class="btn btn-primary pull-right" ng-click="save()">{{claimHeader.ClaimPaymentID ? "Update" : "Create"}}</button>
+                                                        </div>
+                                                        
+                                                    </div>
+
+
+                                                </form>
+                                          
+                                        </div>
+
+
+                                    </div>
+
+
+
+                                </div>
+
+
+
+
+
+
+
+
+
+                            </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+                            <div class="modal-footer">
+                                
+                                <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- END MODAL ICON PREVIEW -->
+
+        <div class="page-content-wrap">
+            <div class="panel panel-default tabs"  style="background-image: url('../../Content/img/bg.png');">
+
+                <ul class="nav nav-tabs" role="tablist" style="background-color:transparent!important">
+                    <li class="active" id="tabView"><a href="#tab-first" role="tab" data-toggle="tab">View</a></li>
+                    <li id="tabEdit"><a href="#tab-second" role="tab" data-toggle="tab">New/Edit</a></li>
+                </ul>
+
+                <div class="panel-body tab-content" style="background-color:transparent!important">
+
+                    <div class="tab-pane active" id="tab-first" style="background-color:transparent!important">
+
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">
+                                    <strong>cliam  Recording</strong>
+                                </h3>
+                                <ul class="panel-controls">
+                                    <li><a href="#" class="panel-refresh"><span class="fa fa-refresh"></span></a></li>
+                                    <li><a href="#" class="panel-remove"><span class="fa fa-times"></span></a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="panel-body" style="background-color:transparent!important">
+                            <table class="table table-bordered table-striped dataTable" style="font-size:10px;">
+                                <thead>
+                                    <tr>
+                                        <th>PolicyNumber</th>
+                                        <th>QuotationHeaderID</th>
+                                        <th>Period Of Cover FromDate</th>
+                                        <th>Period Of Cover ToDate</th>
+                                        <th>Tax Invoice Number</th>
+                                        <th>File Number</th>
+                                        <th>Created Date</th>
+                                        <th>Action </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="policyInfor in policyInforList"
+                                       >
+                                        <td>
+                                            {{policyInfor.PolicyNumber}}
+                                        </td>
+                                        <td>
+                                            QAT-{{policyInfor.QuotationHeaderID}}
+                                        </td>
+                                        <td>
+                                            {{policyInfor.PeriodOfCoverFromDate}}
+                                        </td>
+                                        <td>
+                                            {{policyInfor.PeriodOfCoverToDate}}
+                                        </td>
+
+                                        <td>
+                                            {{policyInfor.TaxInvoiceNumber}}
+                                        </td>
+                                        <td>
+                                            {{policyInfor.FileNumber}}
+                                        </td>
+                                        <td>
+                                            {{policyInfor.CreatedDate}}
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-info" style="width:90px;padding:1px;"
+                                                    ng-click="EditForClaim(policyInfor)">
+                                                Claim
+                                            </button>
+                                            <button class="btn btn-warning" style="width:90px;padding:1px;"
+                                                    ng-click="InActive(policyInfor)">
+                                                Inactive
+                                            </button>
+
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="tab-pane" id="tab-second">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h5 class="panel-title">Policy Information Recording</h5>
+                                <h3 class="panel-title"></h3>
+                                <ul class="panel-controls">
+                                    <li><input type="text" ng-style="{'background-color': data.backgroundCol}" class="form-control" placeholder="Search  ..." ng-model="search_query"></li>
+                                    <li><a href="#" class="panel-collapse"><span class="fa fa-angle-down"></span></a></li>
+                                    <li><a href="#" class="panel-refresh" ng-click="refresh()"><span class="fa fa-refresh"></span></a></li>
+                                    <li><a href="#" class="panel-remove"><span class="fa fa-times"></span></a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="panel-body" style="background-color:transparent!important">
+
+                            <form id="validate" role="form" class="form-horizontal" >
+
+                                <div class="row">
+                                    <div class="col-md-8" style="background-color:transparent!important">
+
+
+ 
+
+
+                                        <div class="form-group">
+                                            <label class="col-md-4 control-label">Policy Number</label>
+                                            <div class="col-md-8">
+                                                <input type="text" placeholder="Policy Number" class="form-control" ng-model="policyInfor.PolicyNumber" ng-readonly="isDisabled" />
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+
+
+                                            <label class="col-md-4 control-label">Date of Commence</label>
+
+                                            <div class="col-md-8">
+
+                                                <input type="text" placeholder="" class="form-control" ng-model="policyInfor.DateofCommence" />
+                                            </div>
+
+                                        </div>
+                                       
+                                        
+                                         <div class="form-group">
+                                            <label class="col-md-4 control-label">Period of Cover</label>
+
+                                        </div>
+                                        <div class="form-group">
+        
+                                                <label class="col-md-5 control-label">From : </label>
+                                                <div class="col-md-7">
+                                                    <div class="input-group date datepicker" data-date="{{policyInfor.PeriodOfCoverFromDate|date:'MM/dd/yyyy' }}"
+                                                         data-date-format="mm/dd/yyyy" ng-model="policyInfor.PeriodOfCoverFromDate">
+                                                        <input type="text" ng-style="{'background-color': data.backgroundCol}"
+                                                               id="dp-3" class="form-control  " value="{{policyInfor.PeriodOfCoverFromDate|date:'MM/dd/yyyy' }}" />
+                                                        <span class="input-group-addon add-on">
+                                                            <span class="glyphicon glyphicon-calendar"></span>
+                                                        </span>
+                                                    </div>
+
+                                                </div>
+                                               
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-5 control-label">To :</label>
+                                                <div class="col-md-7">
+                                                    <div class="input-group date datepicker" data-date="{{policyInfor.PeriodOfCoverToDate|date:'MM/dd/yyyy' }}"
+                                                         data-date-format="mm/dd/yyyy" ng-model="policyInfor.PeriodOfCoverToDate">
+                                                        <input type="text" ng-style="{'background-color': data.backgroundCol}"
+                                                               id="dp-4" class="form-control  " value="{{policyInfor.PeriodOfCoverToDate|date:'MM/dd/yyyy'}}" />
+                                                        <span class="input-group-addon add-on">
+                                                            <span class="glyphicon glyphicon-calendar"></span>
+                                                        </span>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+
+
+
+                                        <div class="form-group">
+
+                                            <label class="col-md-4 control-label">Existing Claim</label>
+                                            <div class="col-md-6">
+                                                <label class="switch switch-small">
+                                                    <input type="checkbox" checked value="0" ng-model="isExistingClaim" />
+                                                    <span></span>
+                                                </label>
+                                            </div>
+                                            <div class="col-md-2"><a href="#" class="panel-refresh" ng-click="initialize()">
+                                                <span class="fa fa-refresh"></span>
+                                            </a></div>
+
+
+                                            
+                                        </div>
+                                     
+                                        <div class="form-group" ng-show="isExistingClaim">
+                                            <label class="col-md-4 control-label">Choose Claim Select Reason</label>
+                                            <div class="col-md-8">
+                                                <select 
+                                                        ng-model="ClaimSelectReason" class="form-control">
+                                                    
+                                                    <option ng-repeat="ClaimSelectReason in ClaimSelectReasons"
+                                                            value="{{ClaimSelectReason.SelectReasonCode}}">
+                                                        {{ClaimSelectReason.Description}}
+                                                    </option>
+
+                                                    
+
+                                                </select>
+                                            </div>
+
+
+                                        </div>
+                                        <div class="row" ng-hide="isExistingClaim" ng-show="show">
+                                            <div class="form-group">
+                                                <label class="col-md-4 control-label">Claim Number</label>
+                                                <div class="col-md-8">
+                                                    <input type="text" placeholder="claim Number" class="form-control"
+                                                           ng-model="claimRecording.ClaimNo" ng-readonly="isDisabled" />
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label class="col-md-4 control-label">SIB Referance Number</label>
+                                                <div class="col-md-8">
+                                                    <input type="text" placeholder="Policy Number" class="form-control" ng-model="claimRecording.SIFRefNumber" />
+                                                </div>
+                                            </div>
+
+
+                                            <div class="form-group">
+                                                <label class="col-md-4 control-label">Date Of Loss</label>
+                                                <div class="col-md-8">
+                                                    <div class="input-group date datepicker" data-date="{{claimRecording.DateOfLoss}}"
+                                                         data-date-format="mm/dd/yyyy">
+                                                        <input type="text" ng-style="{'background-color': data.backgroundCol}"
+                                                               id="DateOfLoss" class="form-control  "
+                                                               ng-model="claimRecording.DateOfLoss"
+                                                               value="{{claimRecording.DateOfLoss|date:'MM/dd/yyyy'}}" />
+                                                        <span class="input-group-addon add-on">
+                                                            <span class="glyphicon glyphicon-calendar"></span>
+                                                        </span>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-4 control-label">Date Of Intimation</label>
+                                                <div class="col-md-8">
+                                                    <div class="input-group date datepicker"
+                                                         data-date="{{claimRecording.DateOfIntimation|date:'MM/dd/yyyy'}}"
+                                                         data-date-format="mm/dd/yyyy">
+                                                        <input type="text"
+                                                               ng-style="{'background-color': data.backgroundCol}"
+                                                               id="DateOfIntimation" class="form-control  "
+                                                               ng-model="claimRecording.DateOfIntimation"
+                                                               value="{{claimRecording.DateOfIntimation|date:'MM/dd/yyyy'}}" />
+                                                        <span class="input-group-addon add-on">
+                                                            <span class="glyphicon glyphicon-calendar"></span>
+                                                        </span>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+
+
+
+                                            <div class="form-group">
+
+
+                                                <label class="col-md-4 control-label">Payment Pending Reason</label>
+
+                                                <div class="col-md-8">
+
+                                                    <select ng-style="{'background-color': data.backgroundCol}"
+                                                            class="col-md-12 form-control "
+                                                           
+                                                           
+                                                            ng-model="claimRecording.PaymentPendingReason"
+                                                            ng-options="PaymentPendingReason.selectReasonID as PaymentPendingReason.Description for PaymentPendingReason in PaymentPendingReasons"></select>
+
+                                                </div>
+
+                                            </div>
+                                            <div class="form-group">
+
+
+                                                <label class="col-md-4 control-label">Pending document</label>
+
+                                                <div class="col-md-8">
+                                                 
+                                                    <select ng-style="{'background-color': data.backgroundCol}"
+                                                            class="col-md-12 form-control"
+                                                            ng-model="document"
+                                                            >
+                                                        <option ng-repeat="document in documnts"
+                                                                value="{{document.DocumentID}}">
+                                                            {{document.Description}}
+                                                        </option>
+
+                                                    </select>
+
+                                                </div>
+                                               
+                                            </div>
+
+
+                                            <div class="form-group">
+
+
+                                                <label class="col-md-4 control-label">Withdraw Reason</label>
+
+                                                <div class="col-md-8">
+
+                                                    <select ng-style="{'background-color': data.backgroundCol}"
+                                                            class="col-md-12 form-control "
+                                                            ng-model="claimRecording.WithdrawReason"
+                                                            ng-options="partner.PartnerID as partner.PartnerName for partner in Partners"></select>
+
+                                                </div>
+
+                                            </div>
+
+                                            <div class="form-group">
+
+
+                                                <label class="col-md-4 control-label">Damage Description</label>
+
+                                                <div class="col-md-8">
+
+                                                    <input type="text" class="form-control col-md-6" ng-model="claimRecording.DamageDescription" />
+
+                                                </div>
+
+                                            </div>
+
+                                            <div class="form-group">
+
+
+                                                <label class="col-md-4 control-label">Amount Cliamed</label>
+
+                                                <div class="col-md-8">
+
+                                                    <input type="text" class="form-control col-md-6" ng-model="claimRecording.AmountClaimed" />
+
+                                                </div>
+
+                                            </div>
+
+                                            <div class="form-group">
+
+
+                                                <label class="col-md-4 control-label">Amount Paid</label>
+
+                                                <div class="col-md-8">
+
+                                                    <input type="text" class="form-control col-md-6" ng-model="claimRecording.AmountPaid" />
+
+                                                </div>
+
+                                            </div>
+                                            <button class="btn btn-primary pull-right"   ng-click="SaveClaimRecording()">Save Claim <span class="fa fa-floppy-o fa-right"></span></button>
+                                            <button class="btn btn-primary pull-right" style="margin-right:5px;"    ng-click="ClaimPayment()">Claim Payment<span class="fa fa-floppy-o fa-right"></span></button>
+
+                                        </div>
+
+
+                                    
+                                        <div class="col-md-12" style="margin-top:20px;">
+                                             
+                                            <!-- START Claim History PANEL -->
+                                            <div class="panel panel-info">
+                                                <div class="panel-heading">
+                                                    <h3 class="panel-title">Claim History Information</h3>
+                                                    <input type="text" ng-style="{'background-color': data.backgroundCol}"
+                                                           class="form-control col-md-6"
+                                                           placeholder="Search  ..."
+                                                           ng-model="search_ipol_history" />
+                                                </div>
+                                                <div class="panel-body">
+
+
+
+
+
+
+                                                    <div class="row">
+                                            
+                                                        <table class="table table-bordered table-responsive" style="font-size:10px;">
+                                                            <thead style="background-color:palegreen;font-size:10px;">
+                                                                <tr>
+
+                                                                    <th style="font-size:10px!important;">Claim No</th>
+                                                                    <th style="font-size:10px!important;">Date Of Loss</th>
+                                                                    <th style="font-size:10px!important;">Date Of Intimation</th>
+                                                                    <th style="font-size:10px!important;">Cause Of Loss</th>
+                                                                    <th style="font-size:10px!important;">Amount Claimed</th>
+                                                                    <th style="font-size:10px!important;">Amount Paid</th>
+                                                                    <th style="font-size:10px!important;">IsOpened</th>
+                                                                    <th style="font-size:10px!important;">Payment Pending Reason</th>
+                                                                    <th style="font-size:10px!important;">Action</th>
+                                                                </tr>
+                                                            </thead>
+
+                                                            <!--<tr  >-->
+                                                            <tr ng-repeat="claimHistory in Claimhistories|filter:search_ipol_history"
+                                                                 ng-click="LoadClaim(claimHistory)"  style="cursor:pointer">
+                                                                <td hidden>{{claimHistory.ClaimRecordingID}}</td>
+                                                                <td hidden>{{claimHistory.PolicyInfoRecID}}</td>
+
+
+                                                                <td>{{claimHistory.ClaimNo}}</td>
+                                                                <td>{{claimHistory.DateOfLoss}}</td>
+                                                                <td>{{claimHistory.DateOfIntimation}}</td>
+                                                                <td>{{claimHistory.CauseOfLoss}}</td>
+                                                                <td>{{claimHistory.AmountClaimed}}</td>
+                                                                <td>{{claimHistory.AmountPaid}}</td>
+                                                                <td>{{claimHistory.IsOpened}}</td>
+                                                                <td>{{claimHistory.PaymentPendingReason}}</td>
+                                                                <td>
+                                                                    <button class="btn btn-info pull-right" 
+                                                                            ng-click="LoadMoreInClaim()">More 
+                                                                    </button>
+</td>
+                                                            </tr>
+
+                                                           
+
+                                                        </table>
+
+
+
+
+                                                    </div>
+
+
+
+
+
+
+
+
+
+                                                </div>
+
+                                            </div>
+                                            <!-- END COMMISIION PANEL -->
+
+
+
+
+
+                                            <!-- START Policy History PANEL -->
+                                            <div class="panel panel-info" hidden>
+                                                <div class="panel-heading">
+                                                    <h3 class="panel-title">Policy History Information</h3>
+                                                    <input type="text" ng-style="{'background-color': data.backgroundCol}"
+                                                           class="form-control col-md-6"
+                                                           placeholder="Search  ..."
+                                                           ng-model="search_ipol_history" />
+                                                </div>
+                                                <div class="panel-body">
+
+
+
+
+
+
+                                                    <div class="row">
+                                                   
+                                                        <table class="table table-bordered table-responsive" style="font-size:10px;">
+                                                            <thead style="background-color:palegreen;font-size:10px;">
+                                                                <tr>
+                                                                    
+                                                                    <th style="font-size:10px!important;">Renewal Date</th>
+                                                                    <th style="font-size:10px!important;">Notification Date</th>
+                                                                    <th style="font-size:10px!important;">Sent Notify</th>
+                                                                    <th style="font-size:10px!important;">Cancel Renew</th>
+                                                                    
+
+                                                                </tr>
+                                                            </thead>
+
+                                                            <!--<tr  >-->
+                                                            <tr ng-repeat="policyRenewalhistory in PolicyRenewalhistories|filter:search_ipol_history">
+                                                                <td hidden>{{policyRenewalhistory.PolicyRenewalHistoryID}}</td>
+                                                                <td hidden>{{policyRenewalhistory.PolicyInfoRecID}}</td>
+                                                                <td>{{policyRenewalhistory.RenewalDate}}</td>
+                                                                <td>{{policyRenewalhistory.NotificationDate}}</td>
+                                                                <td>{{policyRenewalhistory.IsSent}}</td>
+                                                                <td>{{policyRenewalhistory.IsCancel}}</td>
+                                                            </tr>
+
+
+
+
+                                                        </table>
+
+
+
+
+                                                    </div>
+
+
+
+
+
+
+
+
+
+                                                </div>
+
+                                            </div>
+                                            <!-- END COMMISIION PANEL -->
+
+
+
+
+
+
+
+
+
+
+                                            <!-- START INFO PANEL -->
+                                            <div class="panel panel-info" hidden>
+                                                <div class="panel-heading">
+                                                    <h3 class="panel-title">Added Ins/Companies/InsSub Classes/Scope</h3>
+                                                   
+                                                </div>
+                                                <div class="panel-body">
+
+
+
+
+
+
+                                                    <table class="table table-condensed ">
+                                                        <thead style="font-size:10px;background-color:palegreen!important">
+                                                            <tr>
+                                                                <th hidden>In/Sub Class ID</th>
+                                                                <th>In/Class</th>
+                                                                <th>In/Sub Class</th>
+                                                                <th>Company</th>
+                                                                <th> Sum Insured</th>
+
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <!--<tr  >-->
+                                                            <tr>
+                                                                <td hidden>{{selectedSubClassIDFromInsCompany[0].inslassID}}</td>
+                                                                <td hidden>{{selectedSubClassIDFromInsCompany[0].insSubClassID}}</td>
+                                                                <td hidden>{{selectedSubClassIDFromInsCompany[0].InsuranceCompanyID}}</td>
+                                                                <td>{{selectedSubClassIDFromInsCompany[0].InsClass}}</td>
+                                                                <td>{{selectedSubClassIDFromInsCompany[0].InsSubClass}}</td>
+                                                                <td>{{selectedSubClassIDFromInsCompany[0].InsuranceCompanyName}}</td>
+                                                                <td><input type="text" ng-style="{'background-color': data.backgroundCol}" ng-model="selectedSubClassIDFromInsCompany[0].SumInsured" value="{{selectedSubClassIDFromInsCompany[0].SumInsured}}" /></td>
+
+
+                                                            </tr>
+
+                                                        </tbody>
+
+
+                                                    </table>
+
+
+                                                    <table class="table table-bordered table-responsive" style="font-size:10px;">
+                                                        <thead style="background-color:palegreen;font-size:10px;">
+                                                            <tr>
+                                                                <th hidden style="font-size:10px!important;">In/Sub Class ID</th>
+                                                                <th hidden style="font-size:10px!important;">In/Class</th>
+                                                                <th style="font-size:10px!important;">Insurance Class</th>
+                                                                <th style="font-size:10px!important;">Insurance Sub Class</th>
+                                                                <th style="font-size:10px!important;">Scope Description</th>
+
+                                                                <th style="font-size:10px!important;">Is Selected</th>
+                                                                <th style="font-size:10px!important;">Excess Type</th>
+                                                                <th style="font-size:10px!important;">Excess </th>
+                                                            </tr>
+                                                        </thead>
+
+                                                        <!--<tr  >-->
+                                                        <tr ng-repeat="ScopeInsClass in QuotationDetailsInsCompanyScopeDetails|filter:search_ins_comapnies_sub_class_scope_query">
+                                                            <td hidden>{{ScopeInsClass.InsuranceClassCode}}</td>
+                                                            <td hidden>{{ScopeInsClass.InsuranceSubClassID}}</td>
+
+                                                            <td>{{ScopeInsClass.InsuranceClassCode}}</td>
+                                                            <td>{{ScopeInsClass.InsSubClass}}</td>
+                                                            <td>{{ScopeInsClass.ScopeDescription}}</td>
+
+                                                            <td>
+                                                                <input type="checkbox" class="icheckbox"
+                                                                       ng-model="ScopeInsClass.isChecked" />
+                                                            </td>
+
+
+                                                            <td>{{ScopeInsClass.ExcessType}}</td>
+                                                            <td>{{ScopeInsClass.ExcessAmount}}</td>
+
+
+
+                                                        </tr>
+
+
+
+
+                                                    </table>
+
+
+
+                                                    <div class="row small">
+
+                                                        <label type="text" class="col-md-3">Primium Including Tax</label>
+
+                                                        <label type="text" class="col-md-4">Other Excess Description</label>
+
+                                                        <label type="text" class="col-md-4">Other Excesss Amount</label>
+
+
+
+                                                    </div>
+
+                                                    <div class="row">
+
+                                                        <input type="text" ng-style="{'background-color': data.backgroundCol}" class="col-md-3" ng-model="policyInfor.PremiumIncludingTax" style="margin-right:5px;" />&nbsp;&nbsp;
+
+                                                        <input type="text" ng-style="{'background-color': data.backgroundCol}" class="col-md-4" ng-model="policyInfor.OtherExcessDescription" style="margin-right:5px;" />&nbsp;&nbsp;
+
+                                                        <input type="text" ng-style="{'background-color': data.backgroundCol}" class="col-md-4" ng-model="policyInfor.OtherExcessAmount" />&nbsp;
+
+
+
+                                                    </div>
+
+
+
+                                                </div>
+
+                                            </div>
+                                            <!-- END INFO PANEL -->
+                                            <!-- START COMMISIION PANEL -->
+                                            <div class="panel panel-info" hidden>
+                                                <div class="panel-heading">
+                                                    <h3 class="panel-title">Commision Information</h3>
+                                                    <input type="text" ng-style="{'background-color': data.backgroundCol}"
+                                                           class="form-control col-md-6"
+                                                           placeholder="Search  ..."
+                                                           ng-model="search_ins_comapnies_sub_class_scope_query" />
+                                                </div>
+                                                <div class="panel-body">
+
+
+
+
+
+
+                                                    <div class="row">
+                                                        <div class="form-group" hidden>
+
+
+                                                            <label class="col-md-2 control-label">Commition Parter</label>
+
+                                                            <div class="col-md-10">
+
+                                                                <select ng-style="{'background-color': data.backgroundCol}"
+                                                                        class="col-md-12 form-control "
+                                                                        ng-readonly="isDisabled"
+                                                                        name="PartnerID"
+                                                                        ng-model="partner"
+                                                                        ng-options="partner.PartnerID as partner.PartnerName for partner in Partners"
+                                                                        ng-change="ChangeCommition(partner)"></select>
+
+                                                            </div>
+
+                                                        </div>
+                                                        <div class="form-group" hidden>
+
+
+                                                            <label class="col-md-2 control-label">Commition Rate</label>
+
+                                                            <div class="col-md-10">
+
+                                                                <select class="col-md-12 form-control "
+                                                                        ng-model="comHeader"
+                                                                        ng-options="comHeader.CommisionStructureID as comHeader.CommisionStructureName for comHeader in commitionStructuresHeader"></select>
+                                                            </div>
+
+                                                        </div>
+                                                        <div class="form-group" hidden>
+
+
+                                                            <button style="width:200px;margin-top:10px;" class="btn btn-success pull-right" ng-click="AddCommision()">Add Commision </button>&nbsp;&nbsp;
+
+
+
+                                                        </div>
+                                                      
+                                                        <table class="table table-bordered table-responsive" style="font-size:10px;">
+                                                            <thead style="background-color:palegreen;font-size:10px;">
+                                                                <tr>
+                                                                    <th style="font-size:10px!important;">PartnerName</th>
+                                                                    <th style="font-size:10px!important;"> Commission Name</th>
+                                                                    <th style="font-size:10px!important;">Commission Rate/Value</th>
+
+                                                                </tr>
+                                                            </thead>
+
+                                                            <!--<tr  >-->
+                                                            <tr ng-repeat="policyComm in policyCommissionPayment|filter:search_ins_comapnies_sub_class_scope_query">
+                                                                <td hidden>{{policyComm.CommisionTypeID}}</td>
+
+                                                                <td>{{policyComm.CommitionName}}</td>
+                                                                <td>{{policyComm.CommisionRate}}</td>
+                                                                <td>{{policyComm.CommisionValue}}</td>
+
+                                                            </tr>
+
+
+
+
+                                                        </table>
+
+
+
+
+                                                    </div>
+
+
+
+
+
+
+
+
+
+                                                </div>
+
+                                            </div>
+                                            <!-- END COMMISIION PANEL -->
+
+
+
+                                           
+
+
+                                        </div>
+
+
+
+
+
+
+
+                                    </div>
+                                    <div class="col-md-4" style="background-color:transparent!important">
+                                       
+                                            <!-- START Customer Information PANEL -->
+                                            <div class="panel panel-primary " style="border:0px;background-color:transparent!important">
+                                                <div class="panel-heading">
+                                                    <h3 class="panel-title">Customer Information</h3>
+
+                                                </div>
+                                                <div class="panel-body" style="background-color:transparent!important">
+
+                                                    <div class="form-group" hidden>
+                                                        <label class="col-md-4 control-label">Status{{}}</label>
+                                                        <div class="col-md-4">
+
+                                                            <select class="form-control "
+                                                                    ng-model="statuseee">
+                                                                <option ng-repeat="status in statuses"
+                                                                        value="{{status.QuotationStatusCode}}">
+                                                                    {{status.Description}}
+                                                                </option>
+                                                            </select>
+
+
+                                                        </div>
+
+
+                                                        <div class="col-md-4">
+                                                            <div class="btn btn-success" ng-click="UpdateStatus()">Update Status</div>
+
+
+                                                        </div>
+
+
+                                                    </div>
+
+
+
+                                                    <div class="form-group">
+                                                        <label class="col-md-4 control-label">Request No</label>
+                                                        <div class="col-md-8">
+                                                            <div class="form-control">
+                                                                REQ-{{ ClientRequestHeader.ClientRequestHeaderID}}
+
+
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+
+
+
+
+
+
+                                                    <div class="form-group">
+                                                        <label class="col-md-4 control-label">Request Date</label>
+                                                        <div class="col-md-8">
+                                                            <div class="form-control">
+                                                                {{RequestedDate}}
+
+
+                                                            </div>
+                                                        </div>
+
+
+
+
+
+                                                    </div>
+
+                                                    <div class="form-group" hidden>
+                                                        <label class="col-md-4 control-label">Choose Customer</label>
+                                                        <div class="col-md-8">
+                                                            <select ng-options="client.ClientID as client.ClientName for client in Clients"
+                                                                    ng-change="LoadClientByID(client)"
+                                                                    ng-model="ClientID" class="form-control"></select>
+                                                        </div>
+
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label class="col-md-4 control-label">Customer Name</label>
+                                                        <div class="col-md-8">
+                                                            <div type="text" class="form-control" ng-model="cusName">{{cusName}}</div>
+
+
+                                                        </div>
+
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label class="col-md-4 control-label">Address </label>
+                                                        <div class="col-md-8">
+                                                            <div type="text" class="form-control" ng-model="Address1">{{Address1}}</div>
+                                                        </div>
+
+                                                    </div>
+
+                                                    <div class="form-group" hidden>
+                                                        <label class="col-md-4 control-label">Address  Line 2</label>
+                                                        <div class="col-md-8">
+                                                            <input type="text" class="form-control" ng-model="Address2" value="password" />
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="form-group" hidden>
+                                                        <label class="col-md-4 control-label">Address Line 3</label>
+                                                        <div class="col-md-8">
+                                                            <input type="text" class="form-control" ng-model="Address3" value="password" />
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="form-group">
+
+                                                        <label class="col-md-4 control-label">Date Of Birth</label>
+                                                        <div class="col-md-8 ">
+
+                                                            <div type="text" class="col-md-4  form-control">{{DOB }}</div>
+
+
+                                                        </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                    </div>
+                                                    <div class="form-group">
+
+                                                        <label class="col-md-4 control-label">NIC</label>
+                                                        <div class="col-md-8">
+                                                            <div class="form-control"
+                                                                 ng-model="NIC">{{NIC}}</div>
+
+                                                        </div>
+
+
+
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label class="col-md-4 control-label">Mobile No</label>
+                                                        <div class="col-md-8">
+                                                            <div type="text" class="form-control"
+                                                                 maxlength="10"
+                                                                 ng-model="mobileNo">{{mobileNo}}</div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label class="col-md-4 control-label">Fixed Line</label>
+                                                        <div class="col-md-8">
+                                                            <div type="text" class="form-control"
+                                                                 ng-model="fixedLine">{{fixedLine}}</div>
+                                                        </div>
+
+
+
+                                                    </div>
+
+                                                    <div class="form-group">
+
+                                                        <label class="col-md-4 control-label">E-Mail</label>
+                                                        <div class="col-md-8">
+                                                            <div name="email" class="form-control" ng-model="email">{{email}}</div>
+
+                                                        </div>
+
+                                                    </div>
+                                                    <div class="form-group" id="isAVIVA" ng-show="isAVIVA">
+                                                        <label class="col-md-4 control-label">AVIVA/BUPA</label>
+                                                        <div class="col-md-8">
+                                                            <div class="panel panel-default">
+                                                                <div class="panel-body">
+
+                                                                    <div class="form-group" style="font-size:10px;">
+                                                                        <label class="col-md-2 control-label">Resident Country</label>
+                                                                        <div class="col-md-4">
+                                                                            <select class="col-md-12 form-control " data-live-search="true" ng-model="homeCountry">
+                                                                                <option ng-repeat="Country in Countries"
+                                                                                        value="{{Country.CountryID}}">
+                                                                                    {{Country.CountryName}}
+                                                                                </option>
+
+                                                                            </select>
+                                                                        </div>
+                                                                        <label class="col-md-2 control-label">Home Country</label>
+                                                                        <div class="col-md-4">
+                                                                            <select class="form-control " data-live-search="true" ng-model="residentCountry">
+                                                                                <option ng-repeat="Country in Countries"
+                                                                                        value="{{Country.CountryID}}">
+                                                                                    {{Country.CountryName}}
+                                                                                </option>
+
+                                                                            </select>
+                                                                        </div>
+
+
+
+                                                                    </div>
+
+
+                                                                    <div class="form-group" style="font-size:10px;">
+                                                                        <label class="col-md-2 control-label">Inspection Date</label>
+                                                                        <div class="col-md-10">
+                                                                            <div class="input-group date datepicker" data-date="05/07/2014"
+                                                                                 data-date-format="dd-mm-yyyy" ng-model="inspectionType">
+                                                                                <input type="text" id="dp-2" class="form-control  " value="05/07/2014" />
+                                                                                <span class="input-group-addon add-on"><span class="glyphicon glyphicon-calendar"></span></span>
+                                                                            </div>
+
+                                                                        </div>
+
+                                                                    </div>
+                                                                    <div class="form-group" style="font-size:10px;">
+
+                                                                        <label class="col-md-2 control-label">Family Discount</label>
+                                                                        <div class="col-md-10">
+                                                                            <input type="text" class="form-control  " ng-readonly="isDisabled" ng-model="fDiscount" />
+
+                                                                        </div>
+
+
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                        </div>
+
+
+
+                                                    </div>
+
+                                                    <div class="form-group" hidden>
+                                                        <label class="col-md-4 control-label">File Upload</label>
+                                                        <div class="col-md-8">
+                                                            <div class="panel panel-default">
+                                                                <div class="panel-body">
+
+                                                                </div>
+                                                            </div>
+                                                            @*<input type="file" multiple class="btn-success" data-preview-file-type="any" />*@
+                                                        </div>
+                                                    </div>
+
+
+
+                                                </div>
+
+                                            </div>
+                                            <!-- END Insurance Class  PANEL -->
+
+
+                                      
+
+
+
+                                        <div class="form-group">
+                                            <lable class="col-md-4 control-label">Proerty Details</lable>
+                                            <div class="col-md-8">
+
+                                                <!-- START Porperty PANEL -->
+                                                <div class="panel panel-primary" >
+                                                   
+                                                    <div class="panel-body" style="font-size:10px;">
+                                                        <div class="form-group">
+
+                                                            <label class="col-md-4 control-label">Addedddd SubIns Class</label>
+                                                            <div class="col-md-8">
+                                                               
+                                                                    <div ng-repeat="reqList in selectedSubClassIDFromInsCompany" ng-model="addedInssubclass">
+                                                                        {{reqList.InsSubClass}}
+                                                                    </div>
+
+                                                               
+                                                            </div>
+
+
+
+                                                        </div>
+
+                                                        <div class="form-group">
+
+
+                                                            <label class="col-md-4 control-label">Property ID/Vehicle RegNo.</label>
+                                                            <div class="col-md-8">
+                                                                <input type="text" class="form-control" ng-model="ClientPropertyDetails.ClientPropertyID" />
+                                                            </div>
+
+                                                        </div>
+
+                                                        <div class="form-group">
+
+
+                                                            <label class="col-md-4 control-label">Property Description</label>
+                                                            <div class="col-md-8">
+                                                                <input type="text" class="form-control" ng-model="ClientPropertyDetails.ClientPropertyName" />
+                                                            </div>
+
+                                                        </div>
+
+
+                                                        <div class="form-group">
+
+
+                                                            <label class="col-md-4 control-label">VAT No</label>
+                                                            <div class="col-md-8">
+                                                                <input type="text" class="form-control" ng-model="ClientPropertyDetails.VATNo" />
+                                                            </div>
+
+                                                        </div>
+                                                        <div class="form-group">
+
+
+                                                            <label class="col-md-4 control-label">BRNo</label>
+                                                            <div class="col-md-8">
+                                                                <input type="text" class="form-control" ng-model="ClientPropertyDetails.BRNo" />
+                                                            </div>
+
+                                                        </div>
+
+
+                                                        <div class="form-group">
+
+
+                                                            <label class="col-md-4 control-label">SVAT No</label>
+                                                            <div class="col-md-8">
+                                                                <input type="text" class="form-control" ng-model="ClientPropertyDetails.SVATNo" />
+                                                            </div>
+
+                                                        </div>
+
+
+                                                      
+
+
+                                                    </div>
+
+                                                </div>
+                                                <!-- END Porperty PANEL -->
+
+                                            </div>
+
+
+
+
+                                        </div>
+
+
+
+
+
+
+
+
+
+
+
+                                    </div>
+
+
+
+
+
+                                </div>
+
+
+
+
+
+                            </form>
+
+
+                        </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

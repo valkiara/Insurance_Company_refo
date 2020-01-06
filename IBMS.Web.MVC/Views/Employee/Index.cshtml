@@ -1,0 +1,298 @@
+﻿
+@{
+    ViewBag.Title = "Employee";
+}
+
+@Scripts.Render("~/Scripts/ng/Services/EmployeeService.js")
+@Scripts.Render("~/Scripts/ng/Controllers/EmployeeControler.js")
+<script type="text/javascript">
+    function IsNumber(evt) {
+        evt = (evt) ? evt : window.event;
+        var charCode = (evt.which) ? evt.which : evt.keyCode;
+        if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+            return false;
+        }
+        return true;
+    }
+
+
+
+</script>
+<div class="breadcrumb-line">
+    <ul class="breadcrumb">
+        <li><a href="/Dashboard/Dashboard"><i class="icon-home2 position-left"></i>Home</a></li>
+        <li>Master Details</li><li>Company</li>
+        <li class="active"><b>Employee</b></li>
+    </ul>
+</div>
+<div ng-app="IBMSAPP" ng-controller="EmployeeController" ng-cloak>
+
+ 
+    <div class="page-content-wrap">
+
+        <div class="panel panel-default tabs">
+            <ul class="nav nav-tabs" role="tablist">
+                <li class="active"><a href="#tab-first" role="tab" data-toggle="tab">View</a></li>
+                <li><a href="#tab-second" role="tab" data-toggle="tab">New</a></li>
+                @*<li><a href="#tab-third" role="tab" data-toggle="tab">Edit</a></li>*@
+            </ul>
+            <div class="panel-body tab-content">
+                <div class="tab-pane active" id="tab-first">
+
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">
+                            <strong>Employee</strong>    
+                            </h3>
+                            <ul class="panel-controls">
+                                <li><input type="text" style="font-size: 12px;width: 100%;border-radius: 0px;margin-right:2px;" class="form-control" placeholder="Search Employee. . . ." ng-model="search_query" ng-change="searchTextChange(search_query)"></li>
+                                <li><a href="#" ng-click="refreshContent()"><span class="fa fa-refresh"></span></a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="col-md-2">Show records per page </div>
+                        <div class="col=md-10">
+                            <select class="form-control" style="width:100px;"
+                                    ng-model="viewby"
+                                    ng-change="setItemsPerPage(viewby)">
+                                <option>5</option>
+                                <option>10</option>
+                                <option>20</option>
+                                <option>30</option>
+                                <option>40</option>
+                                <option>50</option>
+                            </select>
+                        </div>
+                        <div><br></div>
+                        <table class="table table-responsive" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    @*<th width="30%">Bussiness Unit Name</th>*@
+                                    <th>Employee Name</th>
+                                    <th>Address</th>
+                                    <th>Designation</th>
+                                    <th>Contact No</th>
+                                    <th>Email</th>
+                                    <th>NIC</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody ng-repeat="Emp in data.slice(((currentPage-1)*itemsPerPage), ((currentPage)*itemsPerPage))">
+                                
+                                <tr id="view{{Emp.EmployeeID}}" >
+
+                                    @*<td>{{Emp.BussinessUnitName}}</td>*@
+                                    <td>{{Emp.EmployeeName}}</td>
+                                    <td>{{Emp.Address1}},{{Emp.Address2}},{{Emp.Address3}}</td>
+                                    <td>{{Emp.DesignationName}}</td>
+                                    <td>{{Emp.ContactNo}}</td>
+                                    <td>{{Emp.Email}}</td>
+                                    <td>{{Emp.NIC}}</td>
+                                    <td>
+                                        <div class="fa fa-edit btn btn-success"  ng-click="edit(Emp)"> Edit</div>&nbsp;&nbsp;
+                                        <div class="fa fa-trash-o btn btn-danger" ng-click="Delete(Emp)"> Delete</div>
+                                    </td>
+
+
+                                </tr>
+
+                                <tr id="edit{{Emp.EmployeeID}}" hidden>
+                                  
+                                    <td>
+                                       
+                                         <input type="text" style="font-size: 12px;width: 100%;border-radius: 0px;margin-right:2px;" class="form-control"
+                                               value="{{Emp.EmployeeName}}"
+                                               ng-model="Emp.EmployeeName">
+                                     
+                                        <span class="help-block" style="color:red" ng-show="!Emp.EmployeeName">Required Field *</span>
+                                    </td>
+                                    <td>
+                                        <input type="text" style="font-size: 12px;width: 100%;border-radius: 0px;margin-right:2px;" class="form-control"
+                                               value="{{Emp.Address1}}"
+                                               ng-model="Emp.Address1"><span class="help-block" style="color:red" ng-show="!Emp.Address1">Required Field *</span>
+                                        <input type="text" style="font-size: 12px;width: 100%;border-radius: 0px;margin-right:2px;" class="form-control"
+                                               value="{{Emp.Address2}}"
+                                               ng-model="Emp.Address2">
+                                        <input type="text" style="font-size: 12px;width: 100%;border-radius: 0px;margin-right:2px;" class="form-control"
+                                               value="{{Emp.Address3}}"
+                                               ng-model="Emp.Address3">
+                                    </td>
+                                    <td>
+                                        <select name="selectBusinessunit" class="form-control"
+                                                ng-model="Emp.DesignationID"
+                                                ng-options="Des.DesignationID as Des.DesignationName for Des in Designations" ng-required="true" style="width:100%">
+                                            <option value="">--Select a Designation--</option>
+                                        </select>
+                                        
+                                        <span class="help-block" style="color:red" ng-show="!Emp.DesignationID">Required Field *</span>
+                                    </td>
+                                    <td>
+                                        <input type="text" style="font-size: 12px;width: 100%;border-radius: 0px;margin-right:2px;" class="form-control"
+                                               value="{{Emp.ContactNo}}"
+                                               ng-model="Emp.ContactNo" onkeypress="return IsNumber(event)" ng-pattern="/^\d{10}$/">
+                                        <span class="help-block" style="color:red" ng-show="Emp.ContactNo.$error.pattern">Incorrect Contact Number</span>
+                                    </td>
+                                    <td>
+                                        <input type="text" style="font-size: 12px;width: 100%;border-radius: 0px;margin-right:2px;" class="form-control"
+                                               value="{{Emp.Email}}"
+                                               ng-model="Emp.Email">
+                                    </td>
+                                    <td>
+                                        <input type="text" style="font-size: 12px;width: 100%;border-radius: 0px;margin-right:2px;" class="form-control"
+                                               value="{{Emp.NIC}}"
+                                               ng-model="Emp.NIC">
+                                    </td>
+                                   
+                                    <td>
+                                        <div class="fa fa-save btn btn-info" ng-disabled="!(Emp.EmployeeName && Emp.Address1 && Emp.DesignationID)" ng-click="update(Emp)"> Update</div>&nbsp;&nbsp;&nbsp;&nbsp;
+                                        <div ng-click="cancel(Emp)" class="fa fa-times btn btn-default">&nbsp; Cancel</div>
+                                    </td>
+
+
+                                </tr>
+
+                            </tbody>
+
+                        </table>
+                        <pagination class="pull-left" total-items="totalItems" ng-model="currentPage" max-size="maxSize" class="pagination-sm" boundary-links="true" rotate="false" num-pages="numPages" items-per-page="itemsPerPage"></pagination>
+                    </div>
+
+
+
+                </div>
+                <div class="tab-pane" id="tab-second">
+                    <form id="jvalidate" class="form-horizontal col-md-10" role="form">
+                        <ng-form name="empData" novalidate>
+
+                            <div class="form-group">
+                                <label class="col-md-4 control-label">Business Unit</label>
+                                <div class="col-md-8">
+                                    <select name="selectBusinessunit" class="form-control"
+                                            ng-model="BusinessUnit"
+                                            ng-options="BusinessUnit.BusinessUnitID as BusinessUnit.BusinessUnit for BusinessUnit in filteredBusinessUnits" ng-required="true">
+                                        <option value="">--Select a Business Unit--</option>
+                                    </select>
+                                   <span class="help-block" style="color:red" ng-show="empData.bu.$error.required">Required Field *</span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-4 control-label">Employee Name</label>
+                                <div class="col-md-8">
+                                    <input type="text" name="inputname" class="form-control" ng-model="empNAme" ng-required="true" /><span class="help-block" style="color:red" ng-show="empData.inputname.$error.required">Required Field *</span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-4 control-label">Employee NIC</label>
+                                <div class="col-md-8">
+                                    <input type="text" class="form-control" ng-model="EmployeeNIC" maxlength="10" name="inputNIC" ng-pattern="/^[0-9]{9}[vVxX]|[0-9]{12}$/" ng-required="true" />
+                                    <span class="help-block" style="color:red" ng-show="empData.inputNIC.$error.required">Required Field *</span>
+                                    <span class="help-block" style="color:red" ng-show="empData.inputNIC.$error.pattern">Incorrect NIC Number</span>
+                                </div>
+                            </div>
+                            @*<div class="form-group">
+                <label class="col-md-4 control-label"> First Name</label>
+                <div class="col-md-8">
+                    <input type="text" class="form-control" ng-model="firstName" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-md-4 control-label"> Last Name</label>
+                <div class="col-md-8">
+                    <input type="text" class="form-control" ng-model="lastName" />
+                </div>
+            </div>*@
+                            <div class="form-group">
+                                <label class="col-md-4 control-label">Address Line1</label>
+                                <div class="col-md-8">
+                                    <input type="text" name="inputaddress" class="form-control" ng-model="Address1" ng-required="true" /><span class="help-block" style="color:red" ng-show="empData.inputaddress.$error.required">Required Field *</span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-4 control-label">Address Line2</label>
+                                <div class="col-md-8">
+                                    <input type="text" class="form-control" ng-model="Address2" />
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-4 control-label">Address Line3</label>
+                                <div class="col-md-8">
+                                    <input type="text" class="form-control" ng-model="Address3" />
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-4 control-label">Contact No</label>
+                                <div class="col-md-8">
+                                    <input type="text" name="inputContactNo" class="form-control" ng-model="contactNo" onkeypress="return IsNumber(event)" ng-pattern="/^\d{10}$/"/>
+                                    <span class="help-block" style="color:red" ng-show="empData.inputContactNo.$error.pattern">Incorrect Contact Number</span>
+                                  </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-4 control-label">Designation</label>
+                                <div class="col-md-8">
+                                    <select name="designation" class="form-control"
+                                            ng-model="designationID"
+                                            ng-options="Des.DesignationID as Des.DesignationName for Des in Designations" ng-required="true">
+                                        <option value="">--Select a Designation--</option>
+                                    </select>
+                                    <span class="help-block" style="color:red" ng-show="empData.designation.$error.required">Required Field *</span>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-md-4 control-label">Email</label>
+                                <div class="col-md-8">
+                                    <input type="email" name="inputEmail" placeholder="Email" ng-model="email" class="form-control" >
+                                    <span class="error" ng-show="empData.inputEmail.$error.email" style="color:red">
+                                        Invalid Email
+                                    </span>
+                                </div>
+                            </div>
+                            @*<div class="form-group">
+        <label class="col-md-4 control-label">Administration Level</label>ng-model="email"
+        <select class="col-md-8" ng-model="settingID">
+            <option ng-repeat="Setting in Settings"
+                    value="{{Setting.SettingID}}">
+                {{Setting.SettingName}}
+            </option>
+
+        </select>
+
+
+    </div>*@
+                            <div class="form-group">
+                                <label class="col-md-4 control-label"></label>
+                                <div class="col-md-8">
+                                    <div class="btn btn-primary" ng-disabled="!empData.$valid" ng-click="Save()">Save Employee <span class="fa fa-floppy-o fa-right"></span></div>
+                                    <button type="button" class="btn btn-default" ng-click="ClearFields()">Clear<span class="glyphicon glyphicon-erase fa-right"></span></button>
+                                 </div>
+                            </div>
+                        </ng-form>
+
+                    </form>
+
+                       
+</div>
+                @*<div class="tab-pane" id="tab-third">
+                        <p> 3rd</p>
+
+                    </div>*@
+            </div>
+        </div>
+        <div id="divLoading" ng-show="showLoader"></div>s
+    </div>
+</div>
+@*<script src="~/Scripts/jquery-1.10.2.js"></script>
+<script src="~/Scripts/jquery-1.10.2.min.js"></script>
+<script src="~/Scripts/js/plugins/jquery-validation/jquery.validate.js"></script>
+<script type="text/javascript">
+            var jvalidate = $("#jvalidate").validate({
+                ignore: [],
+                rules: {
+                    email: {
+                        //required: true,
+                        email: true
+                    },
+                }
+            });
+</script>*@

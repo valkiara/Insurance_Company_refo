@@ -1,0 +1,39 @@
+﻿@section scripts{
+    <script src="~/Scripts/ng/testAPI.js"></script>
+}
+
+<br /><br />
+<div class="row" ng-app="TestAPIApp" ng-controller="TestAPIController" ng-init="init()" ng-cloak>
+    <div class="col-md-4"></div>
+    <div class="col-md-4">
+        <div ng-if="!isTest">
+            <b>Welcome to IBMS Web API</b>
+        </div>
+        <div ng-if="!isTest">
+            <input type="button" ng-click="saveBusinessUnitData()" value="Save Business Unit Data" /><br /><br />
+            <input type="button" ng-click="updateBusinessUnitData()" value="Update Business Unit Data" /><br /><br />
+            <input type="button" ng-click="deleteBusinessUnitData()" value="Delete Business Unit Data" /><br /><br />
+            <input type="button" ng-click="getAllBusinessUnits()" value="Get All Business Units" /><br /><br />
+            <input type="button" ng-click="getBusinessUnitByID(7)" value="Get Business Unit By ID" /><br /><br />
+            <input type="button" ng-click="saveIntroducer()" value="Save Introducer" /><br /><br />
+            <input type="button" ng-click="saveClientRequest()" value="Save Client Request" /><br /><br />
+            <input type="button" ng-click="saveRequest()" value="Save Request" /><br /><br />
+            <input type="button" ng-click="login()" value="Login" /><br /><br />
+            <input type="button" ng-click="saveQuotation()" value="Save Quotation" /><br /><br />
+            <input type="button" ng-click="updateQuotation()" value="Update Quotation" /><br /><br />
+            <input type="button" ng-click="sendEmail()" value="Send Email" /><br /><br />
+            <input type="button" ng-click="searchClients()" value="Search Clients" /><br /><br />
+            <input type="button" ng-click="getPremium()" value="Primium" /><br /><br />
+            <input type="button" ng-click="savePolicyInformationRecording()" value="Save Policy Info Recording" /><br /><br />
+            <input type="button" ng-click="saveClaimRecording()" value="Save Claim Recording" /><br /><br />
+            <input type="button" ng-click="saveClaimPayment()" value="Save Claim Payment" /><br /><br />
+            <input type="button" ng-click="updatePaymentDetails()" value="Update Payment" /><br /><br /><br />
+            <input type="file" class="form-control" id="file" name="file" multiple onchange="angular.element(this).scope().getDocument(this)" /><br />
+            <input type="button" class="btn btn-primary" ng-click="saveDocument()" value="Save Document" /><br /><br />
+            <input type="button" class="btn btn-primary" ng-click="updateDocument()" value="Update Document" /><br /><br />
+            <input type="button" class="btn btn-primary" ng-click="deleteDocument()" value="Delete Document" />
+        </div>
+    </div>
+    <div class="col-md-4"></div>
+</div>
+

@@ -1,0 +1,487 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{2428C7AF-8347-4E44-9BB1-2DD981FB608F}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>IBMS.Repository</RootNamespace>
+    <AssemblyName>IBMS.Repository</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Office.Interop.Excel, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+      <HintPath>..\packages\Microsoft.Office.Interop.Excel.15.0.4795.1000\lib\net20\Microsoft.Office.Interop.Excel.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Security" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Admission_Singapore.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="GenericRepository.cs" />
+    <Compile Include="IBMSDataModel.Context.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>IBMSDataModel.Context.tt</DependentUpon>
+    </Compile>
+    <Compile Include="IBMSDataModel.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="IBMSDataModel.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>IBMSDataModel.edmx</DependentUpon>
+    </Compile>
+    <Compile Include="MemberStatu.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="PatientAdmission.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SingaporeAdmission.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="SingaporeInvoice.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spGetAllBupaPremiumClient_Result.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spGetCommissionDetails_Result.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spGetInsCompanyByClientRequestLine_Result.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spSearchChartedAccounts_Result.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="spSearchClient_Result.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="sp_GetClientVSQuotation_Count_Result.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Status.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblAccessLevelType.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblAccountHandler.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblAgent.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblAgeWisePremium.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblBankDetail.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblBankTransactionDetail.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblBussinessUnit.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblCauseOfLoss.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblChargeType.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblClaimPayment.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblClaimPaymentMethod.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblClaimRecHistory.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblClaimRecording.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblClaimRecPendingDoc.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblClaimRejectReason.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblClaimReOpenReason.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblClaimStatu.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblClient.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblClientProperty.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblClientRenewelRequestHeader.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblClientRequestHeader.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblClientRequestInsSubClassScope.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblClientRequestLine.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblClientRewenelHistory.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblClientRHistory.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblClientRnlRequestHeader.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblComCommisionStructureLine.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblCommisionStructureHeader.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblCommisionStructureLine.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblCommisionType.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblCommissionFormat.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblCommissionFormatNew.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblCommonInsScope.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblCompany.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblCountry.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblCoverNote.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblCurrency.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblCustomerQuotation.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblDebitNote.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblDeduction.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblDeductionsLine.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblDeductionType.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblDesignation.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblDistrict.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblDocCategory.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblDocument.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblEmployee.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblEndorsementCharge.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblEndorsementInfo.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblFamilyDiscount.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblFamilyMember.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblFrequncyDetail.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblFunction.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblFunctionAccess.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblFunctionType.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblGender.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblGrpFamilyDetail.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblHospitals.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblInsClass.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblInsClassType.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblInsComCommisionStructureHeader.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblInsCompany.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblInsSubClass.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblInternalPolicyNumSetup.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblIntroducer.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblIntroducerBusinessUnit.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblJLT.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblLoadingType.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblParentCompany.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblPartner.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblPartnerMapping.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblPayment.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblPaymentType.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblPilotPremium.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblPilotPRM.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblPolicy.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblPolicyCategory.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblPolicyCommisionPayment.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblPolicyCommisionPayment_New.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblPolicyDebitNote.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblPolicyInfoCharge.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblPolicyInfoPayment.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblPolicyInforCharge_New.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblPolicyInformationBUPA.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblPolicyInformationRecording.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblPolicyMemberDetail.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblPolicyRenewalHistory.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblPremium.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblPremiumHolderType.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblQuotationDetailsInsCompanyHeader.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblQuotationDetailsInsCompanyLine.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblQuotationDetailsInsCompanyScope.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblQuotationHeader.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblQuotationLine.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblQuotationRequestedInsCompany.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblQuotationStatu.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblRateCategory.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblReceivedQuotation.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblRelationship.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblRequiredDocument.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblScheme.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblSetting.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblTaxType.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblTitle.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblTransactionDetail.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblTransactionType.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblUser.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblWBN.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="tblYear.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Trf_Bupa.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="UnitOfWork.cs" />
+    <Compile Include="UploadedFile.cs">
+      <DependentUpon>IBMSDataModel.tt</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.Config">
+      <SubType>Designer</SubType>
+    </None>
+    <EntityDeploy Include="IBMSDataModel.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>IBMSDataModel.Designer.cs</LastGenOutput>
+    </EntityDeploy>
+    <None Include="IBMSDataModel.edmx.diagram">
+      <DependentUpon>IBMSDataModel.edmx</DependentUpon>
+    </None>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="IBMSDataModel.Context.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>IBMSDataModel.edmx</DependentUpon>
+      <LastGenOutput>IBMSDataModel.Context.cs</LastGenOutput>
+    </Content>
+    <Content Include="IBMSDataModel.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>IBMSDataModel.edmx</DependentUpon>
+      <LastGenOutput>IBMSDataModel.cs</LastGenOutput>
+    </Content>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

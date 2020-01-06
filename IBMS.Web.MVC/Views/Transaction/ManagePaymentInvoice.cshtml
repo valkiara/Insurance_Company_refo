@@ -1,0 +1,389 @@
+﻿@{
+    ViewBag.Title = "ManagePaymentInvoice";
+}
+
+<script src="~/Scripts/ng/Controllers/PaymentInvoiceController.js"></script>
+<script src="~/Scripts/ng/Services/PaymentService.js"></script>
+
+<div class="breadcrumb-line">
+    <ul class="breadcrumb">
+        <li><a href="/Dashboard/Index"><i class="icon-home2 position-left"></i>Home</a></li>
+        <li>Transaction</li>
+        <li>Payment</li>
+        <li class="active"><b>Manage Payment</b></li>
+        <li class="active"><b>Invoice</b></li>
+    </ul>
+</div>
+
+<div class="content" ng-app="IBMSAPP">
+    <div ng-controller="PaymentInvoiceController" ng-init="init()" ng-cloak>
+        <div class="col-md-12">
+            <div class="panel-body">
+                <section class="content-header">
+                    <h1>
+                        Invoice
+                        <small ng-bind=""></small>
+                    </h1>
+
+                </section>
+                @* <span ng-bind="invoiceData.ReferenceNo"></span>*@
+
+
+            </div>
+
+
+
+        </div>
+
+        <div class="col-md-12">
+            <div class="panel-body">
+
+                <div class="panel panel-flat">
+                   
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <h2 class="page-header">
+                                    <i class="fa fa-globe"></i> Senerathna Insurance Borkers
+                                    <small class="pull-right">Date: @DateTime.Now</small>
+                                </h2>
+                            </div>
+                            <!-- /.col -->
+                        </div>
+
+                        <div class="row invoice-info">
+                            <div class="col-sm-4 invoice-col">
+
+                                <address>
+                                    <strong>Senarathne Insurance Brokers (PVT) Ltd</strong><br>
+                                    4th Floor <br />
+                                    Liberty Plaza <br />
+                                    Colombo 03<br>
+                                    Sri Lanka.<br />
+                                    Tel : 01125730047<br />
+                                    Fax : <br />
+                                </address>
+                            </div>
+                            <!-- /.col -->
+                            <div class="col-sm-4 invoice-col">
+
+                            </div>
+                            <!-- /.col -->
+                            <div class="col-sm-4 invoice-col">
+                                <b>Invoice: </b><b ng-bind=""></b>
+                                <br>
+                                <b>Date       :</b> @DateTime.Now.Date.ToShortDateString()<br><br />
+                                @*<b>Terms      : </b> <input type="text" name="terms" ng-model="invoiceData.Terms" ng-required="true">
+                                <span class="help-block" style="color:red" ng-show="admissionInvoice.terms.$error.required">Required Field *</span>
+                                <br><br>*@
+                                @*<b>Cust Id: </b>
+                                <input type="text" name="customerId" ng-model="paymentObj.Poli" ng-required="true">
+                                <span class="help-block" style="color:red" ng-show="admissionInvoice.customerId.$error.required">Required Field *</span>
+                                <br>*@
+
+                            </div>
+
+                            <div class="panel panel-default" >
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">
+                                        <strong>Debit Note</strong>
+                                    </h3>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h3 style="margin-top: 5px;">Client Name:{{paymentObj.ClientName}}</h3>
+                                    <h3 style="margin-top: 5px;">Client ID:{{paymentObj.ClientID }}</h3>
+                                    
+                                    
+                                </div>
+                            </div>
+                            <br />
+
+                            <div class="row">
+                                <div class="col-md-11 set-header">
+                                    <div class="row">
+                                        <div class="col-md-1" align="center"><h5><b>#</b></h5></div>
+                                        <div class="col-md-3" align="center"><h5><b>Policy Number</b></h5></div>
+                                        <div class="col-md-3" align="center"><h5><b>Total Non Commission Premium</b></h5></div>
+                                        <div class="col-md-2" align="center"><h5><b>Total Gross Premium</b></h5></div>
+                                        <div class="col-md-1" align="center"></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-11" ng-repeat="debitNote in paymentObj.DebitNoteList" style="background-color:#d9f7f7">
+                                    <div class="row">
+                                        <div class="col-md-1">
+                                            <div align="center">
+                                                <h6 label>{{$index+1}}</h6>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3" align="center">
+                                            {{debitNote.PolicyInfoRecID}}
+                                        </div>
+
+                                        <div class="col-md-3" align="center">
+                                            
+                                               {{debitNote.TotalNonCommissionPremium | number : 2}}
+                                           
+                                        </div>
+                                        <div class="col-md-2" align="center">
+                                           
+                                                {{debitNote.TotalGrossPremium | number : 2}}
+                                            
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-md-12 set-header">
+                                                <div class="row">
+                                                    <div class="col-md-1" align="center"><h5><b>#</b></h5></div>
+                                                    <div class="col-sm-2" align="center"><h5><b>Payment Method</b></h5></div>
+                                                    <div class="col-sm-1" align="center"><h5><b>Bank</b></h5></div>
+                                                    <div class="col-sm-1" align="center"><h5><b>Cheque/Draft No</b></h5></div>
+                                                    <div class="col-sm-1" align="center"><h5><b>Cheque Date</b></h5></div>
+                                                    <div class="col-sm-1" align="center"><h5><b>Payment Date</b></h5></div>
+                                                    <div class="col-sm-1" align="center"><h5><b>Payments</b></h5></div>
+                                                    <div class="col-sm-1" align="center"><h5><b>Currency Type</b></h5></div>
+                                                    <div class="col-sm-1" align="center"><h5><b>Exchange Rate</b></h5></div>
+                                                    @*<div class="col-sm-1" align="center"></div>*@
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12" ng-repeat="bankObj in debitNote.PolicyInfoPaymentLists" style="background-color:#ffeed0">
+                                                <div class="row">
+                                                    <div class="col-sm-1">
+                                                        <div @*class="panel-body no-padding"*@ align="center">
+                                                            <h6 label>{{$index+1}}</h6>
+                                                        </div>
+                                                    </div>
+                                                     <div class="col-sm-2">
+                                                         {{bankObj.PaymentMethodID}}
+                                                     </div>
+                                                     <div class="col-sm-2">
+                                                        {{bankObj.BankID}}
+                                                     </div>
+                                                    <div class="col-sm-2">
+                                                        {{bankObj.DraftNo}}
+                                                        </div>
+                                                    <div class="col-sm-2">
+                                                        {{bankObj.RequestingDate}}
+                                                    </div>
+                                                    <div class="col-sm-2">
+                                                        {{bankObj.PaymentDate}}
+                                                    </div>
+                                                    <div class="col-sm-2">
+                                                        {{bankObj.BankAmount}}
+                                                    </div>
+                                                    <div class="col-sm-2">
+                                                        {{bankObj.currencyType}}
+                                                    </div>
+                                                     <div class="col-sm-2">
+                                                        {{bankObj.ExchangeRate}}
+                                                     </div>
+                                                 </div>
+                                             </div>
+                                         </div>
+
+                                    </div>
+
+                                    </div>
+
+                                  
+                                </div>
+                            <br />
+
+                           
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="panel-body no-padding" align="left">
+                                            <h3 label style="color:white"><b>Total Premium : {{paymentObj.Cuurency}} {{paymentObj.PaymentAmount | number : 2}}</b></h3>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="panel-body no-padding" align="center">
+                                            <h3 label style="color:white"><b>Total Payments : {{paymentObj.Cuurency}} {{paymentObj.TotalPayments | number : 2}}</b></h3>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="panel-body no-padding" align="right">
+                                            <h3 label style="color:white"><b>Pending Payments : {{paymentObj.Cuurency}} {{paymentObj.PendingPayments | number : 2}}</b></h3>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <br />
+
+
+                            <!-- /.col -->
+                        </div>
+
+                        <!-- Table row -->
+                        <div class="row">
+                            @*<div class="col-xs-12 table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+
+                                            <th>Description</th>
+                                            <th>Total</th>
+                                            <th>Fee (CMA)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+
+                                            <td>
+                                                <div class="col-xs-3">Claims Assessor: </div>
+                                                <div class="col-xs-9">
+                                                    <input type="text" name="claimsAssessor" style="width:100%" ng-model="invoiceData.ClaimAssessor" ng-required="true" />
+                                                    <span class="help-block" style="color:red" ng-show="admissionInvoice.claimsAssessor.$error.required">Required Field *</span>
+                                                </div>
+                                            </td>
+                                            <td></td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td><div class="col-xs-3">Case No: </div><div class="col-xs-9" ng-bind="invoiceData.CaseNo"></div> </td>
+                                            <td></td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td><div class="col-xs-3">Name of Insured: </div><div class="col-xs-9" ng-bind="invoiceData.NameOnInsurance"></div> </td>
+                                            <td></td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td><div class="col-xs-3">Your Reference: </div><div class="col-xs-9" ng-bind="invoiceData.ReferenceNo"></div> </td>
+                                            <td></td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td><div class="col-xs-3">Location of Incident: </div><div class="col-xs-9" ng-bind="invoiceData.LocationOfIncident"></div> </td>
+                                            <td></td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <div class="col-xs-3">Policy or Membership No: </div>
+                                                <div class="col-xs-9">
+                                                    <input type="text" name="membershipNo" style="width:100%" ng-model="invoiceData.MembershipNo" ng-required="true" />
+                                                    <span class="help-block" style="color:red" ng-show="admissionInvoice.membershipNo.$error.required">Required Field *</span>
+                                                </div>
+                                            </td>
+                                            <td></td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td><div class="col-xs-3">Date of Admission: </div><div class="col-xs-9" name="" ng-bind="invoiceData.DateOfAdmission"></div> </td>
+                                            <td></td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td><div class="col-xs-3">Date of Discharget: </div><div class="col-xs-9" ng-bind="invoiceData.DateOfDischarge"></div> </td>
+                                            <td></td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td><div class="col-xs-3">Medical Expenses: </div><div class="col-xs-9"></div> </td>
+                                            <td></td>
+                                            <td ng-bind="invoiceData.MedicalExpenses"></td>
+                                        </tr>
+                                        <tr>
+                                            <td><div class="col-xs-3">Case Fee: </div><div class="col-xs-9"></div> </td>
+                                            <td contenteditable="true"></td>
+                                            <td ng-bind="invoiceData.CaseFee"></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>*@
+                            <!-- /.col -->
+                        </div>
+
+                        <!-- /.row -->
+                        @*<div class="row">
+                            <div class="col-xs-12">
+                                <p class="lead">We thank you In advance for sending a telex transfer to the bank details below : </p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-6">
+                                <div class="table-responsive">
+                                    <table class="table">
+                                        <tr>
+                                            <th style="width:50%">Beneficiary Name:</th>
+                                            <td ng-bind="invoiceData.ClaimAssessor"></td>
+                                        </tr>
+                                        <tr>
+                                            <th style="width:50%">Account No:</th>
+                                            <td>
+                                                <input type="text" name="accountNo" ng-model="invoiceData.AccountNo" ng-required="false" style="width:100%" />
+                                                <span class="help-block" style="color:red" ng-show="admissionInvoice.accountNo.$error.required">Required Field *</span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>Bank Nname</th>
+                                            <td>
+                                                <input type="text" name="bankName" ng-model="invoiceData.BankName" ng-required="false" style="width:100%" />
+                                                <span class="help-block" style="color:red" ng-show="admissionInvoice.bankName.$error.required">Required Field *</span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>Bank Address</th>
+                                            <td>
+                                                <input type="text" name="bankAddress" ng-model="invoiceData.BankAddress" ng-required="false" style="width:100%" />
+                                                <span class="help-block" style="color:red" ng-show="admissionInvoice.bankAddress.$error.required">Required Field *</span>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="col-xs-6">
+                                <div class="table-responsive">
+                                    <table class="table">
+                                        <tr>
+                                            <th>Bank Branch</th>
+                                            <td>
+                                                <input type="text" name="bankBranch" ng-model="invoiceData.BankBranch" ng-required="false" style="width:100%" />
+                                                <span class="help-block" style="color:red" ng-show="admissionInvoice.bankBranch.$error.required">Required Field *</span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th style="width:50%">Swift Code</th>
+                                            <td>
+                                                <input type="text" name="swiftCode" ng-model="invoiceData.SwiftCode" ng-required="false" style="width:100%" />
+                                                <span class="help-block" style="color:red" ng-show="admissionInvoice.swiftCode.$error.required">Required Field *</span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>Bank Code</th>
+                                            <td>
+                                                <input type="text" name="bankCode" ng-model="invoiceData.BankCode" ng-required="false" style="width:100%" />
+                                                <span class="help-block" style="color:red" ng-show="admissionInvoice.bankCode.$error.required">Required Field *</span>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>*@
+
+                        <!-- this row will not appear when printing -->
+                        @*<div class="row no-print">
+                            <div class="col-xs-12">
+                               
+                                <div class="btn btn-primary" ng-disabled="!admissionInvoice.$valid" ng-click="Save()" ng-show="!isUpdate"><span class="fa fa-print"></span>Print</div>
+                            </div>
+                        </div>*@
+
+                       
+                   
+                </div>
+                <div class="panel-body">
+
+                </div>
+            </div>
+
+
+
+
+        </div>
+    </div>
+
+

@@ -1,0 +1,670 @@
+﻿
+@{
+    ViewBag.Title = "ManageCMAClaimRecording";
+    Layout = "~/Views/Shared/_index.cshtml";
+}
+
+<script src="~/Scripts/ng/Controllers/SingaporeAdmissionController.js"></script>
+<script src="~/Scripts/ng/Services/SingaporeAdmissionService.js"></script>
+
+<div class="breadcrumb-line">
+    <ul class="breadcrumb">
+        <li><a href="/Dashboard/Dashboard"><i class="icon-home2 position-left"></i>Home</a></li>
+        <li>Transaction</li>
+        <li>Admission</li>
+        <li class="active"><b>Singapore Admission</b></li>
+    </ul>
+</div>
+
+<div class="content" ng-app="IBMSAPP">
+    <div ng-controller="SingaporeAdmissionController" ng-init="init()" ng-cloak>
+        <div class="page-content-wrap">
+            <div class="panel panel-default tabs">
+                @* Top tab *@
+                <ul class="nav nav-tabs" role="tablist">
+                    <li id="list-tab-1" class="active"><a href="#tab-1" role="tab" data-toggle="tab" ng-click="activateAdmissionListTab()">View</a></li>
+                    <li id="list-tab-2"><a href="#tab-2" role="tab" data-toggle="tab" >New</a></li>
+                </ul>
+
+                @* Main tab part will start here  *@
+                <div class="panel-body tab-content">
+                    @* View Tab  *@
+                    <div class="tab-pane active" id="tab-1">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">
+                                    <strong>Singapore Admission Details</strong>
+                                </h3>
+                                <ul class="panel-controls">
+                                    <li><input type="text" style="font-size: 12px;width: 100%;border-radius: 0px;margin-right:2px;" class="form-control" placeholder="Search Customer Request ..." ng-model="search_query" ng-change="searchTextChange(search_query)"></li>
+                                    <li><a href="#" ng-click="refreshContent()"><span class="fa fa-refresh"></span></a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="panel-body">
+                            <div class="col-md-2">Show records per page </div>
+                            <div class="col=md-10">
+                                <select class="form-control" style="width:100px;"
+                                        ng-model="viewby"
+                                        ng-change="setItemsPerPage(viewby)">
+                                    <option>10</option>
+                                    <option>20</option>
+                                    <option>30</option>
+                                    <option>40</option>
+                                    <option>50</option>
+                                </select>
+                            </div>
+                            <div><br></div>
+                            <table class="table table-responsive" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th>Reference No</th>
+                                        <th>Patient Name</th>
+                                        <th>Hospital</th>
+                                        <th>Passport</th>
+                                        <th>Case Number</th>
+                                        <th>Admission Date</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody ng-repeat="LocalAdmission in data.slice(((currentPage-1)*itemsPerPage), ((currentPage)*itemsPerPage))">
+                                    <tr id="view{{LocalAdmission.ReferenceNo}}">
+                                        <td>{{LocalAdmission.ReferenceNo}}</td>
+                                        <td>{{LocalAdmission.PatientName}}</td>
+                                        <td>{{LocalAdmission.Hospital}}</td>
+                                        <td>{{LocalAdmission.PassportNumber}}</td>
+                                        <td>{{LocalAdmission.BHTNumber}}</td>
+                                        <td>{{LocalAdmission.AdmissionDate | date:'yyyy-MM-dd'}}</td>
+                                        <td>
+                                            @*<button class="btn btn-info" style="width:70px;padding:1px;" ng-click="editClientRequest(ClientRequest.ClientRequestHeaderID,ClientRequest.ClientID)">Edit</button>*@&nbsp;&nbsp;
+                                            <button class="btn btn-info" style="width:100px;padding:1px;" ng-click="getAdmissionByRefNo(LocalAdmission.ReferenceNo)">View or Edit</button>&nbsp;&nbsp;
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <pagination total-items="totalItems"
+                                        ng-model="currentPage"
+                                        max-size="maxSize"
+                                        class="pagination-sm pull-left"
+                                        boundary-links="true"
+                                        rotate="false"
+                                        num-pages="numPages"
+                                        items-per-page="itemsPerPage"></pagination>
+                        </div>
+                    </div>
+
+                    @* New Tab Start *@
+                    <div class="tab-pane" id="tab-2">
+
+                        @*<div class="col-md-5" ng-if="isAddtMode">
+                            <div class="form-group">
+                                <label class="control-label">Select Addmission</label>
+                                <selectize placeholder="Select Addmission" options="availableClients" config="{maxItems: 1}" ng-model="singaporAdmissionObj.DeductionID" ng-change="loadSingaporAdmissionByID(singaporAdmissionObj.DeductionID)"></selectize>
+                            </div>
+                        </div>*@
+                        {{singaporAdmissionObj.ClientRequestHeaderID}}
+                        <div class="form-horizontal col-md-12" @*ng-if="!isAddtMode"*@>
+
+                            <form name="newAdmission" class="form-horizontal col-md-12" role="form">
+
+                                @* new admission form start *@
+                                <ng-form name="newAdmission">
+
+                                    <div class="panel panel-default">
+                                        <div class="panel-heading">
+                                            <h3 class="panel-title">
+                                                <strong>Singapore Admission Details</strong>
+                                            </h3>
+                                        </div>
+                                    </div>
+
+
+                                    @*<div class="form-group row" style="display:none">
+                                            <label class="col-md-4 control-label">Date Of Bath</label>
+                                            <div class="col-md-8">
+                                                <input type="text"
+                                                       name="selectRequestedDate"
+                                                       class="form-control date"
+                                                       ng-click="reqDate=true"
+                                                       datepicker-popup="dd/MM/yyyy"
+                                                       ng-model="cusReqObj.RequestedDate"
+                                                       is-open="reqDate"
+                                                       datepicker-options="dateOptions"
+                                                       placeholder="Requested Date"
+                                                       ng-required="true"
+                                                       close-text="Close">
+                                                <span class="input-group-btn">
+                                                    <button class="btn btn-default glyphicon glyphicon-calendar" ng-click="reqDate=true;$event.stopPropagation();"></button>
+                                                </span>
+                                            </div>
+                                            <span class="help-block" style="color:red" ng-show="manageClientRequest.selectRequestedDate.$error.required">
+                                                Required Field *
+                                            </span>
+                                        </div>*@
+
+
+
+                                    @* Refrence no *@
+                                    <div class="form-group">
+                                        <label class="col-md-4 control-label">Case No</label>
+                                        <div class="col-md-8">
+                                            <input type="text" name="CA" class="form-control" ng-model="admission.ReferenceNo" value="" @*ng-required="true"*@ />
+                                            @*<span class="help-block" style="color:red" ng-show="newAdmission.referenceNo.$error.required">Required Field *</span>*@
+                                        </div>
+                                    </div>
+
+                                    @* NAME OF THE PATIENT*@
+                                    @*<div class="form-group">
+                                            <label class="col-md-4 control-label">Name(Member)</label>
+                                            <div class="col-md-8">
+                                                <selectize placeholder="Select Member" options="availableClients" config="{maxItems: 1}" ng-model="admission.ClientID" ng-change="loadMemberDetails()"></selectize>
+
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="col-md-4 control-label">Name(Dependant)</label>
+                                            <div class="col-md-8">
+                                                <div class="form-group">
+                                                    <selectize placeholder="Select Dependant Name" name="inputDependant" options="availableFamilyMembers" config="{maxItems: 1}" ng-model="admission.FamilyDetails.FamilyMemberID" ng-change="LoadFamilyMemberDetails(admission.FamilyDetails.FamilyMemberID)"></selectize>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    *@
+                                    <div class="form-group">
+                                        <label class="col-md-4 control-label">Name</label>
+                                        <div class="col-md-4">
+                                         @*   <selectize placeholder="Select Addmission" options="availableClients" config="{maxItems: 1}" ng-model="admission.DeductionID" ng-change="loadSingaporAdmissionByID(admission.DeductionID)"></selectize>*@
+                                          
+                                            <selectize placeholder="Select Addmission" options="availableClients" config="{maxItems: 1}" ng-model="admission.DeductionID" ></selectize>
+                                            
+                                              @*<input type="text" name="PatientName" class="form-control" ng-model="admission.PatientName" value="" ng-required="true" />*@
+                                            <span class="help-block" style="color:red" ng-show="newAdmission.PatientName.$error.required">Required Field *</span>
+                                        </div>
+                                    </div>
+                                    @* Date of birth *@
+
+                                    
+
+                                    <div class="form-group">
+                                        <label class="col-md-4 control-label">Date Of Birth</label>
+                                        <div class="col-md-8">
+                                            <input type="text"
+                                                   name="dateOfBirth"
+                                                   class="form-control date"
+                                                   ng-click="reqDate=true"
+                                                   datepicker-popup="dd/MM/yyyy"
+                                                   ng-model="admission.DateOfBirth"
+                                                   is-open="reqDate"
+                                                   datepicker-options="dateOptions"
+                                                   placeholder="Date Of Birth"
+                                                   @*ng-required="true"*@
+                                                   close-text="Close">
+                                            @*<span class="input-group-btn">
+                                                    <button class="btn btn-default glyphicon glyphicon-calendar" ng-click="reqDate=true;$event.stopPropagation();"></button>
+                                                </span>*@
+                                            @*<span class="help-block" style="color:red" ng-show="newAdmission.dateOfBirth.$error.required">
+                                                    Required Field *
+                                                </span>*@
+                                        </div>
+
+                                    </div>
+
+                                    @* P P Number  *@
+                                    <div class="form-group">
+                                        <label class="col-md-4 control-label">Passport Number</label>
+                                        <div class="col-md-8">
+                                            <input type="text" name="passportNumber" class="form-control" ng-model="admission.PassportNumber" value="" @*ng-required="true"*@ />
+                                            @*<span class="help-block" style="color:red" ng-show="newAdmission.passportNumber.$error.required">Required Field *</span>*@
+                                        </div>
+                                    </div>
+
+                                    @* Scheme *@
+                                    <div class="form-group">
+                                        <label class="col-md-4 control-label">Scheme</label>
+                                        @*<div class="col-md-8">
+                                             <input type="text" name="scheme" class="form-control" ng-model="admission.Scheme" value="" ng-required="false" />
+                                             <span class="help-block" style="color:red" ng-show="newAdmission.scheme.$error.required">Required Field *</span>
+                                            </div>*@
+
+                                        <div class="col-md-8">
+                                            <div class="form-group">
+                                                <selectize placeholder="Select Scheme" name="inputPartner" class="col-md-4" options="availablePartners" config="{maxItems: 1}" ng-model="admission.Scheme" @*ng-required="true*@ "></selectize>
+                                                @*<span class="help-block" style="color:red" ng-show="newAdmission.inputPartner.$error.required">
+                                                        Required Field *
+                                                    </span>*@
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    @* INCEPTION DATE *@
+
+                                    @*<div class="form-group">
+                                            <label class="col-md-4 control-label">Inception Date</label>
+                                            <div class="col-md-8">
+                                                <input type="text" name="inceptionDate" class="form-control" ng-model="admission.InceptionDate" value="" ng-required="true" />
+                                                <span class="help-block" style="color:red" ng-show="newAdmission.inceptionDate.$error.required">Required Field *</span>
+                                            </div>
+                                        </div>*@
+
+                                    <div class="form-group row">
+                                        <label class="col-md-4 control-label">Inception Date</label>
+                                        <div class="col-md-8">
+                                            <input type="text"
+                                                   name="inceptionDate"
+                                                   class="form-control date"
+                                                   ng-click="reqDate2=true"
+                                                   datepicker-popup="dd/MM/yyyy"
+                                                   ng-model="admission.InceptionDate"
+                                                   is-open="reqDate2"
+                                                   datepicker-options="dateOptions"
+                                                   placeholder="Inception Date"
+                                                   @*ng-required="true"*@
+                                                   close-text="Close">
+
+                                            @*<span class="help-block" style="color:red" ng-show="newAdmission.inceptionDate.$error.required">
+                                                    Required Field *
+                                                </span>*@
+                                        </div>
+                                    </div>
+
+
+
+
+                                    @* DEDUCTIBLE *@
+                                    <div class="form-group">
+                                        <label class="col-md-4 control-label">Deductible</label>
+                                        <div class="col-md-8">
+                                            <input type="number" name="deductible" class="form-control" ng-model="admission.Deductible" value="" @*ng-required="true"*@ />
+                                            @*<span class="help-block" style="color:red" ng-show="newAdmission.deductible.$error.required">Required Field *</span>*@
+                                        </div>
+                                    </div>
+
+                                    @* DEDUCTIBLE USED FOR THE YEAR *@
+                                    <div class="form-group">
+                                        <label class="col-md-4 control-label">Deductible Used For The Year</label>
+                                        <div class="col-md-8">
+                                            <input type="number" name="deductibleUsedForTheYear" class="form-control" ng-model="admission.DeductibleUsedForTheYear" value="" @*ng-required="true"*@ />
+                                            @*<span class="help-block" style="color:red" ng-show="newAdmission.deductibleUsedForTheYear.$error.required">Required Field *</span>*@
+                                        </div>
+                                    </div>
+
+                                    @* EXCLUSIONS *@
+                                    <div class="form-group">
+                                        <label class="col-md-4 control-label">Exclusions</label>
+                                        <div class="col-md-8">
+                                            <input type="number" name="exclusions" class="form-control" ng-model="admission.Exclusions" value="" @*ng-required="true"*@ />
+                                            @*<span class="help-block" style="color:red" ng-show="newAdmission.exclusions.$error.required">Required Field *</span>*@
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-md-4 control-label">Country</label>
+                                        <div class="col-md-8">
+                                            <div class="form-group">
+                                                <selectize placeholder="Select Country" name="inputCountry" class="col-md-4" options="availableCountries" config="{maxItems: 1}" ng-model="admission.CountryID" ng-change="LoadHospital(admission.CountryID)"></selectize>
+                                            </div>
+                                            <div class="col-md-8">
+                                                <input type="text" name="Country" class="form-control" ng-model="admission.CountryName" value="" @*ng-required="true"*@ ng-show="false" />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    @* Hospital *@
+                                    <div class="form-group">
+                                        <label class="col-md-4 control-label">Hospital</label>
+                                        <div class="form-group">
+
+                                            <selectize placeholder="Select hospital" name="inputHospital" class="col-md-4" options="availableHospitals" config="{maxItems: 1}" ng-model="admission.Hospital" @*ng-required="true"*@></selectize>
+                                            @*<span class="help-block" style="color:red" ng-show="newAdmission.inputHospital.$error.required">
+                                                    Required Field *
+                                                </span>*@
+
+                                        </div>
+
+                                    </div>
+
+                                    @* Intimated DATE *@
+                                    @*<div class="form-group">
+                                            <label class="col-md-4 control-label">Intimated Date</label>
+                                            <div class="col-md-8">
+                                                <input type="text" name="inimatedDate" class="form-control" ng-model="admission.InimatedDate" value="" ng-required="true" />
+                                                <span class="help-block" style="color:red" ng-show="newAdmission.inimatedDate.$error.required">Required Field *</span>
+                                            </div>
+                                        </div>*@
+
+                                    <div class="form-group row">
+                                        <label class="col-md-4 control-label">Intimated Date</label>
+                                        <div class="col-md-8">
+                                            <input type="text"
+                                                   name="inimatedDate"
+                                                   class="form-control date"
+                                                   ng-click="reqDateIntimated=true"
+                                                   datepicker-popup="dd/MM/yyyy"
+                                                   ng-model="admission.InimatedDate"
+                                                   is-open="reqDateIntimated"
+                                                   datepicker-options="dateOptions"
+                                                   placeholder="Inimated Date"
+                                                   @*ng-required="true"*@
+                                                   close-text="Close">
+
+                                            @*<span class="help-block" style="color:red" ng-show="newAdmission.inimatedDate.$error.required">
+                                                    Required Field *
+                                                </span>*@
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-md-4 control-label">Informed By</label>
+                                        <div class="col-md-8">
+                                            <input type="text" name="informedBy" class="form-control" ng-model="admission.InformedBy" value="" @*ng-required="false"*@ />
+                                            @*<span class="help-block" style="color:red" ng-show="newAdmission.informedBy.$error.required">Required Field *</span>*@
+                                        </div>
+                                    </div>
+
+
+                                    @* ADMISSION DATE *@
+                                    @*<div class="form-group">
+                                            <label class="col-md-4 control-label">Admission Date</label>
+                                            <div class="col-md-8">
+                                                <input type="text" name="admissionDate" class="form-control" ng-model="admission.AdmissionDate" value="" ng-required="true" />
+                                                <span class="help-block" style="color:red" ng-show="newAdmission.admissionDate.$error.required">Required Field *</span>
+                                            </div>
+                                        </div>*@
+
+
+                                    <div class="form-group row">
+                                        <label class="col-md-4 control-label">Admission Date</label>
+                                        <div class="col-md-8">
+                                            <input type="text"
+                                                   name="admissionDate"
+                                                   class="form-control date"
+                                                   ng-click="reqDateAdmission=true"
+                                                   datepicker-popup="dd/MM/yyyy"
+                                                   ng-model="admission.AdmissionDate"
+                                                   is-open="reqDateAdmission"
+                                                   datepicker-options="dateOptions"
+                                                   placeholder="Admission Date"
+                                                   @*ng-required="true"*@
+                                                   close-text="Close">
+
+                                            @*<span class="help-block" style="color:red" ng-show="newAdmission.admissionDate.$error.required">
+                                                    Required Field *
+                                                </span>*@
+                                        </div>
+                                    </div>
+
+
+                                    @* DISCHARGED DATE *@
+                                    @*<div class="form-group">
+                                            <label class="col-md-4 control-label">Discharged Date</label>
+                                            <div class="col-md-8">
+                                                <input type="text" name="dischargedDate" class="form-control" ng-model="admission.DischargedDate" value="" ng-required="true" />
+                                                <span class="help-block" style="color:red" ng-show="newAdmission.dischargedDate.$error.required">Required Field *</span>
+                                            </div>
+                                        </div>*@
+
+                                    <div class="form-group row">
+                                        <label class="col-md-4 control-label">Discharged Date</label>
+                                        <div class="col-md-8">
+                                            <input type="text"
+                                                   name="dischargedDate"
+                                                   class="form-control date"
+                                                   ng-click="reqDateDischarge=true"
+                                                   datepicker-popup="dd/MM/yyyy"
+                                                   ng-model="admission.DischargedDate"
+                                                   is-open="reqDateDischarge"
+                                                   datepicker-options="dateOptions"
+                                                   placeholder="Discharge Date"
+                                                   close-text="Close">
+
+                                            @*<span class="help-block" style="color:red" ng-show="newAdmission.dischargedDate.$error.required">
+                                                    Required Field *
+                                                </span>*@
+                                        </div>
+                                    </div>
+
+                                    @* Case NUMBER *@
+                                    <div class="form-group">
+                                        <label class="col-md-4 control-label">Reference Number</label>
+                                        <div class="col-md-8">
+                                            <input type="text" name="caseNumber" class="form-control" ng-model="admission.CaseNumber" value="" @*ng-required="true"*@ />
+                                            @*<span class="help-block" style="color:red" ng-show="newAdmission.caseNumber.$error.required">Required Field *</span>*@
+                                        </div>
+                                    </div>
+                                    @* ILLNESS *@
+                                    <div class="form-group">
+                                        <label class="col-md-4 control-label">Illness</label>
+                                        <div class="col-md-8">
+                                            <input type="text" name="illness" class="form-control" ng-model="admission.Illness" value="" @*ng-required="true"*@ />
+                                            @*<span class="help-block" style="color:red" ng-show="newAdmission.illness.$error.required">Required Field *</span>*@
+                                        </div>
+                                    </div>
+
+
+
+
+                                    @* CONSULTANT'S NAME *@
+                                    <div class="form-group">
+                                        <label class="col-md-4 control-label">Consultans Name</label>
+                                        <div class="col-md-8">
+                                            <input type="text" name="consultantName" class="form-control" ng-model="admission.ConsultantName" value="" ng-required="false" />
+                                            <span class="help-block" style="color:red" ng-show="newAdmission.consultantName.$error.required">Required Field *</span>
+                                        </div>
+                                    </div>
+
+                                    @* INFORMED BY *@
+                                    @*<div class="form-group">
+                                            <label class="col-md-4 control-label">Informed By</label>
+                                            <div class="col-md-8">
+                                                <input type="text" name="informedBy" class="form-control" ng-model="admission.InformedBy" value="" ng-required="false" />
+                                                <span class="help-block" style="color:red" ng-show="newAdmission.informedBy.$error.required">Required Field *</span>
+                                            </div>
+                                        </div>*@
+
+                                    @*  GOP  AMOUNT *@
+                                    <div class="form-group">
+                                        <label class="col-md-4 control-label">GOP Amount</label>
+                                        <div class="col-md-8">
+                                            <input type="number" name="gopAmount" class="form-control" ng-model="admission.GOPAmount" value="" @*ng-required="true"*@ />
+                                            @*<span class="help-block" style="color:red" ng-show="newAdmission.gopAmount.$error.required">Required Field *</span>*@
+                                        </div>
+                                    </div>
+
+                                    @* EXENDED GOP *@
+                                    <div class="form-group">
+                                        <label class="col-md-4 control-label">Extended GOP</label>
+                                        <div class="col-md-8">
+                                            <input type="number" name="extendedGop" class="form-control" ng-model="admission.ExtendedGOP" value="" @*ng-required="true"*@ />
+                                            @*<span class="help-block" style="color:red" ng-show="newAdmission.extendedGop.$error.required">Required Field *</span>*@
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <label class="col-md-4 control-label">Extended GOP Date</label>
+                                        <div class="col-md-8">
+                                            <input type="text"
+                                                   name="ExtendedGOPDate"
+                                                   class="form-control date"
+                                                   ng-click="reqDateExtended=true"
+                                                   datepicker-popup="dd/MM/yyyy"
+                                                   ng-model="admission.ExtendedGOPDate"
+                                                   is-open="reqDateExtended"
+                                                   datepicker-options="dateOptions"
+                                                   placeholder="Extended GOP Date"
+                                                   close-text="Close">
+                                        </div>
+                                    </div>
+
+
+                                    @* FINAL BILL AMOUNT *@
+
+
+                                    @* CONSULTNT'S FEE *@
+                                    <div class="form-group">
+                                        <label class="col-md-4 control-label">Consultant Fee</label>
+                                        <div class="col-md-8">
+                                            <input type="number" name="consultantFee" class="form-control" ng-model="admission.ConsultantFee" value="" @*ng-required="true"*@ />
+                                            @*<span class="help-block" style="color:red" ng-show="newAdmission.consultantFee.$error.required">Required Field *</span>*@
+                                        </div>
+                                    </div>
+
+                                    @*REFFERAL FEE*@
+                                    <div class="form-group">
+                                        <label class="col-md-4 control-label">Referal Fee</label>
+                                        <div class="col-md-8">
+                                            <input type="number" name="referalFee" class="form-control" ng-model="admission.ReferalFee" value="" @*ng-required="true"*@ />
+                                            @*<span class="help-block" style="color:red" ng-show="newAdmission.referalFee.$error.required">Required Field *</span>*@
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-4 control-label">Final Bill</label>
+                                        <div class="col-md-8">
+                                            <input type="number" name="referalFee" class="form-control" ng-model="admission.FinalBillAmount" value="" @*ng-required="true"*@ />
+                                            @*<span class="help-block" style="color:red" ng-show="newAdmission.referalFee.$error.required">Required Field *</span>*@
+                                        </div>
+                                    </div>
+
+                                    @*CMA Invoice Number*@
+                                    <div class="form-group">
+                                        <label class="col-md-4 control-label">CMA Invoice Number</label>
+                                        <div class="col-md-8">
+                                            <input type="text" name="cmaInvoiceNumber" class="form-control" ng-model="admission.CMAInvoiceNumber" value="" @*ng-required="true"*@ />
+                                            @*<span class="help-block" style="color:red" ng-show="newAdmission.cmaInvoiceNumber.$error.required">Required Field *</span>*@
+                                        </div>
+                                    </div>
+
+                                    @*REFFERAL  FEE RECEIVED DATE*@
+                                    @*<div class="form-group">
+                                            <label class="col-md-4 control-label">Referal Fee Received Date</label>
+                                            <div class="col-md-8">
+                                                <input type="text" name="referalFeeReceivedDate" class="form-control" ng-model="admission.ReferalFeeReceivedDate" value="" ng-required="true" />
+                                                <span class="help-block" style="color:red" ng-show="newAdmission.referalFeeReceivedDate.$error.required">Required Field *</span>
+                                            </div>
+                                        </div>*@
+
+
+                                    <div class="form-group row">
+                                        <label class="col-md-4 control-label">Referal Fee Received Date</label>
+                                        <div class="col-md-8">
+                                            <input type="text"
+                                                   name="referalFeeReceivedDate"
+                                                   class="form-control date"
+                                                   ng-click="referalFeeReceived=true"
+                                                   datepicker-popup="dd/MM/yyyy"
+                                                   ng-model="admission.ReferalFeeReceivedDate"
+                                                   is-open="referalFeeReceived"
+                                                   datepicker-options="dateOptions"
+                                                   placeholder="Referal Fee Received Date"
+                                                   @*ng-required="true"*@
+                                                   close-text="Close">
+
+                                            @*<span class="help-block" style="color:red" ng-show="newAdmission.referalFeeReceivedDate.$error.required">
+                                                    Required Field *
+                                                </span>*@
+                                        </div>
+                                    </div>
+
+                                    @* FINAL BILL RECEIVED DATE *@
+                                    @*<div class="form-group">
+                                            <label class="col-md-4 control-label">Final Bill Recieved Date</label>
+                                            <div class="col-md-8">
+                                                <input type="text" name="finalBillRecievedDate" class="form-control" ng-model="admission.FinalBillRecievedDate" value="" ng-required="true" />
+                                                <span class="help-block" style="color:red" ng-show="newAdmission.finalBillRecievedDate.$error.required">Required Field *</span>
+                                            </div>
+                                        </div>*@
+
+                                    <div class="form-group">
+                                        <label class="col-md-4 control-label">Final Bill</label>
+                                        <div class="col-md-8">
+                                            <input type="number" name="extendedGop" class="form-control" ng-model="admission.FinalBillAmount" value="" @*ng-required="true"*@ />
+                                            @*<span class="help-block" style="color:red" ng-show="newAdmission.extendedGop.$error.required">Required Field *</span>*@
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <label class="col-md-4 control-label">Final Bill Recieved Date</label>
+                                        <div class="col-md-8">
+                                            <input type="text"
+                                                   name="finalBillRecievedDate"
+                                                   class="form-control date"
+                                                   ng-click="reqDateFinalBillRecieved=true"
+                                                   datepicker-popup="dd/MM/yyyy"
+                                                   ng-model="admission.FinalBillRecievedDate"
+                                                   is-open="reqDateFinalBillRecieved"
+                                                   datepicker-options="dateOptions"
+                                                   placeholder="Discharge Date"
+                                                   @*ng-required="true"*@
+                                                   close-text="Close">
+
+                                            @*<span class="help-block" style="color:red" ng-show="newAdmission.finalBillRecievedDate.$error.required">
+                                                    Required Field *
+                                                </span>*@
+                                        </div>
+                                    </div>
+
+                                    @*REFFERAL  FEE RECEIVED TT Transfer*@
+                                    <div class="form-group">
+                                        <label class="col-md-4 control-label">Referal Fee Received TT Transfer</label>
+                                        <div class="col-md-8">
+                                            <input type="text" name="referalFeeReceivedTtTransfer" class="form-control" ng-model="admission.ReferalFeeReceivedTtTransfer" value="" @*ng-required="true"*@ />
+                                            @*<span class="help-block" style="color:red" ng-show="newAdmission.referalFeeReceivedTtTransfer.$error.required">Required Field *</span>*@
+                                        </div>
+                                    </div>
+
+                                    @*PAYMENT GIVEN TO ACCOUNTS *@
+                                    <div class="form-group">
+                                        <label class="col-md-4 control-label">Payment Given To Account</label>
+                                        <div class="col-md-8">
+                                            <input type="number" name="paymentGivenToAccount" class="form-control" ng-model="admission.PaymentGivenToAccount" value="" @*ng-required="true"*@ />
+                                            @*<span class="help-block" style="color:red" ng-show="newAdmission.paymentGivenToAccount.$error.required">Required Field *</span>*@
+                                        </div>
+                                    </div>
+
+                                    @*Remark *@
+                                    <div class="form-group">
+                                        <label class="col-md-4 control-label">Remark</label>
+                                        <div class="col-md-8">
+                                            <input type="text" name="remark" class="form-control" ng-model="admission.Remark" value="" @*ng-required="true"*@ />
+                                            @*<span class="help-block" style="color:red" ng-show="newAdmission.remark.$error.required">Required Field *</span>*@
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-md-4 control-label">All Inclusive</label>
+                                        <div class="col-md-8">
+                                            <input type="number" name="finalAmount" class="form-control" ng-model="admission.FinalAmount" value="" @*ng-required="true"*@ />
+                                            @*<span class="help-block" style="color:red" ng-show="newAdmission.finalAmount.$error.required">Required Field *</span>*@
+                                        </div>
+                                    </div>
+
+
+
+                                    @* Buttons *@
+
+                                    <div class="form-group">
+                                        <label class="col-md-4 control-label"></label>
+                                        <div class="col-md-8">
+                                            <div class="btn btn-primary" ng-disabled="!newAdmission.$valid" ng-click="saveRequest()" ng-show="!isUpdate">Save Admission <span class="fa fa-floppy-o fa-right"></span></div>
+                                            <div class="btn btn-primary" ng-disabled="!isUpdate" ng-click="Save()" ng-show="isUpdate">Update Admission <span class="fa fa-floppy-o fa-right"></span></div>
+                                            <button type="button" class="btn btn-default" ng-click="cancelAdmission()">Clear<span class="glyphicon glyphicon-erase fa-right"></span></button>
+                                        </div>
+                                    </div>
+                                </ng-form>
+
+                                @* new admission form end *@
+                           
+                            </form>
+
+
+                        </div>
+
+
+                    </div>
+                    @* New Tab End *@
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

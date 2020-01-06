@@ -1,0 +1,167 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_index.cshtml";
+}
+
+@*<h2>Index</h2>*@
+
+
+<script src="~/Scripts/ng/Services/TransactionTypeService.js"></script>
+<script src="~/Scripts/ng/Controllers/TransactionTypeController.js"></script>
+<div class="breadcrumb-line">
+    <ul class="breadcrumb">
+        <li><a href="/Dashboard/Dashboard"><i class="icon-home2 position-left"></i>Home</a></li>
+        <li>Master Details</li><li>Policy</li>
+        <li class="active"><b>Transaction Type</b></li>
+    </ul>
+</div>
+<div class="content" ng-app="IBMSAPP">
+    <div ng-controller="TransactionTypeController" ng-init="init()" ng-cloak>
+        <div class="page-content-wrap">
+
+            <div class="panel panel-default tabs">
+                <ul class="nav nav-tabs" role="tablist">
+                    <li class="active"><a href="#tab-first" role="tab" data-toggle="tab">View</a></li>
+                    <li><a href="#tab-second" role="tab" data-toggle="tab">New</a></li>
+                    @*<li><a href="#tab-third" role="tab" data-toggle="tab">Edit</a></li>*@
+                </ul>
+                <div class="panel-body tab-content">
+                    <div class="tab-pane active" id="tab-first">
+
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">
+                                    <strong>Transaction Type</strong>
+                                </h3>
+                                <ul class="panel-controls">
+                                    <li><input type="text" style="font-size: 12px;width: 100%;border-radius: 0px;margin-right:2px;" class="form-control" placeholder="Search Transaction Type ..." ng-model="search_query" ng-change="searchTextChange(search_query)"></li>
+                                    <li><a href="#" ng-click="refreshContent()"><span class="fa fa-refresh"></span></a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="panel-body">
+                            <div class="col-md-2">Show record per page </div>
+                            <div class="col=md-10">
+                                <select class="form-control" style="width:100px;" ng-model="viewby" ng-change="setItemsPerPage(viewby)">
+                                    <option>5</option>
+                                    <option>10</option>
+                                    <option>20</option>
+                                    <option>30</option>
+                                    <option>40</option>
+                                    <option>50</option>
+                                </select>
+                            </div>
+                            <div></div><br />
+                            <table class="table table-responsive">
+                                <thead>
+                                    <tr>
+                                        <th hidden>TransactionType ID</th>
+                                        <th>Transaction Type Name</th>
+                                        <th>Business Unit</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody ng-repeat="TRA in data.slice(((currentPage-1)*itemsPerPage), ((currentPage)*itemsPerPage))">
+                                    <!--<tr  >-->
+                                    <tr id="view{{TRA.TransactionTypeID}}">
+                                        <td hidden>{{TRA.TransactionTypeID}}</td>
+                                        <td>{{TRA.Description}}</td>
+                                        <td>{{TRA.BusinessUnitName}}</td>
+                                        <td>
+                                            <div class="fa fa-edit btn btn-success" ng-click="editTRA(TRA)">&nbsp;&nbsp;Edit</div>&nbsp;&nbsp;<div class="fa fa-trash-o btn btn-danger" ng-click="deleteTRA(TRA.TransactionTypeID)">&nbsp;&nbsp;Delete</div>
+                                        </td>
+
+
+                                    </tr>
+
+                                    <tr id="edit{{TRA.TransactionTypeID}}" hidden>
+                                        <td hidden>
+                                            <input type="text" hidden class="form-control"
+                                                   value="{{TRA.TransactionTypeID}}"
+                                                   ng-model="TRA.TransactionTypeID">
+                                        </td>
+                                        <td>
+                                            <input type="text" hidden class="form-control"
+                                                   value="{{TRA.Description}}"
+                                                   ng-model="TRA.Description">
+                                            <span class="help-block" style="color:red" ng-show="!TRA.Description">Required Field *</span>
+                                        </td>
+                                        <td>
+                                            <select name="selectCompany" id="timeZone" hidden class="form-control" ng-model="TRA.BusinessUnitID" ng-options="BU.BusinessUnitID as BU.BusinessUnit for BU in filteredBusinessUnits" ng-required="true">
+                                                <option value="TRA.BusinessUnit"></option>
+                                            </select>
+                                        </td>
+                                       
+                                        <td>
+                                            <div class="fa fa-save btn btn-info" ng-disabled="!(TRA.Description)" ng-click="update(TRA)">&nbsp;&nbsp;Update</div>&nbsp;&nbsp;&nbsp;&nbsp;
+                                            <div ng-click="cancel(TRA)" class="fa fa-times btn btn-default">&nbsp;&nbsp;Cancel</div>
+                                        </td>
+
+
+                                    </tr>
+
+
+                                </tbody>
+
+                            </table>
+                            <pagination total-items="totalItems"
+                                        ng-model="currentPage"
+                                        max-size="maxSize"
+                                        class="pagination-sm pull-left"
+                                        boundary-links="true"
+                                        rotate="false"
+                                        num-pages="numPages"
+                                        items-per-page="itemsPerPage"></pagination>
+                        </div>
+
+                    </div>
+                    <div class="tab-pane" id="tab-second">
+                        <form class="form-horizontal col-md-10" role="form">
+                            <ng-form name="traData" novalidate>
+
+
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label">TransactionType Name</label>
+                                    <div class="col-md-8">
+                                        <input type="text" name="inputTraName" ng-model="traObj.Description" class="form-control" value="Some text value..." ng-required="true" /><span class="help-block" style="color:red" ng-show="traData.inputTraName.$error.required">Required Field *</span>
+                                    </div>
+
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label">Business Unit</label>
+                                    <div class="col-md-8">
+                                        <select name="selectBU" id="timeZone" class="form-control" ng-model="traObj.BusinessUnitID" ng-options="BU.BusinessUnitID as BU.BusinessUnit for BU in filteredBusinessUnits" ng-required="true">
+                                            @*<option value="">--Select a BusinessUnit--</option>*@
+                                        </select><span class="help-block" style="color:red" ng-show="traData.selectBU.$error.required">Required Field *</span>
+                                    </div>
+                                </div>
+                                <br />
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label"></label>
+                                    <div class="col-md-8">
+                                        <div class="btn btn-primary" ng-disabled="!traData.$valid" ng-click="addTransactionType()">Add Transaction Type<i class="icon-arrow-right14 position-right"></i></div>
+                                        <div class="glyphicon glyphicon-refresh btn  btn-default"
+                                             ng-click="ClearFields()">
+                                            Clear<i class="icon-arrow-right14 position-right"></i>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </ng-form>
+                        </form>
+                            
+
+
+</div>
+                    <div class="tab-pane" id="tab-third">
+                        <p> 3rd</p>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div id="divLoading" ng-show="showLoader"></div>
+    </div>
+</div>

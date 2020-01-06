@@ -1,0 +1,154 @@
+﻿
+@{
+    ViewBag.Title = "Business Unit";
+    Layout = "~/Views/Shared/_index.cshtml";
+}
+
+<script src="~/Scripts/ng/Services/BusinessUnitService.js"></script>
+<script src="~/Scripts/ng/Controllers/BusinessUnitController.js"></script>
+
+<div class="breadcrumb-line">
+    <ul class="breadcrumb">
+        <li><a href="/Dashboard/Dashboard"><i class="icon-home2 position-left"></i>Home</a></li>
+        <li>Master Details</li>
+        <li class="active"><b>Business Unit</b></li>
+    </ul>
+</div>
+<div class="content" ng-app="IBMSAPP">
+    <div ng-controller="BusinessUnitController" ng-init="init()" ng-cloak>
+        <div class="page-content-wrap">
+
+            <div class="panel panel-default tabs">
+                <ul class="nav nav-tabs" role="tablist">
+                    <li class="active"><a href="#tab-first" role="tab" data-toggle="tab">View</a></li>
+                    <li><a href="#tab-second" role="tab" data-toggle="tab">New</a></li>
+                    @*<li><a href="#tab-third" role="tab" data-toggle="tab">Edit</a></li>*@
+                </ul>
+                <div class="panel-body tab-content">
+                    <div class="tab-pane active" id="tab-first">
+
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">
+                                    <strong>Business Unit</strong>
+                                </h3>
+                                <ul class="panel-controls">
+                                    <li><input type="text" style="font-size: 12px;width: 100%;border-radius: 0px;margin-right:2px;" class="form-control" placeholder="Search Business Unit ..." ng-model="search_query" ng-change="searchTextChange(search_query)"></li>
+                                    <li><a href="#" ng-click="refreshContent()"><span class="fa fa-refresh"></span></a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="panel-body">
+                            <div class="col-md-2">Show records per page </div>
+                            <div class="col=md-10">
+                                <select class="form-control" style="width:100px;"
+                                         ng-model="viewby"
+                                         ng-change="setItemsPerPage(viewby)">
+                                    <option>5</option>
+                                    <option>10</option>
+                                    <option>20</option>
+                                    <option>30</option>
+                                    <option>40</option>
+                                    <option>50</option>
+                                </select>
+                            </div>
+                            <div><br></div>
+
+
+                            <table class="table table-responsive" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th hidden>BusinessUnit ID</th>
+                                        <th>Business Unit Name</th>
+                                        <th>Is Active</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="Business" ng-repeat="BusinessUnit in data.slice(((currentPage-1)*itemsPerPage), ((currentPage)*itemsPerPage))">
+                                    <tr id="view{{BusinessUnit.BusinessUnitID}}">
+                                        <td hidden>{{BusinessUnit.BusinessUnitID}}</td>
+                                        <td>{{BusinessUnit.BusinessUnit}}</td>
+                                        <td><input type="checkbox" value="{{BusinessUnit.IsActive}}" ng-model="BusinessUnit.IsActive" disabled></td>
+                                        <td>
+                                            <div class="fa fa-edit btn btn-success" style="width:90px;" ng-click="editBU(BusinessUnit)">&nbsp;&nbsp;Edit</div>
+                                            <div class="fa fa-trash-o btn btn-danger" style="width:90px;" ng-click="deleteBU(BusinessUnit.BusinessUnitID)">&nbsp;&nbsp;Delete</div>
+                                        </td>
+                                    </tr>
+                                    <tr id="edit{{BusinessUnit.BusinessUnitID}}" hidden>
+                                        <td hidden>
+                                            <input type="text" hidden class="form-control"
+                                                   value="{{BusinessUnit.BusinessUnitID}}"
+                                                   ng-model="BusinessUnit.BusinessUnitID">
+                                        </td>
+                                        <td>
+                                            <input type="text" hidden style="width:100%" class="form-control"
+                                                   value="{{BusinessUnit.BusinessUnit}}"
+                                                   ng-model="BusinessUnit.BusinessUnit">
+                                            <span class="help-block" style="color:red" ng-show="!BusinessUnit.BusinessUnit">Required Field *</span>
+                                        </td>
+
+                                        <td>
+                                            <input type="checkbox" class="icheckbox" value="{{BusinessUnit.IsActive}}" ng-model="BusinessUnit.IsActive">
+
+                                        </td>
+                                        <td>
+                                            <div class="fa fa-save btn btn-info" ng-disabled="!(BusinessUnit.BusinessUnit)" ng-click="update(BusinessUnit)">&nbsp;&nbsp;Update </div>&nbsp;
+                                            <div ng-click="cancel(BusinessUnit)" class="fa fa-times btn btn-default">&nbsp;&nbsp;Cancel </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <pagination  total-items="totalItems" 
+                                        ng-model="currentPage" 
+                                        max-size="maxSize" 
+                                        class="pagination-sm pull-left" 
+                                        boundary-links="true" 
+                                        rotate="false" 
+                                        num-pages="numPages" 
+                                        items-per-page="itemsPerPage"></pagination>
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="tab-second">
+                        <form class="form-horizontal col-md-10" role="form">
+                            <ng-form name="businessData" novalidate>
+
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label">Business Unit Name</label>
+
+                                    @*<span class="error" ng-show="businessData.inputBusinessUnitName.$error.required" style="color:red">&nbsp;*</span>*@
+                                    <div class="col-md-8">
+                                        <input type="text" name="inputBusinessUnitName" ng-model="buObj.BusinessUnit" class="form-control" ng-required="true" />
+                                        <span class="help-block" style="color:red" ng-show="businessData.inputBusinessUnitName.$error.required">Required Field *</span>
+                                    </div>
+
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label">Is Active</label>
+                                    @*<span class="error" ng-show="businessData.inputIsActive.$error.required" style="color:red">&nbsp;*</span>*@
+                                    <div class="col-md-8">
+                                        @*style="margin-top:5px;">*@
+                                        <input type="checkbox" ng-model="buObj.IsActive" id="isTaxable">
+                                    </div>
+                                </div>
+                                <br />
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label">
+
+                                    </label>
+                                    <div class="col-md-8">
+                                        <div class="btn btn-primary" ng-disabled="!businessData.$valid" ng-click="addBusinessUnit()">Save Business Unit<span class="fa fa-floppy-o fa-right"></span><i class="icon-arrow-right14 position-right"></i></div>
+                                        <button type="button" class="btn btn-default" ng-click="ClearFields()">Clear<span class="glyphicon glyphicon-erase fa-right"></span></button>
+                                    </div>
+                                </div>
+                            </ng-form>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+        <div id="divLoading" ng-show="showLoader"></div>
+    </div>
+</div>
+

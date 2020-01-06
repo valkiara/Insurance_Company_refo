@@ -1,0 +1,185 @@
+﻿@{
+    ViewBag.Title = "Profile";
+    Layout = "~/Views/Shared/_index.cshtml";
+}
+
+<style>
+    .panel-heading {
+        background: #1caf9a;
+    }
+</style>
+
+<script src="~/Scripts/ng/Excel/Excel.js"></script>
+
+<script src="~/Scripts/ng/Controllers/ClaimListController.js"></script>
+<script src="~/Scripts/ng/Services/ClaimListService.js"></script>
+
+<div class="breadcrumb-line">
+    <ul class="breadcrumb">
+        <li><a href="/Dashboard/Index"><i class="icon-home2 position-left"></i>Home</a></li>
+        <li>Enquiries</li>
+        <li class="active"><b>Claim List</b></li>
+    </ul>
+</div>
+
+<div class="content" ng-app="IBMSAPP">
+    <div ng-controller="ClaimListController" ng-init="init()" ng-cloak>
+        <div class="row">
+            <div class="col-md-7">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <h6 class="panel-title">Claim Date Range</h6>
+                    </div>
+                    <div class="panel-body">
+                        <ng-form name="profileData" novalidate>
+                            <div class="form-group">
+                                <div class="row">
+                                    <label class="col-md-3 control-label">Date Range</label>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <div class="input-group">
+                                                <input type="text"
+                                                       name="selectlPaymentDate"
+                                                       class="form-control date"
+                                                       ng-click="lpaydate=true"
+                                                       ng-change="calculateDays()"
+                                                       datepicker-popup="dd/MM/yyyy"
+                                                       ng-model="filterObj.fromDate"
+                                                       is-open="lpaydate"
+                                                       datepicker-options="dateOptions"
+                                                       placeholder="From Date"
+                                                       ng-required="true"
+                                                       close-text="Close">
+                                                <span class="input-group-btn">
+                                                    <button class="btn btn-default glyphicon glyphicon-calendar" ng-click="lpaydate=true;$event.stopPropagation();"></button>
+                                                </span>
+                                            </div>
+                                            <span class="help-block" style="color:red" ng-show="manageCustomer.selectlPaymentDate.$error.required">
+                                                Required Field *
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <div class="input-group">
+                                            <input type="text"
+                                                   name="DateOfIntimation"
+                                                   class="form-control date"
+                                                   ng-click="coverToDateView=true"
+                                                   ng-change="calculateDays()"
+                                                   datepicker-popup="MM/dd/yyyy"
+                                                   ng-model="filterObj.toDate"
+                                                   is-open="coverToDateView"
+                                                   datepicker-options="dateOptions"
+                                                   placeholder="To Date"
+                                                   close-text="Close">
+                                            <span class="input-group-btn">
+                                                <button class="btn btn-default glyphicon glyphicon-calendar" ng-click="coverToDateView=true;$event.stopPropagation();"></button>
+                                            </span>
+                                        </div>
+                                        <span class="help-block" style="color:red" ng-show="managePolicyInfoRecording.DateOfIntimation.$error.required">
+                                            Required Field *
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="row">
+                                    <label class="col-md-3">Number of Days</label>
+                                    <div class="col-md-4">
+                                        <input type="text" id="user" name="inputFirstName" placeholder="In Days" data-ng-model="inDays" class="form-control" ng-required="true">
+                                    </div>
+                                </div>
+                            </div>
+
+                        </ng-form>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-md-4 control-label"></label>
+                        <button type="submit" class="btn btn-primary" ng-click="getClaimListByDate()">Submit<i class="icon-arrow-right14 position-right"></i></button>
+                    </div>
+                    <br />
+                </div>
+            </div>
+        </div>
+
+        @* Table *@
+        <div class="page-content-wrap">
+            <div class="panel panel-default tabs">
+                <div class="panel-body tab-content">
+                    <div class="tab-pane active" id="tab-first">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+
+                                <h3 class="panel-title">
+                                    <strong>Claim Detail</strong>
+                                </h3>
+
+                                <ul class="panel-controls">
+                                    <li><input type="text" style="font-size: 12px;width: 100%;border-radius: 0px;margin-right:2px;" class="form-control" placeholder="Search Commission...." ng-model="search_query" ng-change="searchTextChange(search_query)"></li>
+                                </ul>
+
+                            </div>
+                        </div>
+                        <div class="panel-body">
+                            <form class="form-horizontal col-md-12" role="form">
+                                <ng-form name="CommissionPercentagesData">
+                                    <label class="col-md-3 control-label">Show records per page </label>
+                                    <div class="col=md-10">
+                                        <select class="form-control" style="width:100px;" ng-model="viewby"
+                                                ng-change="setItemsPerPage(viewby)">
+                                            <option>5</option>
+                                            <option>10</option>
+                                            <option>20</option>
+                                            <option>30</option>
+                                            <option>40</option>
+                                            <option>50</option>
+                                        </select>
+                                    </div>
+                                    <div></div>
+                                    <br />
+
+                                    <table class="table table-responsive" cellspacing="0" id="list">
+                                        <thead>
+                                            <tr>
+                                                <th>Claim No</th>
+                                                <th>Client Name</th>
+                                                <th>Date Of Loss</th>
+                                                <th>Date Of Intimation</th>                                             
+                                                <th>Cause of Loss</th>
+                                                <th>Claimed Amount</th>
+                                                <th>Paid Amount</th>
+                                                <th>Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody ng-repeat="filterdData in data.slice(((currentPage-1)*itemsPerPage), ((currentPage)*itemsPerPage))">
+                                            <tr>
+                                                <td>{{filterdData.ClaimNo }}</td>
+                                                <td>{{filterdData.ClientName }}</td>
+                                                <td>{{filterdData.DateOfLoss | date }}</td>
+                                                <td>{{filterdData.DateOfIntimation | date }}</td>
+                                                <td>{{filterdData.CauseOfLoss | date}}</td>
+                                                <td>{{filterdData.AmountClaim }}</td>
+                                                <td>{{filterdData.AmountPaid }}</td>
+                                                <td>{{filterdData.Status }}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                    <pagination total-items="totalItems" ng-model="currentPage" max-size="maxSize" class="pagination-sm pull-left" boundary-links="true" rotate="false" num-pages="numPages" items-per-page="itemsPerPage"></pagination>
+                                    <button style="border-radius: 0px;width:19%;" class="btn btn-danger pull-right" ng-click="exportToExcel('#list')">Export to Excel</button>
+                                </ng-form>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div id="divLoading" ng-show="showLoader"></div>
+    </div>
+</div>
+
+

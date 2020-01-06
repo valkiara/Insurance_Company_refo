@@ -1,0 +1,747 @@
+﻿
+@{
+    ViewBag.Title = "Manage Policy Information Recording";
+}
+
+<style>
+    .form-control[disabled], .form-control[readonly] {
+        color: #000000 !important;
+    }
+
+    .set-header {
+        background-color: #1caf9a;
+        height: 50px;
+        padding: 2px;
+        /*margin-bottom: 15px;*/
+    }
+</style>
+
+<script src="~/Scripts/ng/Services/PolicyInfoRecService.js"></script>
+<script src="~/Scripts/ng/Controllers/PolicyInfoRecController.js"></script>
+
+<script type="text/javascript">
+    function IsNumber(evt) {
+        evt = (evt) ? evt : window.event;
+        var charCode = (evt.which) ? evt.which : evt.keyCode;
+        if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+            return false;
+        }
+        return true;
+    }
+
+    function checkInputRate(rateVal) {
+        var regEx = /^[0-9]+\.?[0-9]*$/;
+        if (regEx.test(rateVal.value) == false) {
+            rateVal.value = rateVal.value.substring(0, rateVal.value.length - 1);
+        }
+    }
+</script>
+
+<div class="breadcrumb-line">
+    <ul class="breadcrumb">
+        <li><a href="/Dashboard/Index"><i class="icon-home2 position-left"></i>Home</a></li>
+        <li>Transaction</li>
+        <li>Policy</li>
+        <li class="active"><b>Policy Information Recording</b></li>
+    </ul>
+</div>
+
+<div class="content" ng-app="IBMSAPP">
+    <div ng-controller="PolicyInfoRecController" ng-init="init()" ng-cloak>
+        <div class="page-content-wrap">
+            <div class="panel panel-default tabs">
+                <ul class="nav nav-tabs" role="tablist">
+                    <li id="list-tab-1" class="active"><a href="#tab-1" role="tab" data-toggle="tab" ng-click="activatePolicyInfoRecListTab()">View</a></li>
+                    <li id="list-tab-2"><a href="#tab-2" role="tab" data-toggle="tab" ng-click="activatePolicyInfoRecTab()">New</a></li>
+                </ul>
+                <div class="panel-body tab-content">
+                    <div class="tab-pane active" id="tab-1">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">
+                                    <strong>Policy Information Recording Details</strong>
+                                </h3>
+                                <ul class="panel-controls">
+                                    <li><input type="text" style="font-size: 12px;width: 100%;border-radius: 0px;margin-right:2px;" class="form-control" placeholder="Search Policy Recording ..." ng-model="search_query" ng-change="searchTextChange(search_query)"></li>
+                                    <li><a href="#" ng-click="refreshContent()"><span class="fa fa-refresh"></span></a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="panel-body">
+                            <div class="col-md-2">Show records per page </div>
+                            <div class="col=md-10">
+                                <select class="form-control" style="width:100px;"
+                                        ng-model="viewby"
+                                        ng-change="setItemsPerPage(viewby)">
+                                    <option>10</option>
+                                    <option>20</option>
+                                    <option>30</option>
+                                    <option>40</option>
+                                    <option>50</option>
+                                </select>
+                            </div>
+                            <div><br></div>
+                            <table class="table table-responsive" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th>Policy ID</th>
+                                        <th>Policy Number</th>
+                                        <th>Quotation Header ID</th>
+                                        <th>Cover From Date</th>
+                                        <th>Cover To Date</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody ng-repeat="policyInfoRec in data.slice(((currentPage-1)*itemsPerPage), ((currentPage)*itemsPerPage))">
+                                    <tr id="view{{policyInfoRec.PolicyInfoRecID}}">
+                                        <td>{{policyInfoRec.PolicyInfoRecID}}</td>
+                                        <td>{{policyInfoRec.PolicyNumber}}</td>
+                                        <td>{{policyInfoRec.QuotationHeaderID}}</td>
+                                        <td>{{policyInfoRec.PeriodOfCoverFromDate}}</td>
+                                        <td>{{policyInfoRec.PeriodOfCoverToDate}}</td>
+                                        <td>
+                                            <button class="btn btn-success" @*ng-disabled="ClientRequest.IsQuotationCreated"*@ style="width:100px;padding:1px;" ng-click="editPolicyRecInfo(policyInfoRec.PolicyInfoRecID,policyInfoRec.QuotationHeaderID)">Edit Policy</button>&nbsp;&nbsp;
+                                            <button style="width:60px;" class="btn btn-info" ng-click="printPolicy(policyInfoRec.PolicyInfoRecID)">Print</button>
+                                        </td>
+                                    </tr>
+
+                                </tbody>
+
+                            </table>
+
+                            <pagination total-items="totalItems"
+                                        ng-model="currentPage"
+                                        max-size="maxSize"
+                                        class="pagination-sm pull-left"
+                                        boundary-links="true"
+                                        rotate="false"
+                                        num-pages="numPages"
+                                        items-per-page="itemsPerPage"></pagination>
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="tab-2">
+                        <form name="manangePolicyInformationRecording" novalidate>
+                            <ng-form name="manageClient" novalidate>
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <h3 class="panel-title">
+                                            <strong>Quotation Details</strong>
+                                        </h3>
+                                    </div>
+                                </div>
+                                <div class="panel-body">
+                                    <div class="col-md-5" ng-if="!isQuotationAvailable">
+                                        <div class="form-group">
+                                            <label class="control-label">Select Quotation</label>
+                                            <selectize placeholder="Select Quotation" options="availableQuotationHeadersPolicy" config="{maxItems: 1}" ng-model="quotationHeaderObj.QuotationHeaderID" ng-change="loadQuotationDetailsByID(quotationHeaderObj.QuotationHeaderID)"></selectize>
+                                        </div>
+                                    </div>
+                                    <div class="row" ng-if="isQuotationAvailable">
+                                        <div class="col-md-5">
+                                            <h3 style="margin-top: 5px;">{{cusObj.ClientName }}</h3>
+                                            <h5 style="color:red">{{cusObj.Email}}</h5>
+                                            <h4>{{cusObj.ClientAddress}}</h4>
+                                            <h6>Phone:&nbsp;{{cusObj.ContactNo}}/{{cusObj.FixedLine}}</h6>
+                                            <h6>NIC:&nbsp;{{cusObj.NIC}}</h6>
+                                            <h6>DOB:&nbsp;{{cusObj.DOB}}</h6>
+                                        </div>
+
+
+                                        <div class="col-md-5" style="border:double">
+                                            <div class="contact-info">
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <p><medium><b>Quotation No</b></medium><br>{{quotationHeaderObj.QuotationHeaderID}}</p>
+                                                        <p><medium><b>Client Request No</b></medium><br>{{quotationHeaderObj.ClientRequestHeaderID}}</p>
+                                                        <p><medium><b>Quotation Status</b></medium><br>{{quotationHeaderObj.QuotationStatusCodeDescription}}</p>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <p><medium><b>Business Unit</b></medium><br>{{cusReqObj.BusinessUnitName}}</p>
+                                                        <p><medium><b>Introduced By</b></medium><br>{{cusReqObj.PartnerName}}</p>
+                                                        <p><medium><b>Transaction Date</b></medium><br>{{cusReqObj.RequestedDate}}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <br />
+                                    <div class="row" ng-if="isQuotationAvailable">
+                                        <div class="col-md-12">
+                                            <button class="btn btn-primary" ng-click="changeQuotation()">Change Quotation</button>
+                                        </div>
+                                    </div>
+                                    @*{{cusObj}}
+                                        {{cusReqObj}}*@
+                                </div>
+                            </ng-form>
+                            <ng-form name="managePolicyInfoRecording" novalidate>
+                                <div class="panel panel-default" ng-if="isQuotationAvailable">
+                                    <div class="panel-heading">
+                                        <h3 class="panel-title">
+                                            <strong>Manage Policy Info Recording</strong>
+                                        </h3>
+                                    </div>
+                                </div>
+                                <div class="panel-body" ng-if="isQuotationAvailable">
+                                    <div class="row">
+                                        <label class="col-md-2 ">Policy Number</label>
+                                        <div class="col-md-6">
+
+                                            <input type="text" placeholder="Policy Number" name="inputPolicyNumber" ng-model="policyInfoRecObj.PolicyNumber" class="form-control" ng-required="true" style="width:100%" />
+                                            <span class="help-block" style="color:red" ng-show="managePolicyInfoRecording.inputPolicyNumber.$error.required">Required Field *</span>
+                                        </div>
+                                    </div>
+                                    <br />
+                                    <div class="row">
+                                        <label class="col-md-2 ">Tax Invoice Number</label>
+                                        <div class="col-md-6">
+                                            <input type="text" placeholder="Tax Invoice Number" name="inputTaxInvoiceNumber" ng-model="policyInfoRecObj.TaxInvoiceNumber" class="form-control" ng-required="true" style="width:100%" />
+                                            <span class="help-block" style="color:red" ng-show="managePolicyInfoRecording.inputTaxInvoiceNumber.$error.required">Required Field *</span>
+                                        </div>
+                                    </div>
+
+                                    <br />
+                                    <div class="row">
+                                        <label class="col-md-2 ">Vehicle Number</label>
+                                        <div class="col-md-6">
+                                            <input type="text" name="inputVehicleNumber" placeholder="Vehicle Number" ng-model="policyInfoRecObj.VehicleNumber" class="form-control" style="width:100%">
+
+                                        </div>
+
+                                    </div>
+                                    <br />
+                                    @*<div class="row" >
+                                            <label class="col-md-2 ">Insurance Policy Line</label>
+                                            <div class="col-md-6">
+                                                <selectize name="SelectInsuranceCompanyLine" placeholder="Select Policy Line" options="availableQuoteInfoInsCompanyDetails" config="{maxItems: 1}" ng-model="policyInfoRecObj.QuotationDetailsInsCompanyLineID" ng-change="SelectedInsuranceCompany(policyInfoRecObj.QuotationDetailsInsCompanyLineID)" ng-required="false"></selectize>
+                                                <span class="help-block" style="color:red" ng-show="managePolicyInfoRecording.SelectInsuranceCompanyLine.$error.required">Required Field *</span>
+                                            </div>
+                                        </div>
+                                        <br />*@
+                                    <div class="row">
+                                        <label class="col-md-2 ">Insurance Company</label>
+                                        <div class="col-md-6">
+                                            <selectize name="SelectInsuranceCompanyID" placeholder="Select Insurance Company Line" options="availableQuoteInfoInsCompanys" config="{maxItems: 1}" ng-model="policyInfoRecObj.InsuranceCompanyID" @*ng-change="getInsChargeType(quotationHeaderObj.QuotationHeaderID,policyInfoRecObj.InsuranceCompanyID)"*@ ng-required="true"></selectize>
+                                            <span class="help-block" style="color:red" ng-show="managePolicyInfoRecording.SelectInsuranceCompanyID.$error.required">Required Field *</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <label class="col-md-2 ">Insurance Class</label>
+                                        <div class="col-md-6">
+                                            <selectize name="SelectInsuranceClass" placeholder="Select Insurance Class" options="availableInsClass" config="{maxItems: 1}" ng-model="policyInfoRecObj.InsuranceClassID" ng-change="getAllInsuranceSubClassByInsClass(policyInfoRecObj.InsuranceClassID)" ng-required="true"></selectize>
+                                            <span class="help-block" style="color:red" ng-show="managePolicyInfoRecording.SelectInsuranceClass.$error.required">Required Field *</span>
+                                        </div>
+                                    </div>
+
+
+                                    <div class="row">
+                                        <label class="col-md-2 ">Insurance Sub Class</label>
+                                        <div class="col-md-6">
+                                            <selectize name="SelectInsuranceSubClass" placeholder="Select Insurance Sub Class" options="availableInsuranceSubClass" config="{maxItems: 1}" ng-model="policyInfoRecObj.InsuranceSubClassID" ng-change="getInsChargeTypeNew(policyInfoRecObj.InsuranceCompanyID,policyInfoRecObj.InsuranceClassID,policyInfoRecObj.InsuranceSubClassID)" ng-required="true"></selectize>
+                                            <span class="help-block" style="color:red" ng-show="managePolicyInfoRecording.SelectInsuranceClass.$error.required">Required Field *</span>
+                                        </div>
+                                    </div>
+
+
+                                    <br />
+                                    <div class="row">
+                                        <label class="col-md-2 ">Transaction Type</label>
+                                        <div class="col-md-6">
+                                            <selectize name="SelectTransactionType" placeholder="Select Transaction Type" options="availableTransaction" config="{maxItems: 1}" ng-model="policyInfoRecObj.TransactionTypeID" ng-required="true"></selectize>
+                                            <span class="help-block" style="color:red" ng-show="managePolicyInfoRecording.SelectTransactionType.$error.required">Required Field *</span>
+                                        </div>
+
+
+                                        <div class="col-md-3" ng-show="policyInfoRecObj.TransactionTypeID == 1037 ">
+                                            <label class="col-md-2 ">Notification Date</label>
+                                            <div class="col-md-4">
+                                                <div class="input-group">
+                                                    <input type="text"
+                                                           readonly
+                                                           name="NotificationDate"
+                                                           class="form-control date"
+                                                           ng-click="NotificationDateView=true"
+                                                           datepicker-popup="dd/MM/yyyy"
+                                                           ng-model="policyInfoRecObj.PeriodOfCoverFromDate"
+                                                           is-open="RequestedDateView"
+                                                           datepicker-options="dateOptions"
+                                                           placeholder="Transaction Date"
+                                                           max-date="policyInfoRecObj.PolicyRequestedDate"
+                                                           close-text="Close">
+                                                    <span class="input-group-btn">
+                                                        <button class="btn btn-default glyphicon glyphicon-calendar" ng-click="RequestedDateView=true;$event.stopPropagation();"></button>
+                                                    </span>
+                                                </div>
+                                                @*<span class="help-block" style="color:red" ng-show="managePolicyInfoRecording.RequestedDate.$error.required">
+                                                        Required Field *
+                                                    </span>*@
+                                            </div>
+                                            &nbsp;&nbsp;
+                                            <label class="col-md-2 "></label>
+                                            <div class="col-md-4">
+                                                <div><label><input type="checkbox" ng-model="policyInfoRecObj.IsSent" id="isSentCheckbox">&nbsp;&nbsp;Is Sent</label></div>
+                                            </div>
+                                            &nbsp;&nbsp;
+                                            <label class="col-md-2 "></label>
+                                            <div class="col-md-4">
+                                                <div><label><input type="checkbox" ng-model="policyInfoRecObj.IsSent" id="isSentCheckbox">&nbsp;&nbsp;Is Sent</label></div>
+                                            </div>
+                                            &nbsp;&nbsp;
+                                            <label class="col-md-2 "></label>
+                                            <div class="col-md-4">
+                                                <div><label><input type="checkbox" ng-model="policyInfoRecObj.IsSent" id="isSentCheckbox">&nbsp;&nbsp;Is Sent</label></div>
+                                            </div>
+                                        </div>
+
+
+                                    </div>
+                                    <br />
+
+                                    <div class="row">
+                                        <label class="col-md-2 ">Transaction Date</label>
+                                        <div class="col-md-4">
+                                            <div class="input-group">
+                                                <input type="text"
+                                                       readonly
+                                                       name="RequestedDate"
+                                                       class="form-control date"
+                                                       ng-click="RequestedDateView=true"
+                                                       datepicker-popup="dd/MM/yyyy"
+                                                       ng-model="policyInfoRecObj.PolicyRequestedDate"
+                                                       is-open="RequestedDateView"
+                                                       datepicker-options="dateOptions"
+                                                       placeholder="TRansaction Date"
+                                                       max-date="policyInfoRecObj.PolicyRequestedDate"
+                                                       ng-required="true"
+                                                       close-text="Close">
+                                                <span class="input-group-btn">
+                                                    <button class="btn btn-default glyphicon glyphicon-calendar" ng-click="RequestedDateView=true;$event.stopPropagation();"></button>
+                                                </span>
+                                            </div>
+                                            <span class="help-block" style="color:red" ng-show="managePolicyInfoRecording.RequestedDate.$error.required">
+                                                Required Field *
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <br />
+
+
+
+                                    <br />
+
+                                    <br />
+                                    <div class="row">
+                                        <label class="col-md-2 ">Account Executive</label>
+                                        <div class="col-md-6">
+                                            <selectize name="SelectAccountExecutive" placeholder="Select Account Executive" options="availableloadExecutive" config="{maxItems: 1}" ng-model="policyInfoRecObj.AccountExecutiveID"></selectize>
+
+                                        </div>
+                                    </div>
+                                    <br />
+                                    <div class="row">
+                                        <label class="col-md-2 ">Introduced By</label>
+                                        <div class="col-md-6">
+                                            <selectize name="SelectIntroducedBy" placeholder="Select Introducer" options="availableIntroducers" config="{maxItems: 1}" ng-model="policyInfoRecObj.IntroducerID"></selectize>
+
+                                        </div>
+                                    </div><br />
+                                    <div class="row">
+                                        <label class="col-md-2 ">Period Of Cover From Date</label>
+                                        <div class="col-md-4">
+                                            <div class="input-group">
+                                                <input type="text"
+                                                       readonly
+                                                       name="selectCoverFromDate"
+                                                       class="form-control date"
+                                                       ng-click="coverFromDateView=true"
+                                                       datepicker-popup="dd/MM/yyyy"
+                                                       ng-model="policyInfoRecObj.PeriodOfCoverFromDate"
+                                                       is-open="coverFromDateView"
+                                                       datepicker-options="dateOptions"
+                                                       placeholder="Period of Cover From Date"
+                                                       max-date="policyInfoRecObj.PeriodOfCoverToDate"
+                                                       ng-required="true"
+                                                       close-text="Close">
+                                                <span class="input-group-btn">
+                                                    <button class="btn btn-default glyphicon glyphicon-calendar" ng-click="coverFromDateView=true;$event.stopPropagation();"></button>
+                                                </span>
+                                            </div>
+                                            <span class="help-block" style="color:red" ng-show="managePolicyInfoRecording.selectCoverFromDate.$error.required">
+                                                Required Field *
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <br />
+                                    <div class="row">
+                                        <label class="col-md-2 ">Period Of Cover To Date</label>
+                                        <div class="col-md-4">
+                                            <div class="input-group">
+                                                <input type="text"
+                                                       readonly
+                                                       name="selectCoverToDate"
+                                                       class="form-control date"
+                                                       ng-click="coverToDateView=true"
+                                                       datepicker-popup="dd/MM/yyyy"
+                                                       ng-model="policyInfoRecObj.PeriodOfCoverToDate"
+                                                       is-open="coverToDateView"
+                                                       datepicker-options="dateOptions"
+                                                       placeholder="Period of Cover To Date"
+                                                       min-date="policyInfoRecObj.PeriodOfCoverFromDate"
+                                                       ng-required="true"
+                                                       close-text="Close">
+                                                <span class="input-group-btn">
+                                                    <button class="btn btn-default glyphicon glyphicon-calendar" ng-click="coverToDateView=true;$event.stopPropagation();"></button>
+                                                </span>
+                                            </div>
+                                            <span class="help-block" style="color:red" ng-show="managePolicyInfoRecording.selectCoverToDate.$error.required">
+                                                Required Field *
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <br />
+
+
+                                    <div class="row">
+                                        <label class="col-md-2 ">Sum Assured</label>
+                                        <div class="col-md-4">
+                                            <input type="number" name="inputSumAssured" placeholder="Sum Assured" ng-model="policyInfoRecObj.SumAssured" class="form-control" onkeyup="checkInputRate(this);" min="0" ng-required="false" style="width:100%; text-align:right">
+                                            <span class="help-block" style="color:red" ng-show="managePolicyInfoRecording.inputSumAssured.$error.required">
+                                                Required Field *
+                                            </span>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <selectize name="SelectSumAssuredCurrency" placeholder="Select Currency" options="availableCurrencies" config="{maxItems: 1}" ng-model="policyInfoRecObj.SumAssuredCurrencyTypeID" ng-required="true" ng-click="calCurrency(policyInfoRecObj.SumAssured,policyInfoRecObj.CurrencyRate)" ng-disabled="true"></selectize>
+                                            <span class="help-block" style="color:red" ng-show="managePolicyInfoRecording.SelectSumAssuredCurrency.$error.required">Required Field *</span>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <input type="number" name="inputCurrencyRte" placeholder="Exchange Rate" ng-model="policyInfoRecObj.OtherExcessAmount" class="form-control" onkeyup="checkInputRate(this);" min="0" ng-required="true" style="width:100%; text-align:right;" ng-disabled="true">
+                                            <span class="help-block" style="color:red" ng-show="managePolicyInfoRecording.inputCurrencyRte.$error.required">
+                                                Required Field *
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <br />
+
+                                    <div class="row">
+                                        <label class="col-md-2 ">Premium</label>
+                                        <div class="col-md-4">
+                                            <input type="number" name="inputPremiumIncludingTax" placeholder="Premium" ng-model="policyInfoRecObj.PremiumIncludingTax" class="form-control" onkeyup="checkInputRate(this);" min="0" ng-required="true" style="width:100%; text-align:right">
+                                            <span class="help-block" style="color:red" ng-show="managePolicyInfoRecording.inputPremiumIncludingTax.$error.required">
+                                                Required Field *
+                                            </span>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <selectize name="SelectPremiumIncludingTaxCurrency" placeholder="Select Currency" options="availableCurrencies" config="{maxItems: 1}" ng-model="policyInfoRecObj.PremiumIncludingTaxCurrencyTypeID" ng-required="true"></selectize>
+                                            <span class="help-block" style="color:red" ng-show="managePolicyInfoRecording.SelectPremiumIncludingTaxCurrency.$error.required">Required Field *</span>
+                                        </div>
+                                    </div>
+                                    <br />
+                                    @*<div class="row">
+                                            <label class="col-md-2 ">Non Commission Premium</label>
+                                            <div class="col-md-6">
+                                                <input type="number" name="inputNonCommissionPremium" placeholder="Non Commission Premium" ng-model="policyInfoRecObj.NonCommissionPremium" class="form-control" onkeyup="checkInputRate(this);" min="0" ng-required="true" style="width:100%; text-align:right">
+                                                <span class="help-block" style="color:red" ng-show="managePolicyInfoRecording.inputNonCommissionPremium.$error.required">
+                                                    Required Field *
+                                                </span>
+                                            </div>
+
+                                        </div>
+                                    *@
+
+
+
+                                    @* New  *@
+                                    <div class="row">
+                                        <div class="col-md-10 set-header">
+                                            <div class="row">
+                                                <div class="col-md-1" align="center"><h6><b>#</b></h6></div>
+                                                <div class="col-md-4" align="center"><h6><b>Commission Payable Premium</b></h6></div>
+                                                <div class="col-md-4" align="center"><h6><b>Amount</b></h6></div>
+                                                @*<div class="col-md-2" align="center"><h6><b>Amount</b></h6></div>*@
+                                                <div class="col-md-2" align="center"></div>
+                                            </div>
+                                        </div>
+
+
+
+                                        @*  Add Charge Type *@
+                                        <div class="col-md-10" ng-repeat="policyInfoCharge in policyInfoRecObj2.PolicyChargeType" style="background-color:#ffeed0">
+                                            <ng-form name="managePolicyChargeInfo2" novalidate>
+                                                <div class="row">
+                                                    <div class="col-md-1">
+                                                        <div class="panel-body no-padding" align="center">
+                                                            <h6 label>{{$index+1}}</h6>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <div class="panel-body no-padding" style="align-content:center">
+
+                                                            <label ng-bind="policyInfoCharge.ChargeTypeName"></label>
+                                                            @*<input type="text" name="chargeType"  ng-model="policyInfoCharge2.ChargeType" class="form-control" style="width:100%; text-align:right">*@
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <div class="panel-body no-padding" style="align-content:center">
+                                                            <input type="text" name="inputAmount" placeholder="Amount" ng-model="policyInfoCharge.Amount" class="form-control" onkeyup="checkInputRate(this);" min="0" ng-required="true" style="width:100%; text-align:right">
+                                                            <span class="help-block" style="color:red" ng-show="managePolicyChargeInfo.inputAmount.$error.required">
+                                                                Required Field *
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </ng-form>
+                                        </div>
+
+                                        @* End *@
+
+
+
+                                    </div>
+                                    @* End new *@
+                                    <br />
+
+                                    <div class="row">
+                                        <label class="col-md-2 ">Commisssion Code</label>
+                                        <div class="col-md-6">
+                                            <selectize name="SelectCommisssionStructureHeader" placeholder="Select Commisssion Structure Header" options="availableComStructHeaders" config="{maxItems: 1}" ng-model="policyInfoRecObj.CommissionStructureHeaderID" ng-change="LoadComStruLine(policyInfoRecObj.CommissionStructureHeaderID)" ng-required="true"></selectize>
+                                            <span class="help-block" style="color:red" ng-show="managePolicyChargeInfo.SelectCommisssionStructureHeader.$error.required">Required Field *</span>
+                                        </div>
+                                    </div>
+                                    <br />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                    <div class="row" }>
+                                        @*<div class="col-md-12 set-header">
+                                                <div class="row">
+                                                    <div class="col-md-1" align="center"><h5><b>#</b></h5></div>
+                                                    <div class="col-md-4" align="center"><h5><b>Charge Type</b></h5></div>
+                                                    <div class="col-md-4" align="center"><h5><b>Amount</b></h5></div>
+                                                    @*<div class="col-md-2" align="center"><h5><b>IsCR</b></h5></div>
+                                                    <div class="col-md-1" align="center"></div>
+                                                </div>
+                                            </div>*@
+                                        <div class="row">
+                                            <div class="col-md-12 set-header">
+                                                <div class="row">
+                                                    <div class="col-md-1" align="center"><h6><b>#</b></h6></div>
+                                                    <div class="col-md-2" align="center"><h6><b>Charge Type</b></h6></div>
+                                                    <div class="col-md-2" align="center"><h6><b>Percetage</b></h6></div>
+                                                    <div class="col-md-2" align="center"><h6><b>Amount</b></h6></div>
+                                                    <div class="col-md-2" align="center"></div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12" ng-repeat="policyInfoCharge in policyInfoRecObj.policyInfoChargeList" style="background-color:#ffeed0">
+                                                <ng-form name="managePolicyChargeInfo" novalidate>
+                                                    <div class="row">
+                                                        <div class="col-md-1">
+                                                            <div class="panel-body no-padding" align="center">
+                                                                <h6 label>{{$index+1}}</h6>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-2">
+
+                                                            <div class="panel-body no-padding" align="center">
+                                                                {{policyInfoCharge.ChargeTypeName}}
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <div class="panel-body no-padding" align="center">
+                                                                <input type="text" name="inputPercentage" placeholder="Percentage" ng-model="policyInfoCharge.Percentage" class="form-control" onkeyup="checkInputRate(this);" min="0" ng-required="true" @*onchange="CalLineAmount($index, policyInfoChargeList)"*@ />
+                                                                <span class="help-block" style="color:red" ng-show="managePolicyChargeInfo.inputPercentage.$error.required">
+                                                                    Required Field *
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-3">
+                                                            <div class="panel-body no-padding" align="center">
+                                                                <input type="number" name="inputAmount" placeholder="Amount" ng-model="policyInfoCharge.Amount" class="form-control" onkeyup="checkInputRate(this);" min="0" ng-required="true" ng-readonly="true" />
+                                                                <span class="help-block" style="color:red" ng-show="managePolicyChargeInfo.inputAmount.$error.required">
+                                                                    Required Field *
+                                                                </span>
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+                                                </ng-form>
+                                            </div>
+
+                                        </div>
+                                        <br />
+
+                                        <br />
+
+                                        <div class="row" hidden>
+                                            <div class="col-md-12 set-header">
+                                                <div class="row">
+                                                    <div class="col-md-1" align="center"><h5><b>#</b></h5></div>
+                                                    <div class="col-md-2" align="center"><h5><b>Commission Type</b></h5></div>
+                                                    <div class="col-md-2" align="center"><h5><b>Amount</b></h5></div>
+                                                    <div class="col-md-2" align="center" hidden><h5><b>Commission Value</b></h5></div>
+                                                    @*<div class="col-md-2" align="center"><h5><b>Commission Structure Line</b></h5></div>
+                                                        <div class="col-md-2" align="center"><h5><b>Precentage(%)</b></h5></div>*@
+
+                                                    <div class="col-md-1" align="center"></div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12" ng-repeat="policyCommissionPayment in policyInfoRecObj.PolicyCommissionPaymentDetails" style="background-color:#d9f7f7">
+                                                <ng-form name="managePolicyCommissionPayment" novalidate>
+                                                    <div class="row">
+                                                        <div class="col-md-1">
+                                                            <div class="panel-body no-padding" align="center">
+                                                                <h6 label>{{$index+1}}</h6>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <div class="panel-body no-padding" style="align-content:center">
+                                                                <selectize placeholder="Commission Type" name="inputCommissionType" options="availableCommissionTypes" config="{maxItems: 1}" ng-model="policyCommissionPayment.CommisionTypeID"></selectize>
+                                                                <span class="help-block" style="color:red" ng-show="managePolicyCommissionPayment.inputCommissionType.$error.required">
+                                                                    Required Field *
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <div class="panel-body no-padding" align="left">
+                                                                <input type="text" placeholder="Enter Value" name="inputValue" ng-model="policyCommissionPayment.Amount" class="form-control" onkeyup="checkInputRate(this);" min="0" style="width:100%" />
+                                                                <span class="help-block" style="color:red" ng-show="managePolicyCommissionPayment.inputValue.$error.required">
+                                                                    Required Field *
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <div class="panel-body no-padding" align="left" hidden>
+                                                                <input type="text" placeholder="Commission Value" name="inputCommissionValue" ng-model="policyCommissionPayment.CommisionValue" class="form-control" onkeyup="checkInputRate(this);" min="0" style="width:100%" />
+                                                                @*<span class="help-block" style="color:red" ng-show="managePolicyCommissionPayment.inputCommissionValue.$error.required">
+                                                                        Required Field *
+                                                                    </span>*@
+                                                            </div>
+                                                        </div>
+                                                        @*<div class="col-md-2">
+                                                                <div class="panel-body no-padding" align="left">
+                                                                    <selectize placeholder="CommissionLine" ng-show="false" name="inputComStructLine" options="availableComStructLines" config="{maxItems: 1}" ng-model="policyCommissionPayment.ComStructLineID" ng-change="LoadComStruLineDetails(policyCommissionPayment.ComStructLineID,$index,policyInfoRecObj.PolicyCommissionPaymentDetails)"></selectize>
+
+                                                                </div>
+                                                            </div>*@
+                                                        <div class="col-md-2">
+                                                            <div class="panel-body no-padding" align="left">
+                                                                <input type="text" placeholder="Precentage" ng-show="false" name="inputPrecentage" ng-model="policyCommissionPayment.RateValue" class="form-control" onkeyup="checkInputRate(this);" min="0" style="width:100%" />
+                                                                @*<span class="help-block" style="color:red" ng-show="managePolicyCommissionPayment.inputPrecentage.$error.required">
+                                                                        Required Field *
+                                                                    </span>*@
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="col-md-1">
+                                                            <div class="panel-body no-padding" ng-if="$index>0">
+                                                                <button type="button" class="btn btn-default" ng-click="deleteItem($index)">
+                                                                    <span class="glyphicon glyphicon-remove-circle"></span>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </ng-form>
+                                            </div>
+                                            <div class="col-md-12">
+                                                <br />
+                                                <div class="row">
+                                                    <div class="col-md-1">
+                                                        <div class="panel-body no-padding" align="center">
+                                                            <button type="button" class="btn btn-default" ng-click="addItem()">
+                                                                <span class="glyphicon glyphicon-plus"></span>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-1">
+                                                        <div class="panel-body no-padding" align="center">
+                                                            <button type="button" class="btn btn-success" ng-click="calAmount(policyInfoChargeList,policyInfoRecObj.policyInfoChargeList)">
+                                                                @*<span class="glyphicon glyphicon-remove-circle"></span>*@ Calculate Commission
+                                                            </button>
+                                                        </div>
+                                                        @*<div class="panel-body no-padding" align="center">
+                                                                <button type="button" class="btn btn-success" ng-click="calDiscount(policyInfoChargeList)">
+                                                                    Calculate Gross Premium
+                                                                </button>
+                                                            </div>*@
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <br />
+                                        <div class="row">
+                                            <div class="col-md-1">
+                                                <div class="panel-body no-padding" align="center">
+                                                    <button type="button" class="btn btn-success" ng-click="calAmount(policyInfoRecObj2.PolicyChargeType,policyInfoRecObj.policyInfoChargeList)">
+                                                        @*<span class="glyphicon glyphicon-remove-circle"></span>*@ Calculate Commission
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <label class="col-md-2 ">Total Commission Receivable</label>
+                                            <div class="col-md-6">
+
+                                                <input type="number" name="inputTotalCommission" placeholder="Total Commission Receivable" ng-model="policyInfoRecObj.TotalCommission" class="form-control" onkeyup="checkInputRate(this);" min="0" ng-required="true" style="width:100%">
+                                                <span class="help-block" style="color:red" ng-show="managePolicyInfoRecording.inputTotalCommission.$error.required">
+                                                    Required Field *
+                                                </span>
+                                            </div>
+                                        </div><br />
+
+                                        <br />
+                                        <div class="row">
+                                            @*<label class="col-md-2 ">Other Excess Description</label>*@
+                                            <div class="col-md-6" hidden>
+                                                <textarea rows="3" class="form-control" placeholder="Other Excess Description" ng-model="policyInfoRecObj.OtherExcessDescription" style="width:100%" visible="false"></textarea>
+                                            </div>
+                                        </div>
+                                        <br />
+
+                                        @*<br />*@
+
+                                        <div class="row">
+                                            <label class="col-md-2 ">File Number</label>
+                                            <div class="col-md-6">
+                                                <input type="text" placeholder="File Number" name="inputFileNumber" ng-model="policyInfoRecObj.FileNumber" class="form-control" ng-required="true" style="width:100%" />
+                                                <span class="help-block" style="color:red" ng-show="managePolicyInfoRecording.inputFileNumber.$error.required">Required Field *</span>
+                                            </div>
+                                        </div>
+                                        <br />
+
+
+                                        @*{{policyInfoRecObj}}*@
+                                        <div class="row">
+                                            <div class="col-md-12 modal-footer">
+                                                <button class="btn btn-primary" @*ng-disabled="!managePolicyInfoRecording.$valid"*@ ng-show="isClientReqAddMode && !isViewMode" ng-click="savePolicyInfoRecording()">Save Policy Info Recording<span class="fa fa-floppy-o fa-right"></span></button>
+                                                <button class="btn btn-primary" @*ng-disabled="!managePolicyChargeInfo.$valid"*@ ng-show="!isClientReqAddMode && !isViewMode" ng-click="updatePolicyInfoRecording()">Update Policy Info Recording<span class="fa fa-floppy-o fa-right"></span></button>
+                                                <button class="btn btn-default" ng-click="cancelCustomerRequest()">Cancel</button>
+                                            </div>
+                                        </div>
+                                        <br />
+                                    </div>
+                            </ng-form>
+                        </form>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+        <div id="divLoading" ng-show="showLoader"></div>
+    </div>
+</div>

@@ -1,0 +1,1628 @@
+﻿
+@{
+    ViewBag.Title = "Insurance company";
+}
+
+
+
+@Scripts.Render("~/Scripts/angular.min.js")
+@Scripts.Render("~/Scripts/ng/paging.js")
+
+
+@Scripts.Render("~/Scripts/ng/IBMSApp.js")
+
+<script src="~/Scripts/ng/Excel/Excel.js"></script>
+@Scripts.Render("~/Scripts/ng/Services/QuatationService.js")
+@Scripts.Render("~/Scripts/ng/Controllers/QuatationControler.js")
+<script src="~/Scripts/ng/Services/DocumentService.js"></script>
+@Scripts.Render("~/Scripts/ng/Services/EmailService.js")
+@Scripts.Render("~/Scripts/ng/Controllers/QuatEmail.js")
+
+
+
+<style>
+    .form-control {
+        min-width: 100%;
+        border-radius: 0px;
+    }
+</style>
+
+<div ng-app="IBMSAPP" ng-controller="QuatationControler"  ng-cloak>
+
+    <!-- START MODAL ADDED INS SUB CLASS PROPERTIES PREVIEW -->
+    <div class="modal fade" id="emailModel"  ng-controller="DocumentController"  tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="col-md-12">
+                                <h3>Email Request</h3>
+                            </div>
+                          </div>
+                    </div>
+
+                    <div class="row" style="margin-top:10px;">
+                       
+                        <div class="col-md-12" >
+                            <div  >
+                                <!-- START CONTENT FRAME -->
+                                <div class="row">
+                                  
+                                   
+                                    <!-- START CONTENT FRAME BODY -->
+                                    <div class="row" style="margin-top: 10px;">
+                                        <div class="col-md-12">
+                                            <form id="jvalidate"  role="form" 
+                                                  class="col-md-12 form-horizontal" 
+                                                  action="javascript:alert('Form #validate2 submited');"
+                                                  >
+                                                <div class="form-group">
+                                                    <label class="col-md-2 control-label">Reciever Name:</label>
+                                                    <div class="col-md-10">
+                                                        <input type="text" class="form-control"  ng-model="emlObj.Name"  />
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="col-md-2 control-label">To:</label>
+                                                    <div class="col-md-9">
+                                                        <input type="text"  id="emailc" class="form-control" ng-model="emlObj.email">
+                                                        <span class="help-block">required email</span>
+                                                      </div>
+                                                   
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="col-md-2 control-label">Subject:</label>
+                                                    <div class="col-md-10">
+                                                        <input type="text" class="form-control"  ng-model="emlObj.Subject" />
+                                                    </div>
+                                                </div>  
+
+
+                                                <div class="form-group">
+                                                    <label class="col-md-2 control-label">attachment:</label>
+                                                    <div class="col-md-10">
+                                                        <input type="file" class="form-control" id="file" ng-click="init()" name="file" multiple onchange="angular.element(this).scope().getDocument(this)" />
+                                                        <span class="help-block" style="color:red" ng-show="!Doc.Description">Required Field *</span>
+
+                                                    </div>
+                                                </div> 
+
+
+                                                <div class="form-group">
+                                                    <label class="col-md-2 control-label">Messege:</label>
+                                                    <div class="col-md-10">
+                                                        <textarea ui-tinymce="tinymceOptions" ng-model="emlObj.Messege">
+                                                        </textarea>
+                                                    </div>
+
+                                                </div>
+                                                <div class="form-group">
+                                                    <div class="col-md-12">
+                                                        
+                                                        <div class="pull-right" hidden>
+                                                            <button class="btn btn-danger" ng-click="saveEmail()"><span class="fa fa-envelope"></span> Send Message</button>
+                                                           </div>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </div>
+
+                                    </div>
+                                    <!-- END CONTENT FRAME BODY -->
+                                </div>
+                                <!-- END CONTENT FRAME -->
+                            </div>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button class="btn btn-success pull-right" 
+                                    style="margin-left:5px;" 
+                                    ng-click="saveEmail()"
+                                    ng-show="iscustomer">
+                                        <span class="fa fa-plus">&nbsp;&nbsp;Request Customer</span>&nbsp;
+                            </button>
+                            <button class="btn btn-success pull-right" ng-click="saveEmail()" ng-show="IsCompany">
+                                    <span class="fa fa-plus">&nbsp;&nbsp;Request Ins/Company</span>&nbsp;&nbsp;&nbsp;
+                            </button>
+                            <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+              
+                
+                
+                
+                
+                  </div>
+            </div>
+        </div>
+    </div>
+    <!-- END MODAL Email Request PREVIEW -->
+
+
+<div  >
+    {{message}}
+    <div ng-click="init()" hidden>sfsdgdf</div>
+
+    <!-- TEMP COVER NOTE-->
+    <div class="modal fade" id="coverNote" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="col-md-6">
+                                <h3>Tempcover Note</h3>
+                            </div>
+
+                        </div>
+                        <div class="panel panel-default tabs">
+                            <ul class="nav nav-tabs" role="tablist">
+                                <li class="active"><a href="#addTCN" role="tab" data-toggle="tab">Issue TCN</a></li>
+                                <li><a href="#TCNHistory" role="tab" data-toggle="tab">TCN History</a></li>
+
+
+                            </ul>
+
+                            <div class="panel-body tab-content" style="background-color:transparent!important">
+                                <div class="tab-pane active" id="addTCN">
+
+                                    <div class="panel panel-default">
+                                        <div class="panel-heading">
+                                            <h5 class="panel-title">Issue TCN</h5>
+                                            <h3 class="panel-title"></h3>
+                                            <ul class="panel-controls">
+                                                <li><input type="text" ng-style="{'background-color': data.backgroundCol}" class="form-control" placeholder="Search  ..." ng-model="search_query"></li>
+                                                <li><a href="#" class="panel-collapse"><span class="fa fa-angle-down"></span></a></li>
+                                                <li><a href="#" class="panel-refresh" ng-click="refresh()"><span class="fa fa-refresh"></span></a></li>
+                                                <li><a href="#" class="panel-remove"><span class="fa fa-times"></span></a></li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <div class="panel-body" style="background-color:transparent">
+                                        <div class="row" style="margin-top:10px;">
+                                            <form id="validate" role="form" class="form-horizontal">
+
+                                                <div class="row">
+                                                    <div class="col-md-12">
+
+                                                        <div class="form-group">
+                                                            <label class="col-md-4 control-label">CoverNote Number</label>
+                                                            <div class="col-md-8">
+                                                                <input type="text" class="form-control" ng-disabled="true" value="{{coverNote.coverNoteNo}}"/>
+
+                                                                
+                                                               
+                                                            </div>
+
+                                                        </div>
+
+
+
+                                                        <div class="form-group">
+                                                            <label class="col-md-4 control-label">Insurance Class</label>
+                                                            <div class="col-md-8">
+                                                                <div class="form-control">
+                                                                    {{coverNote.inscompany.InsClass}}
+
+
+                                                                </div>
+                                                            </div>
+
+
+
+
+
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label class="col-md-4 control-label">Insurance SubClass</label>
+                                                            <div class="col-md-8">
+                                                                <div class="form-control">
+
+
+                                                                    {{coverNote.inscompany.InsSubClass}}
+                                                                </div>
+                                                            </div>
+
+                                                        </div>
+
+                                                        <div class="form-group">
+                                                            <label class="col-md-4 control-label">Insurance Company Name</label>
+                                                            <div class="col-md-8">
+                                                                <div class="form-control">
+
+                                                                    {{coverNote.inscompany.InsuranceCompanyName}}
+                                                                </div>
+                                                            </div>
+
+                                                        </div>
+
+
+                                                        <div class="form-group">
+                                                            <label class="col-md-4 control-label">Request Date</label>
+                                                            <div class="col-md-8">
+                                                                <div class="form-control" ng-model="coverNote.IssuedDate">
+                                                                    {{coverNote.IssuedDate}}
+
+
+                                                                </div>
+                                                            </div>
+
+
+
+
+
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label class="col-md-4 control-label">Confimation Method</label>
+                                                            <div class="col-md-8">
+
+                                                                <select class="col-md-12 form-control " data-live-search="true" ng-model="coverNote.ConfirmationMethod">
+                                                                    <option value="Email">  Email</option>
+                                                                    <option value="Post"> Post </option>
+                                                                    <option value="Call"> Call </option>
+
+                                                                </select>
+
+                                                            </div>
+
+
+                                                        </div>
+                                                        <div class="form-group" style="font-size:10px;">
+                                                            <label class="col-md-4 control-label">From Date</label>
+                                                            <div class="col-md-8">
+                                                                <div class="input-group date datepicker" data-date="{{coverNote.IssuedDate}}"
+                                                                     data-date-format="mm/dd/yyyy">
+                                                                    <input type="text" ng-model="coverNote.FromDate" ng-style="{'background-color': data.backgroundCol}" id="dp-3" class="form-control  " ng-readonly="isDisabled" />
+                                                                    <span class="input-group-addon add-on"><span class="glyphicon glyphicon-calendar"></span></span>
+                                                                </div>
+
+                                                            </div>
+
+                                                        </div>
+
+                                                        <div class="form-group" style="font-size:10px;">
+                                                            <label class="col-md-4 control-label">To Date</label>
+                                                            <div class="col-md-8">
+                                                                <div class="input-group date datepicker" data-date="{{coverNote.FromDate}}"
+                                                                     data-date-format="mm/dd/yyyy">
+                                                                    <input type="text" ng-model="coverNote.ToDate" ng-style="{'background-color': data.backgroundCol}" 
+                                                                           id="dp-4" class="form-control  " ng-readonly="isDisabled" />
+                                                                    <span class="input-group-addon add-on"><span class="glyphicon glyphicon-calendar"></span></span>
+                                                                </div>
+
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="form-group">
+                                                            <label class="col-md-4 control-label">Pending Document</label>
+                                                            <div class="col-md-8">
+                                                                <input type="text" ng-style="{'background-color': data.backgroundCol}"
+                                                                       ng-model="coverNote.PendingDocItem" value="Some text value..." />
+
+
+                                                            </div>
+
+
+                                                        </div>
+
+
+                                                        <div class="form-group">
+                                                            <label class="col-md-4 control-label">Add Prposal Form </label>
+                                                            <div class="col-md-8">
+                                                                <div class="panel panel-default">
+                                                                    <div class="panel-body">
+                                                                        <h3> Click/Drag File to upload</h3>
+                                                                        <div action="#" class="dropzone dropzone-mini"></div>
+                                                                    </div>
+                                                                </div>
+
+                                                            </div>
+                                                        </div>
+
+
+
+
+                                                    </div>
+
+
+                                                </div>
+
+
+
+
+                                                <div class="modal-footer">
+                                                    <button class="btn btn-success pull-right" ng-click="AddCovernote()"><span class="fa fa-plus"></span>&nbsp;&nbsp;&nbsp;Issue Cover Note</button>
+
+                                                    <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+                                                </div>
+
+
+
+
+
+
+
+
+
+                                            </form>
+                                        </div>
+
+                                    </div>
+
+
+
+
+                                </div>
+
+                                <div class="tab-pane " id="TCNHistory" style="background-color:transparent!important">
+
+                                    <div class="panel panel-default">
+                                        <div class="panel-heading">
+                                            <h5 class="panel-title"> TCN History</h5>
+                                            <h3 class="panel-title"></h3>
+                                            <ul class="panel-controls">
+                                                <li><input type="text" ng-model="search_coverNotes_query" ng-style="{'background-color': data.backgroundCol}" class="form-control" placeholder="Search  ..." ng-model="search_query"></li>
+                                                <li><a href="#" class="panel-collapse"><span class="fa fa-angle-down"></span></a></li>
+                                                <li><a href="#" class="panel-refresh" ng-click="refresh()"><span class="fa fa-refresh"></span></a></li>
+                                                <li><a href="#" class="panel-remove"><span class="fa fa-times"></span></a></li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <div class="panel-body" style="background-color:transparent">
+
+
+
+                                        <div class="row" style="margin-top:10px;font-size:8px;">
+                                            <table class="table table-bordered">
+                                                <thead>
+                                                    <tr>
+                                                        <th>CoverNoteNo</th>
+                                                        <th>Insurance SubClass Name</th>
+                                                        <th>Confirmation Method </th>
+                                                        <th>Pending Doc Item</th>
+                                                        <th>From Date</th>
+                                                        <th>To Date</th>
+                                                        <th>Issued Date</th>
+                                                    </tr>
+                                                </thead>
+
+                                                <!--<tr  >-->
+                                                <tr ng-repeat="coverNote in coverNotes| filter:search_coverNotes_query">
+                                                    <td hidden>{{coverNote.CoverNoteID}} </td>
+                                                    <td hidden>{{coverNote.QuotationHeaderID}}</td>
+                                                    <td hidden>{{coverNote.InsuranceSubClassID}}</td>
+                                                    <td hidden>{{coverNote.InsuranceCompanyName}}</td>
+                                                    <td>{{coverNote.CoverNoteNo}}</td>
+
+                                                    <td>{{coverNote.InsuranceSubClassName}}</td>
+
+                                                    <td>{{coverNote.ConfirmationMethod}}</td>
+                                                    <td>{{coverNote.PendingDocItem}}</td>
+                                                    <td>{{coverNote.FromDate}}</td>
+                                                    <td>{{coverNote.ToDate}}</td>
+                                                    <td>{{coverNote.IssuedDate}}</td>
+                                                </tr>
+
+
+
+                                            </table>
+
+
+
+                                        </div>
+
+
+
+
+                                    </div>
+
+
+
+
+
+                                </div>
+                            </div>
+
+
+
+
+
+
+
+                        </div>
+
+
+
+
+
+
+
+
+
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- TEMP COVER NOTE -->
+    <!-- START MODAL INS SUB CLASS SCOPE PREVIEW -->
+    <div class="modal fade" id="inscompanyies" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="col-md-6">
+                                <h3>Insurance Company  Details</h3>
+                            </div>
+                            <input type="text" ng-style="{'background-color': data.backgroundCol}"
+                                   class="form-control col-md-6"
+                                   placeholder="Search  ..."
+                                   ng-model="search_ins_comapny_query" />
+                        </div>
+                    </div>
+
+                    <div class="row" style="margin-top:10px;">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th hidden>Ins Comp ID</th>
+
+                                    <th>Insurance Company</th>
+                                    <th>contact Person </th>
+                                    <th>Contact No</th>
+                                    <th>Is Selected</th>
+                                </tr>
+                            </thead>
+
+                            <!--<tr  >-->
+                            <tr ng-repeat="InsuranceCompnay in InsuranceCompies| filter:search_ins_comapny_query">
+                                <td hidden>{{InsuranceCompnay.InsuranceCompanyID}} </td>
+                                <td hidden>{{InsuranceCompnay.businessUnitID}}</td>
+                                <td>{{InsuranceCompnay.InsuranceCompanyName}}</td>
+                                <td>{{InsuranceCompnay.ContactPerson}}</td>
+                                <td>{{InsuranceCompnay.ContactNo}}</td>
+                                <td><input type="checkbox" ng-model="InsuranceCompnay.isChecked" value="{{InsuranceCompnay.isChecked}}" /></td>
+
+
+                            </tr>
+
+
+
+
+                        </table>
+
+
+
+                        <div class="modal-footer">
+                            <button class="btn btn-success pull-right" ng-click="AddCompToList(InsuranceCompies)"><span class="fa fa-plus"></span>&nbsp;&nbsp;&nbsp;Add</button>
+
+                            <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- END MODAL INS SUB CLASS SCOPE PREVIEW -->
+    <!-- START MODAL ADDED INS SUB CLASS ADDED SCOPE PREVIEW -->
+    <div class="modal fade" id="addedScopeList" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="col-md-6">
+                                <h3>Added Scope Details</h3>
+                            </div>
+                            <input type="text" ng-style="{'background-color': data.backgroundCol}" class="form-control col-md-6" placeholder="Search  ..." ng-model="search_added_scope_query" />
+                        </div>
+                    </div>
+
+                    <div class="row" style="margin-top:10px;">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th hidden>In/Sub Class ID</th>
+                                    <th hidden>In/Class</th>
+                                    <th>Insurance Class</th>
+                                    <th>Insurance Sub Class</th>
+                                    <th>Scope Description</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+
+                            <!--<tr  >-->
+                            <tr ng-repeat="ScopeInsClass in AddedInsClassesScopesByInsSubClassID|filter:search_added_scope_query">
+                                <td hidden>{{ScopeInsClass.InsuranceClassCode}}</td>
+                                <td hidden>{{ScopeInsClass.InsuranceSubClassID}}</td>
+
+                                <td>{{ScopeInsClass.InsuranceClassCode}}</td>
+                                <td>{{ScopeInsClass.InsuranceSubClassID}}</td>
+                                <td>{{ScopeInsClass.Description}}</td>
+                                <td hidden><input type="checkbox" class="icheckbox" ng-model="ScopeInsClass.isChecked" />{{ScopeInsClass.isChecked}}</td>
+
+
+
+                            </tr>
+
+
+
+
+                        </table>
+
+
+
+                        <div class="modal-footer" hidden>
+                            <button class="btn btn-success pull-right" ng-click="AddScopeToList(ScopeInsClasses)"><span class="fa fa-plus"></span>&nbsp;&nbsp;&nbsp;Add</button>
+
+                            <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- END MODAL ICON PREVIEW -->
+    <!-- START MODAL ADDED INS SUB CLASS PROPERTIES PREVIEW -->
+    <div class="modal fade" id="addedPropList" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="col-md-6">
+                                <h3>Added Property  Details</h3>
+                            </div>
+                            <input type="text" ng-style="{'background-color': data.backgroundCol}" class="form-control col-md-6" placeholder="Search  ..." ng-model="search_added_propeties_query" />
+                        </div>
+                    </div>
+
+                    <div class="row" style="margin-top:10px;">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th hidden>In/Sub Class ID</th>
+                                    <th hidden>In/Class</th>
+                                    <th>Insurance Class</th>
+                                    <th>Insurance Sub Class</th>
+                                    <th>Property ID</th>
+                                    <th>Property Description</th>
+                                    <th>VAT No</th>
+                                    <th>BR No</th>
+                                    <th>SVAT No</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+
+                            <!--<tr  >-->
+                            <tr ng-repeat="pisc in AddedPropertiesInsClass|filter:search_added_propeties_query">
+                                <td hidden>{{pisc.addedinsClassID}}</td>
+                                <td>{{pisc.addedinsClass}}</td>
+                                <td>{{pisc.addedinsSubClass}}</td>
+                                <td>{{pisc.pID}}>
+
+                                <td>{{pisc.ClientPropertyName}}</td>
+                                <td>{{pisc.VATNo}}</td>
+                                <td>{{pisc.BRNo}}</td>
+
+                                <td>{{pisc.SVATNo}}</td>
+                                <td></td>
+
+
+                            </tr>
+
+
+
+
+                        </table>
+
+
+
+                        <div class="modal-footer" hidden>
+                            <button class="btn btn-success pull-right" ng-click="AddScopeToList(ScopeInsClasses)"><span class="fa fa-plus"></span>&nbsp;&nbsp;&nbsp;Add</button>
+
+                            <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- END MODAL ADDED INS SUB CLASS PROPERTIES PREVIEW -->
+
+    <div class="breadcrumb-line">
+        <ul class="breadcrumb">
+            <li><a href="/Dashboard/Index"><i class="icon-home2 position-left"></i>Home</a></li>
+            <li>Transaction</li>
+            <li class="active"><b>Quatation</b></li>
+        </ul>
+    </div>
+
+    <div class="page-content-wrap">
+
+        <div class="panel panel-default tabs" style="background-image: url('../../Content/img/bg.png'); ">
+            <ul class="nav nav-tabs" role="tablist">
+                <li id="first"  class="active"><a href="#tab-first" role="tab" data-toggle="tab" ng-click="ClickEvent('tab-first','tab-second','first','second')">Current Quatation </a></li>
+                <li id="second" ><a href="#tab-second" role="tab" data-toggle="tab" ng-click="ClickEvent('tab-second','tab-first','second','first')">Quatation List</a></li>
+
+
+            </ul>
+            <div class="panel-body tab-content" style="background-color:transparent!important">
+                <div class="tab-pane" id="tab-second" style="background-color:transparent!important">
+
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">
+                                <input type="text" ng-style="{'background-color': data.backgroundCol}" style="font-size: 12px;width: 100%;border-radius: 0px;margin-right:2px;" class="form-control" placeholder="Search Request ..." ng-model="search_RequestList_query">
+                            </h3>
+                            <ul class="panel-controls">
+                              
+                                <li><a href="#" ng-click="refreash()" class="panel-refresh"><span class="fa fa-refresh"></span></a></li>
+                        
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <b>CAR:</b>Customer Approve Request,&nbsp;&nbsp;&nbsp;&nbsp;<b>TCN:</b>Temporary Cover Note
+                        <table id="user_table" class="table table-responsive">
+                            <thead>
+                                <tr>
+                                    <th>Referance No</th>
+                                    <th>Req Number</th>
+                                    <th>Client Name</th>
+                                    <th>Introduced By</th>
+                                    <th>Request Date</th>
+                                    <th>Created Date</th>
+                                    <th>Status</th>
+
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                                <tr ng-repeat="qHeader in quotationHeader">
+                                    <td hidden>{{qHeader.QuotationHeaderID}} </td>
+                                    <td hidden>{{qHeader.ClientRequestHeaderID}}</td>
+                                    <td>QUA-{{qHeader.QuotationHeaderID}}</td>
+                                    <td>REQ-{{qHeader.ClientRequestHeaderID}}</td>
+                                    <td>{{qHeader.myReqList.ClientName}}</td>
+                                    <td>{{qHeader.myReqList.PartnerName}}</td>
+                                    <td>{{qHeader.myReqList.RequestedDate}}</td>
+                                    <td>{{qHeader.CreatedDate.trim()}}</td>
+
+                                    <td>{{qHeader.QuotationStatusCodeDescription}}</td>
+                                    <td>
+                                        <button style="width:80px;" class="btn btn-success "
+                                                ng-disabled="qHeader.QuotationStatusCode == 'QR'
+                                                ||
+                                                qHeader.QuotationStatusCode == 'CA'
+                                                ||
+                                                qHeader.QuotationStatusCode == 'CAR'
+                                                ||
+                                                 qHeader.QuotationStatusCode == 'TCN'
+                                                ||  
+                                                qHeader.QuotationStatusCode == 'TCNI'
+                                                "
+                                                ng-click="editMyReq(qHeader)">
+                                            Update
+                                        </button>
+                                        <button style="width:80px;display:none" class="btn btn-default "
+                                                ng-disabled="qHeader.QuotationStatusCode == 'QR'"
+                                                ng-click="requestapprovecustomer(qHeader)">
+                                            CAR
+                                        </button>
+                                        <button style="width:80px;" class="btn btn-info"
+                                                ng-click="editMyReq(qHeader)">
+                                            View
+                                        </button>
+
+
+                                        <button style="width:70px;display:none" class="btn btn-success" ng-click="Update(qHeader)">Generate </button>&nbsp;&nbsp;
+                                        @*<button style="width:70px;" class="btn btn-danger " ng-click="Inactive(qHeader)">Inactive </button>*@
+
+
+
+
+                                    </td>
+
+
+                                </tr>
+
+
+
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+                <div class="tab-pane  active" id="tab-first" style="background-color:transparent!important;display:none">
+
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h5 class="panel-title">Quatation Of Customer Request From</h5>
+                            <h3 class="panel-title"></h3>
+                            <ul class="panel-controls">
+                                <li><input type="text" ng-style="{'background-color': data.backgroundCol}" class="form-control" placeholder="Search  ..." ng-model="search_query"></li>
+                                <li><a href="#" class="panel-collapse"><span class="fa fa-angle-down"></span></a></li>
+                                <li><a href="#" class="panel-refresh" ng-click="refresh()"><span class="fa fa-refresh"></span></a></li>
+                                <li><a href="#" class="panel-remove"><span class="fa fa-times"></span></a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="panel-body" style="background-color:transparent">
+
+                        <form id="validate" role="form" class="form-horizontal" >
+
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <div class="form-group" hidden>
+                                        <label class="col-md-4 control-label">Company/ParentCompany</label>
+                                        <div class="col-md-8">
+
+
+                                            <select ng-style="{'background-color': data.backgroundCol}" class="col-md-12 form-control " ng-readonly="isDisabled" name="comp" ng-model="comp"
+                                                    ng-options="comp.CompanyID as comp.CompanyName for comp in Company"></select>
+
+                                        </div>
+
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-md-4 control-label">Introduce By</label>
+                                        <div class="col-md-8">
+
+                                            <select ng-style="{'background-color': data.backgroundCol}" class="col-md-12 form-control " ng-readonly="isDisabled" name="PartnerID" ng-model="partner"
+                                                    ng-options="partner.PartnerID as partner.PartnerName for partner in Partners"></select>
+
+
+                                            @*<select class="col-md-12 form-control " ng-model="partner">
+                                                    <option ng-repeat="partner in Partners"
+                                                            value="{{partner.PartnerID}}">
+                                                        {{partner.PartnerName}}
+                                                    </option>
+
+                                                </select>*@
+                                        </div>
+
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-4 control-label">Bussiness Unit</label>
+                                        <div class="col-md-8">
+
+
+                                            <select ng-style="{'background-color': data.backgroundCol}"
+                                                    class="col-md-12 form-control " ng-readonly="isDisabled" name="BUnit" ng-model="BUnit"
+                                                    ng-options="BUnit.BusinessUnitID as BUnit.BusinessUnit for BUnit in BUnits"></select>
+                                            @*<select class="col-md-12 form-control " ng-model="BUnit">
+                                                    <option ng-repeat="BUnit in BUnits"
+                                                            value="{{BUnit.BusinessUnitID}}">
+                                                        {{BUnit.BusinessUnit}}
+                                                    </option>
+
+                                                </select>*@
+                                        </div>
+                                    </div>
+                                    <div class="form-group" hidden>
+                                        <label class="col-md-4 control-label">File Upload</label>
+                                        <div class="col-md-8">
+                                            <div class="panel panel-default">
+                                                <div class="panel-body">
+                                                    <h3> Click/Drag File to upload</h3>
+                                                    <div action="#" class="dropzone dropzone-mini"></div>
+                                                </div>
+                                            </div>
+                                            @*<input type="file" multiple class="btn-success" data-preview-file-type="any" />*@
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-md-12">
+                                            <!-- START INFO PANEL -->
+                                            <div class="panel panel-info">
+                                                <div class="panel-heading">
+                                                    <h3 class="panel-title">Added Information</h3>
+                                                </div>
+                                                <div class="panel-body">
+                                                    <table class="table table-striped table-responsive">
+                                                        <thead style="font-size:10px;">
+                                                            <tr>
+                                                                <th hidden>In/Sub Class ID</th>
+                                                                <th>In/Class</th>
+                                                                <th>In/Sub Class</th>
+                                                                <th hidden> Property Description</th>
+                                                                <th> Is Select</th>
+                                                                <th>Action</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <!--<tr  >-->
+                                                            <tr ng-repeat="reqList in requestList|filter:search_sub_insclass_query"
+                                                                id="view{{reqList.insSubClassID}}">
+                                                                <td hidden>{{reqList.inslassID}}</td>
+                                                                <td hidden>{{reqList.insSubClassID}}</td>
+                                                                <td hidden>{{reqList.propertyID}}</td>
+                                                                <td>{{reqList.InsClass}}</td>
+                                                                <td>{{reqList.InsSubClass}}</td>
+                                                                <td hidden>{{reqList.ProertDiscription}}</td>
+                                                                <td>
+                                                                    <input type="checkbox" ng-model="reqList.isChecked" value="{{InsClas.isChecked}}" />
+
+
+                                                                </td>
+                                                                <td>
+                                                                    <button class="btn btn-info" style="width:90px;padding-top:4px;padding-bottom:4px;" ng-click="filterAddedScope(reqList)">
+                                                                        Scope
+                                                                    </button>
+                                                                    <button class="btn btn-warning" style="width:100px;padding-top:4px;padding-bottom:4px;" ng-click="filterAddedProperties(reqList)">
+                                                                        Properties
+                                                                    </button>
+                                                                    <button class="btn btn-success" style="width:120px;padding-top:4px;padding-bottom:4px;" ng-click="AddInsCompanies(reqList)">
+                                                                        Add In/Comp
+                                                                    </button>
+                                                                </td>
+                                                            </tr>
+
+
+
+                                                        </tbody>
+
+
+                                                    </table>
+                                                    <button class="btn btn-success pull-right" ng-click="AddBulkInsCompanies()">
+                                                        <b>Add Ins/Companies</b>
+                                                    </button>
+
+
+                                                </div>
+
+                                            </div>
+                                            <!-- END INFO PANEL -->
+                                        </div>
+
+
+
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-md-12">
+                                            <!-- START INFO PANEL -->
+                                            <div class="panel panel-info">
+                                                <div class="panel-heading">
+                                                    <h3 class="panel-title">Added Ins/Companies</h3>
+                                                    <input type="text" ng-style="{'background-color': data.backgroundCol}"
+                                                           class="form-control col-md-6"
+                                                           placeholder="Search  ..."
+                                                           ng-model="search_ins_comapnies_query" />
+                                                </div>
+                                                <div class="panel-body">
+                                                    <table class="table table-striped table-responsive">
+                                                        <thead style="font-size:10px;">
+                                                            <tr>
+                                                                <th hidden>In/Sub Class ID</th>
+                                                                <th>In/Class</th>
+                                                                <th>In/Sub Class</th>
+                                                                <th>Company</th>
+                                                                <th hidden> Sum Insured</th>
+                                                                <th hidden> Is Select</th>
+                                                                <th>Action</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <!--<tr  >-->
+                                                            <tr ng-repeat="inscompany in AddedInscompanies| filter:search_ins_comapnies_query" id="view{{reqList.insSubClassID}}"
+                                                                ng-click="updateScopefinal(inscompany)"
+                                                                style="cursor:pointer">
+                                                                <td hidden>{{inscompany.inslassID}}</td>
+                                                                <td hidden>{{inscompany.insSubClassID}}</td>
+                                                                <td hidden>{{inscompany.InsuranceCompanyID}}</td>
+                                                                <td>{{inscompany.InsClass}}</td>
+                                                                <td>{{inscompany.InsSubClass}}</td>
+                                                                <td>{{inscompany.InsuranceCompanyName}}</td>
+                                                                <td hidden>{{inscompany.SumInsured}}</td>
+
+                                                                <td hidden>
+                                                                    <input type="checkbox" ng-model="inscompany.isChecked" value="{{inscompany.isChecked}}" />
+
+                                                                </td>
+                                                                <td>
+                                                                    <button class="btn btn-primary " 
+                                                                            style="width:90px;"
+                                                                            ng-if="statuseee == 'TCNI'" 
+                                                                            ng-click="TemcoverNote(inscompany)">
+                                                                        Issue TCN
+                                                                    </button>
+                                                              
+                                                                    <button style="width:90px;padding-top:4px;padding-bottom:4px;" 
+                                                                            class="btn btn-primary " 
+                                                                             ng-if="statuseee == 'QP'" 
+                                                                            ng-click="RequestAllInsCompany('#insCompanytbl',inscompany)"> Request 
+                                                                    </button>
+                                                                   
+                                                                    <button class="btn btn-success " style="padding-top:4px;padding-bottom:4px;" ng-click="updateScopefinal(inscompany)">
+                                                                        View
+                                                                    </button>
+                                                                    <button class="btn btn-danger " style="width:80px;" 
+                                                                            ng-click="RemoveAddedInsCompany(inscompany)">
+                                                                        Remove
+                                                                    </button>
+                                                                
+                                                                 
+                                                                   
+
+                                                                </td>
+                                                            </tr>
+
+                                                        </tbody>
+
+
+                                                    </table>
+
+                                                </div>
+
+                                            </div>
+                                            <!-- END INFO PANEL -->
+                                        </div>
+
+
+
+                                    </div>
+
+
+                                    <div class="form-group">
+                                        <div class="col-md-12">
+                                            <!-- START INFO PANEL -->
+                                            <div class="panel panel-info">
+                                                <div class="panel-heading">
+                                                    <h3 class="panel-title">Added Ins/Companies/InsSub Classes/Scope</h3>
+                                                    <input type="text" ng-style="{'background-color': data.backgroundCol}"
+                                                           class="form-control col-md-6"
+                                                           placeholder="Search  ..."
+                                                           ng-model="search_ins_comapnies_sub_class_scope_query" />
+                                                </div>
+                                                <div class="panel-body">
+
+
+
+
+                                                    <table class="table table-responsive ">
+                                                        <thead style="font-size:10px;background-color:palegreen!important">
+                                                            <tr>
+                                                                <th hidden>In/Sub Class ID</th>
+                                                                <th>In/Class</th>
+                                                                <th>In/Sub Class</th>
+                                                                <th>Company</th>
+                                                                <th> Sum Insured</th>
+
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <!--<tr  >-->
+                                                            <tr>
+                                                                <td hidden>{{selectedSubClassIDFromInsCompany[0].inslassID}}</td>
+                                                                <td hidden>{{selectedSubClassIDFromInsCompany[0].insSubClassID}}</td>
+                                                                <td hidden>{{selectedSubClassIDFromInsCompany[0].InsuranceCompanyID}}</td>
+                                                                <td>{{selectedSubClassIDFromInsCompany[0].InsClass}}</td>
+                                                                <td>{{selectedSubClassIDFromInsCompany[0].InsSubClass}}</td>
+                                                                <td>{{selectedSubClassIDFromInsCompany[0].InsuranceCompanyName}}</td>
+                                                                <td><input type="text" ng-style="{'background-color': data.backgroundCol}" ng-model="selectedSubClassIDFromInsCompany[0].SumInsured" value="{{selectedSubClassIDFromInsCompany[0].SumInsured}}" /></td>
+
+
+                                                            </tr>
+
+                                                        </tbody>
+
+
+                                                    </table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                    <table class="table table-bordered table-responsive" >
+                                                        <thead style="background-color:palegreen">
+                                                            <tr>
+                                                                <th hidden>In/Sub Class ID</th>
+                                                                <th hidden>In/Class</th>
+                                                                <th>Insurance Class</th>
+                                                                <th>Insurance Sub Class</th>
+                                                                <th>Scope Description</th>
+
+                                                                <th>Is Selected</th>
+                                                                <th>Excess Type</th>
+                                                                <th>Excess </th>
+                                                            </tr>
+                                                        </thead>
+
+                                                        <!--<tr  >-->
+                                                        <tr ng-repeat="ScopeInsClass in InsSubClassScopeByInsCompany|filter:search_ins_comapnies_sub_class_scope_query">
+                                                            <td hidden>{{ScopeInsClass.InsuranceClassCode}}</td>
+                                                            <td hidden>{{ScopeInsClass.InsuranceSubClassID}}</td>
+
+                                                            <td>{{ScopeInsClass.InsuranceClassCode}}</td>
+                                                            <td>{{ScopeInsClass.InsuranceSubClassID}}</td>
+                                                            <td>{{ScopeInsClass.Description}}</td>
+
+                                                            <td>
+                                                                <input type="checkbox" class="icheckbox"
+                                                                       ng-model="ScopeInsClass.isChecked" />
+                                                            </td>
+
+
+                                                            <td>
+
+                                                                <select ng-style="{'background-color': data.backgroundCol}" ng-model="ScopeInsClass.ExcessType">
+                                                                    <option value="Rate">Rate</option>
+                                                                    <option value="Fixed">Fixed</option>
+                                                                </select>
+
+
+
+
+                                                            </td>
+                                                            <td>
+
+                                                                <input type="text" ng-style="{'background-color': data.backgroundCol}" ng-model="ScopeInsClass.ExcessAmount" />
+
+
+
+
+                                                            </td>
+
+
+
+                                                        </tr>
+
+
+
+
+                                                    </table>
+
+
+
+                                                    <div class="row small">
+
+                                                        <label type="text" class="col-md-3">Primium Including Tax</label>
+
+                                                        <label type="text" class="col-md-4">Other Excess Description</label>
+
+                                                        <label type="text" class="col-md-4">Other Excesss Amount</label>
+
+
+
+                                                    </div>
+
+                                                    <div class="row">
+
+                                                        <input type="text" ng-style="{'background-color': data.backgroundCol}" class="col-md-3" ng-model="PrimiumInTax" style="margin-right:5px;" />&nbsp;&nbsp;
+
+                                                        <input type="text" ng-style="{'background-color': data.backgroundCol}" class="col-md-4" ng-model="OtherExcessDescription" style="margin-right:5px;" />&nbsp;&nbsp;
+
+                                                        <input type="text" ng-style="{'background-color': data.backgroundCol}" class="col-md-4" ng-model="OtherExcesssAmount" />&nbsp;
+
+
+
+                                                    </div>
+
+
+
+                                                    @*{{AddedInsClassesScopes}}*@
+
+
+                                                    <button class="btn btn-success pull-right" style="width:200px;padding:1px;margin:10px;"
+                                                            ng-click="updateQuatationDetails()">
+                                                        Update Quatation Details
+                                                    </button>
+
+                                                    <button class="btn btn-primary pull-right" style="width:200px;padding:1px;margin:10px;"
+                                                            ng-if="statuseee == 'TCNI'" ng-click="SetPolicy()">
+                                                        Set As Policy
+                                                    </button>
+                                                    @*// {{QuotationDetailsInsCompanyScopeDetails}}*@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                </div>
+
+                                            </div>
+                                            <!-- END INFO PANEL -->
+                                        </div>
+
+
+
+                                    </div>
+
+
+
+                                </div>
+                                <div class="col-md-4">
+                                    <!-- START Customer Information PANEL -->
+                                    <div class="panel panel-primary " style="border:0px;background-color:transparent!important">
+                                        <div class="panel-heading">
+                                            <h3 class="panel-title">Customer Information</h3>
+
+                                        </div>
+                                        <div class="panel-body" style="background-color:transparent!important">
+
+                                            <div class="form-group">
+                                                <label class="col-md-4 control-label">Status{{}}</label>
+                                                <div class="col-md-4">
+
+                                                    <select class="form-control "
+                                                            ng-model="statuseee">
+                                                        <option ng-repeat="status in statuses"
+                                                                value="{{status.QuotationStatusCode}}">
+                                                            {{status.Description}}
+                                                        </option>
+                                                    </select>
+
+
+                                                </div>
+
+
+                                                <div class="col-md-4">
+                                                    <div class="btn btn-success" ng-click="UpdateStatus()">Update Status</div>
+
+
+                                                </div>
+
+
+                                            </div>
+
+
+
+                                            <div class="form-group">
+                                                <label class="col-md-4 control-label">Request No</label>
+                                                <div class="col-md-8">
+                                                    <div class="form-control">
+                                                        REQ-{{ ClientRequestHeader.ClientRequestHeaderID}}
+
+
+                                                    </div>
+                                                </div>
+
+                                            </div>
+
+                                            
+                                            
+                                            
+                                            
+                                            
+                                              <div class="form-group">
+                                                <label class="col-md-4 control-label">Request Date</label>
+                                                <div class="col-md-8">
+                                                    <div class="form-control">
+                                                        {{RequestedDate}}
+
+
+                                                    </div>
+                                                </div>
+                                              
+
+
+
+
+                                            </div>
+
+                                            <div class="form-group" hidden>
+                                                <label class="col-md-4 control-label">Choose Customer</label>
+                                                <div class="col-md-8">
+                                                    <select ng-options="client.ClientID as client.ClientName for client in Clients"
+                                                            ng-change="LoadClientByID(client)"
+                                                            ng-model="ClientID" class="form-control"></select>
+                                                </div>
+
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-4 control-label">Customer Name</label>
+                                                <div class="col-md-8">
+                                                    <div type="text" class="form-control"   ng-model="cusName" >{{cusName}}</div>
+                                              
+
+                                                </div>
+
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-4 control-label">Address </label>
+                                                <div class="col-md-8">
+                                                    <div type="text" class="form-control" ng-model="Address1"  >{{Address1}}</div>
+                                                </div>
+
+                                            </div>
+
+                                            <div class="form-group" hidden>
+                                                <label class="col-md-4 control-label">Address  Line 2</label>
+                                                <div class="col-md-8">
+                                                    <input type="text" class="form-control" ng-model="Address2"  value="password" />
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group" hidden>
+                                                <label class="col-md-4 control-label">Address Line 3</label>
+                                                <div class="col-md-8">
+                                                    <input type="text" class="form-control" ng-model="Address3"  value="password" />
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group">
+
+                                                <label class="col-md-4 control-label">Date Of Birth</label>
+                                                <div class="col-md-8 " >
+
+                                                    <div type="text" class="col-md-4  form-control"    >{{DOB }}</div>
+
+
+                                                </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                            </div>
+                                            <div class="form-group">
+
+                                                <label class="col-md-4 control-label">NIC</label>
+                                                <div class="col-md-8">
+                                                    <div class="form-control"
+                                                       
+                                                           ng-model="NIC"  >{{NIC}}</div>
+                                               
+                                                </div>
+
+
+
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-4 control-label">Mobile No</label>
+                                                <div class="col-md-8">
+                                                    <div type="text" class="form-control"
+                                                           maxlength="10"
+                                                           ng-model="mobileNo"  >{{mobileNo}}</div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-4 control-label">Fixed Line</label>
+                                                <div class="col-md-8">
+                                                    <div type="text" class="form-control"
+                                                      
+                                                           ng-model="fixedLine" >{{fixedLine}}</div>
+                                                </div>
+
+
+
+                                            </div>
+
+                                            <div class="form-group">
+
+                                                <label class="col-md-4 control-label">E-Mail</label>
+                                                <div class="col-md-8">
+                                                    <div  name="email" class="form-control"  ng-model="email" >{{email}}</div>
+                                                  
+                                                </div>
+
+                                            </div>
+                                            <div class="form-group" id="isAVIVA" ng-show="isAVIVA">
+                                                <label class="col-md-4 control-label">AVIVA/BUPA</label>
+                                                <div class="col-md-8">
+                                                    <div class="panel panel-default">
+                                                        <div class="panel-body">
+
+                                                            <div class="form-group" style="font-size:10px;">
+                                                                <label class="col-md-2 control-label">Resident Country</label>
+                                                                <div class="col-md-4">
+                                                                    <select class="col-md-12 form-control " data-live-search="true" ng-model="homeCountry">
+                                                                        <option ng-repeat="Country in Countries"
+                                                                                value="{{Country.CountryID}}">
+                                                                            {{Country.CountryName}}
+                                                                        </option>
+
+                                                                    </select>
+                                                                </div>
+                                                                <label class="col-md-2 control-label">Home Country</label>
+                                                                <div class="col-md-4">
+                                                                    <select class="form-control " data-live-search="true" ng-model="residentCountry">
+                                                                        <option ng-repeat="Country in Countries"
+                                                                                value="{{Country.CountryID}}">
+                                                                            {{Country.CountryName}}
+                                                                        </option>
+
+                                                                    </select>
+                                                                </div>
+
+
+
+                                                            </div>
+
+
+                                                            <div class="form-group" style="font-size:10px;">
+                                                                <label class="col-md-2 control-label">Inspection Date</label>
+                                                                <div class="col-md-10">
+                                                                    <div class="input-group date datepicker" data-date="05/07/2014"
+                                                                         data-date-format="dd-mm-yyyy" ng-model="inspectionType">
+                                                                        <input type="text" id="dp-2" class="form-control  " value="05/07/2014" />
+                                                                        <span class="input-group-addon add-on"><span class="glyphicon glyphicon-calendar"></span></span>
+                                                                    </div>
+
+                                                                </div>
+
+                                                            </div>
+                                                            <div class="form-group" style="font-size:10px;">
+
+                                                                <label class="col-md-2 control-label">Family Discount</label>
+                                                                <div class="col-md-10">
+                                                                    <input type="text" class="form-control  "  ng-readonly="isDisabled" ng-model="fDiscount" />
+
+                                                                </div>
+
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+
+
+
+                                            </div>
+
+                                            <div class="form-group" hidden>
+                                                <label class="col-md-4 control-label">File Upload</label>
+                                                <div class="col-md-8">
+                                                    <div class="panel panel-default">
+                                                        <div class="panel-body">
+                                                            
+                                                        </div>
+                                                    </div>
+                                                    @*<input type="file" multiple class="btn-success" data-preview-file-type="any" />*@
+                                                </div>
+                                            </div>
+
+
+
+                                        </div>
+
+                                    </div>
+                                    <!-- END Insurance Class  PANEL -->
+
+
+                                </div>
+
+                               
+
+
+
+                                <div class="col-md-12" style="margin-bottom:10px;">
+                                    &nbsp;&nbsp;<button style="margin-left:5px;" class="btn btn-primary pull-right" id="update" ng-if="statuseee == 'QP'" ng-click="Save()">Update Quatation <span class="fa fa-floppy-o fa-right"></span></button>&nbsp;&nbsp;
+                                    &nbsp;&nbsp;<button style="margin-left:5px;" class="btn btn-primary pull-right" id="update" ng-if="statuseee == 'QR'" ng-click="requestByEmail('#listHidden','Quatation Details')">Request Customer <span class="fa fa-floppy-o fa-right"></span></button>&nbsp;&nbsp;
+                                 
+
+
+
+
+
+                                </div>
+                            </div>
+
+
+
+
+
+                        </form>
+
+                        <div class="row">
+
+                            <table style="border:1px;" class="table table-bordered table-responsive" id="listHidden" hidden>
+                                <tbody>
+                                    <tr>
+                                        <td colspan="2">
+                                            <div class="td_head"><b>Quotation  Details</b></div>
+                                            <table style="width:100%" class="table table-bordered table-responsive">
+                                                <tbody>
+                                                    <tr>
+                                                        <th>
+                                                            <div class="td_head">
+                                                                Insurance Code
+                                                            </div>
+                                                        </th>
+                                                        <th>
+                                                            <div class="td_head">Insurance SubClass Description</div>
+                                                        </th>
+                                                        <th>
+                                                            <div class="td_head">Requested Insurance Company Details</div>
+                                                        </th>
+                                                    </tr>
+                                                    <tr ng-repeat="QuotationLine in HeaderObj.QuotationLineDetails">
+                                                        <td class="td_row_even">
+                                                            <div class="td_row_even">
+                                                                {{QuotationLine.InsuranceCode}}
+                                                            </div>
+                                                        </td>
+                                                        <td class="td_row_even">
+                                                            <div class="td_row_even">
+                                                               {{QuotationLine.InsuranceSubClassDescription}} 
+                                                            </div>
+                                                        </td>
+                                                        <td class="td_row_even">
+                                                            <table style="width:100%" class="table table-bordered table-responsive" id="insCompanytbl">
+                                                                <tbody>
+                                                                    <tr>
+                                                                        <th>
+                                                                            <div class="td_head">Insurance Company Name</div>
+                                                                        </th>
+                                                                        <th>
+                                                                            <div class="td_head">Quotation Details By Ins Company </div>
+                                                                        </th>
+                                                                    </tr>
+                                                                    <tr ng-repeat="RequestedInsuranceCompanyDetail in QuotationLine.RequestedInsuranceCompanyDetails">
+                                                                        <td class="td_row_even">
+                                                                            <div class="td_row_even">{{RequestedInsuranceCompanyDetail.InsuranceCompanyName}}</div>
+                                                                        </td>
+                                                                        <td class="td_row_even">
+                                                                            <table style="width:100%" class="table table-responsive table-bordered">
+                                                                                <tbody>
+                                                                                    <tr>
+                                                                                        <th>
+                                                                                            <div class="td_head">Premium Including Tax</div>
+                                                                                        </th>
+                                                                                        <th>
+                                                                                            <div class="td_head">Excess Description</div>
+                                                                                        </th>
+                                                                                        <th>
+                                                                                            <div class="td_head">Excess Amount</div>
+                                                                                        </th>
+                                                                                        <th>
+                                                                                            <div class="td_head">Details</div>
+                                                                                        </th>
+                                                                                    </tr>
+                                                                                    <tr ng-repeat="QuotationDetailsInsCompanyHeaderDetail in RequestedInsuranceCompanyDetail.QuotationDetailsInsCompanyHeaderDetails">
+                                                                                        <td class="td_row_even">
+                                                                                            <div class="td_row_even">{{QuotationDetailsInsCompanyHeaderDetail.PremiumIncludingTax}}</div>
+                                                                                        </td>
+                                                                                        <td class="td_row_even">
+                                                                                            <div class="td_row_even">{{QuotationDetailsInsCompanyHeaderDetail.ExcessDescription}}</div>
+                                                                                        </td>
+                                                                                        <td class="td_row_even">
+                                                                                            <div class="td_row_even">{{QuotationDetailsInsCompanyHeaderDetail.ExcessAmount}}</div>
+                                                                                        </td>
+                                                                                        <td class="td_row_even">
+                                                                                            <table style="width:100%" class="table table-responsive table-bordered">
+                                                                                                <tbody>
+                                                                                                    <tr>
+                                                                                                        <th>
+                                                                                                            <div class="td_head">Insurance Sub Class </div>
+                                                                                                        </th>
+                                                                                                        <th><div class="td_head">Sum Insured</div></th>
+                                                                                                        <th>
+                                                                                                            <div class="td_head">Scope Details</div>
+                                                                                                        </th>
+                                                                                                    </tr>
+                                                                                                    <tr ng-repeat="QuotationDetailsInsCompanyLineDetail in QuotationDetailsInsCompanyHeaderDetail.QuotationDetailsInsCompanyLineDetails">
+                                                                                                        <td class="td_row_even">
+                                                                                                            <div class="td_row_even">{{QuotationDetailsInsCompanyLineDetail.InsuranceSubClassDescription}}</div>
+                                                                                                        </td>
+                                                                                                        <td class="td_row_even">
+                                                                                                            <div class="td_row_even">{{QuotationDetailsInsCompanyLineDetail.SumInsured}}</div>
+                                                                                                        </td>
+                                                                                                        <td class="td_row_even">
+                                                                                                            <table style="width:100%" class="table table-responsive table-bordered" >
+                                                                                                                <tbody>
+                                                                                                                    <tr>
+                                                                                                                        <th>
+                                                                                                                            <div class="td_head">Scope Description</div>
+                                                                                                                        </th>
+                                                                                                                        <th><div class="td_head">Excess Type</div></th>
+                                                                                                                        <th>
+                                                                                                                            <div class="td_head">Excess Amount</div>
+                                                                                                                        </th>
+                                                                                                                    </tr>
+                                                                                                                    <tr ng-repeat="QuotationDetailsInsCompanyScopeDetail in QuotationDetailsInsCompanyLineDetail.QuotationDetailsInsCompanyScopeDetails">
+                                                                                                                        <td class="td_row_even">
+                                                                                                                            <div class="td_row_even">{{QuotationDetailsInsCompanyScopeDetail.ScopeDescription}}</div>
+                                                                                                                        </td>
+                                                                                                                        <td class="td_row_even">
+                                                                                                                            <div class="td_row_even">{{QuotationDetailsInsCompanyScopeDetail.ExcessType}}</div>
+                                                                                                                        </td>
+                                                                                                                        <td class="td_row_even"><div class="td_row_even">{{QuotationDetailsInsCompanyScopeDetail.ExcessAmount}}</div></td>
+                                                                                                                    </tr>
+                                                                                                                </tbody>
+                                                                                                            </table>
+                                                                                                        </td>
+                                                                                                    </tr>
+                                                                                                </tbody>
+                                                                                            </table>
+                                                                                        </td>
+                                                                                    </tr>
+                                                                                </tbody>
+                                                                            </table>
+                                                                        </td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+
+
+
+
+                        </div>
+                    </div>
+
+
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+</div>
+
+</div>

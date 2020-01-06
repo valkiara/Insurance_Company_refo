@@ -1,0 +1,426 @@
+﻿@{
+    ViewBag.Title = "Commission Structure Header";
+}
+
+<script src="~/Scripts/ng/Services/CommissionHeaderService.js"></script>
+<script src="~/Scripts/ng/Controllers/CommisionHeaderController.js"></script>
+<script type="text/javascript">
+    function IsNumber(evt) {
+        evt = (evt) ? evt : window.event;
+        var charCode = (evt.which) ? evt.which : evt.keyCode;
+        if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+            return false;
+        }
+        return true;
+    }
+
+    function checkInputRate(rateVal) {
+        var regEx = /^[0-9]+\.?[0-9]*$/;
+        if (regEx.test(rateVal.value) == false) {
+            rateVal.value = rateVal.value.substring(0, rateVal.value.length - 1);
+        }
+    }
+</script>
+
+<div class="breadcrumb-line">
+    <ul class="breadcrumb">
+        <li><a href="/Dashboard/Dashboard"><i class="icon-home2 position-left"></i>Home</a></li>
+        <li>Master Details</li>
+        <li>Commission Structure</li>
+        <li class="active"><b>Commission Structure Header</b></li>
+    </ul>
+</div>
+<div class="content" ng-app="IBMSAPP">
+    <div ng-controller="CommisionHeaderController" ng-init="init()" ng-cloak>
+        <div class="page-content-wrap">
+
+            <div class="panel panel-default tabs">
+                <ul class="nav nav-tabs" role="tablist">
+                    <li class="active"><a href="#tab-first" role="tab" data-toggle="tab">View</a></li>
+                    <li><a href="#tab-second" role="tab" data-toggle="tab">New</a></li>
+                    @*<li><a href="#tab-third" role="tab" data-toggle="tab">Edit</a></li>*@
+                </ul>
+                <div class="panel-body tab-content">
+                    <div class="tab-pane active" id="tab-first">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">
+                                    <strong>Agent Commission Structure Header</strong>
+                                </h3>
+                                <ul class="panel-controls">
+                                    <li><input type="text" style="font-size: 12px;width: 100%;border-radius: 0px;margin-right:2px;" class="form-control" placeholder="Search Commission. . ." ng-model="search_query" ng-change="searchTextChange(search_query)"></li>
+                                    <li><a href="#" ng-click="refreshContent()"><span class="fa fa-refresh"></span></a></li>
+                                    @*<li><a href="#" class="panel-remove"><span class="fa fa-times"></span></a></li>*@
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="panel-body">
+                            <div class="col-md-2">Show records per page </div>
+                            <div class="col=md-10">
+                                <select class="form-control" style="width:100px;"
+                                        ng-model="viewby"
+                                        ng-change="setItemsPerPage(viewby)">
+                                    <option>5</option>
+                                    <option>10</option>
+                                    <option>20</option>
+                                    <option>30</option>
+                                    <option>40</option>
+                                    <option>50</option>
+                                </select>
+                            </div>
+                            <div><br></div>
+                            <table class="table table-responsive" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th hidden>ComStructID</th>
+                                        <th>Commission Structure Name</th>
+                                        <th>Business Unit</th>
+                                        <th>Partner name</th>
+                                        <th>Insurance Company</th>
+                                        <th>Insurance Class</th>
+                                        <th>Insurance Sub Class</th>
+                                        @*<th>Rate Value</th>
+                                        <th>Rate Value</th>
+                                        <th>Is AgeConsider</th>
+                                        <th>Age From</th>
+                                        <th>Age To</th>
+                                        <th>Action</th>
+                                        <th>Is Fixed</th>*@
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody ng-repeat="CommStruHeader in data.slice(((currentPage-1)*itemsPerPage), ((currentPage)*itemsPerPage))">
+                                    <!--<tr  >-->
+                                    <tr id="view{{CommStruHeader.CommisionStructureID}}">
+                                        <td hidden>{{CommStruHeader.CommisionStructureID}}</td>
+                                        <td>{{CommStruHeader.CommisionStructureName}}</td>
+                                        <td>{{CommStruHeader.BusinessUnitName}}</td>
+                                        <td>{{CommStruHeader.PartnerName}}</td>
+                                        <td>{{CommStruHeader.InsuranceCompanyName}}</td>
+                                        <td>{{CommStruHeader.InsuranceClassName}}</td>
+                                        <td>{{CommStruHeader.InsuranceSubClassName}}</td>
+                                        <td>
+                                            <div class="fa fa-edit btn btn-success" style="width:90px;" ng-click="edit(CommStruHeader)">&nbsp;&nbsp;Edit</div>
+                                            <div class="fa fa-trash-o btn btn-danger" style="width:90px;" ng-click="deleteCommissionHeader(CommStruHeader.CommisionStructureID)">&nbsp;&nbsp;Delete</div>
+                                        </td>
+                                    </tr>
+                                    <tr id="edit{{CommStruHeader.CommisionStructureID}}" hidden>
+                                        <td hidden>
+                                            <input type="text" hidden class="form-control"
+                                                   value="{{CommStruHeader.CommisionStructureID}}"
+                                                   ng-model="CommStruHeader.CommisionStructureID">
+                                        </td>
+                                        <td>
+                                            <input type="text" class="form-control"
+                                                   value="{{CommStruHeader.CommisionStructureName}}"
+                                                   ng-model="CommStruHeader.CommisionStructureName"
+                                                   style="width:100%" />
+                                            <span class="help-block" style="color:red" ng-show="!CommStruHeader.CommisionStructureName">Required Field *</span>
+                                        </td>
+                                        <td>
+                                            <select name="selectBusinessunit" class="form-control"
+                                                    ng-model="CommStruHeader.BusinessUnitID"
+                                                    ng-options="BusinessUnit.BusinessUnitID as BusinessUnit.BusinessUnit for BusinessUnit in filteredBusinessUnits" ng-required="true" style="width:100%">
+                                                <option value="">--Select a Business Unit--</option>
+                                            </select>
+                                            <span class="help-block" style="color:red"
+                                                  ng-show="!CommStruHeader.BusinessUnitID">Required Field *</span>
+                                        </td>
+                                        <td>
+                                            <select name="selectPartner" class="form-control" ng-model="CommStruHeader.PartnerID" ng-options="partner.PartnerID as partner.PartnerName for partner in availablePartner" ng-required="true" style="width:100%">
+                                                <option value="">--Select a Partner--</option>
+                                            </select>
+                                            <span class="help-block" style="color:red" ng-show="!CommStruHeader.PartnerID">Required Field *</span>
+                                        </td>
+                                        <td>
+                                            <select name="selectInsCompany" class="form-control" ng-model="CommStruHeader.InsuranceCompanyID" ng-options="Inscompany.InsuranceCompanyID as Inscompany.InsuranceCompanyName for Inscompany in availableInsCompany" ng-required="true" style="width:100%">
+                                                <option value="">--Select a Ins Company--</option>
+                                            </select>
+                                            <span class="help-block" style="color:red" ng-show="!CommStruHeader.InsuranceCompanyID">Required Field *</span>
+                                        </td>
+                                        <td>
+                                            <select name="selectInsClass" class="form-control"
+                                                    ng-model="CommStruHeader.InsuranceClassID"
+                                                    ng-options="InsClass.InsuranceClassID as InsClass.InsuranceCode for InsClass in availableInsClass"
+                                                    ng-change="LoadSubInsClass(CommStruHeader.InsuranceClassID)"
+                                                    ng-required="true" style="width:100%">
+                                                <option value="">--Select a Ins Class--</option>
+                                            </select>
+                                            <span class="help-block" style="color:red" ng-show="!CommStruHeader.InsuranceClassID">Required Field *</span>
+                                        </td>
+                                        <td>
+                                            <select name="selectInsSubClass" class="form-control"
+                                                    ng-model="CommStruHeader.InsuranceSubClassID"
+                                                    ng-options="InsSubClass.InsuranceSubClassID as InsSubClass.Description for InsSubClass in availableInsSubClass" ng-required="true" style="width:100%">
+                                                <option value="">--Select a Ins Sub Class--</option>
+                                            </select>
+                                            <span class="help-block" style="color:red" ng-show="!CommStruHeader.InsuranceSubClassID">Required Field *</span>
+                                        </td>
+                                        <td>
+                                            <div class="fa fa-save btn btn-info"
+                                                 style="width:90px;"
+                                                 ng-disabled="!(CommStruHeader.CommisionStructureName && CommStruHeader.BusinessUnitID && CommStruHeader.PartnerID && CommStruHeader.InsuranceCompanyID && CommStruHeader.InsuranceClassID && CommStruHeader.InsuranceSubClassID)"
+                                                 ng-click="update(CommStruHeader)">&nbsp;&nbsp;Update</div>
+                                            <div ng-click="cancel(CommStruHeader)" style="width:90px;" class="fa fa-times btn btn-default">&nbsp;&nbsp;Cancel</div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div style="align-content:center"><pagination total-items="totalItems" ng-model="currentPage" max-size="maxSize" class="pagination-sm pull-left" boundary-links="true" rotate="false" num-pages="numPages" items-per-page="itemsPerPage"></pagination></div>
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="tab-second" >
+                        <div class="col-md-6">
+                            <form name="comStructHeaderData" class="form-horizontal" novalidate role="form">
+
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label">Commission Structure Name</label>
+                                    <div class="col-md-6">
+                                        <input type="text" name="inputComStructName" ng-model="CommissionObj.ComStruName" ng-required="true" class="form-control" value="Some text value..." />
+                                        <span class="help-block" style="color:red" ng-show="comStructHeaderData.inputComStructName.$error.required">Required Field *</span>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label">Business Unit</label>
+                                    <div class="col-md-6">
+                                        <select name="selectBusinessUnit" class="form-control" ng-model="CommissionObj.buID"
+                                                ng-options="BusinessUnit.BusinessUnitID as BusinessUnit.BusinessUnit for BusinessUnit in filteredBusinessUnits" ng-required="true">
+                                            <option value="">--Select Business Unit--</option>
+                                        </select>
+                                        <span class="help-block" style="color:red" ng-show="comStructHeaderData.selectBusinessUnit.$error.required">Required Field *</span>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label">Partner</label>
+                                    <div class="col-md-6">
+                                        <select name="selectPartner" class="form-control"
+                                                ng-model="CommissionObj.PartnerID"
+                                                ng-options="partner.PartnerID as partner.PartnerName for partner in availablePartner" ng-required="true">
+                                            <option value="">--Select a Partner--</option>
+                                        </select>
+                                        <span class="help-block" style="color:red" ng-show="comStructHeaderData.selectPartner.$error.required">Required Field *</span>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label">Insurance Company</label>
+                                    <div class="col-md-8">
+                                        <select name="selectInsCompany" class="form-control" ng-model="CommissionObj.InsCompanyID" ng-options="Inscompany.InsuranceCompanyID as Inscompany.InsuranceCompanyName for Inscompany in availableInsCompany" ng-required="true">
+                                            <option value="">--Select a Ins Company--</option>
+                                        </select>
+                                        <span class="help-block" style="color:red" ng-show="comStructHeaderData.selectInsCompany.$error.required">Required Field *</span>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label">Insurance Class</label>
+                                    <div class="col-md-8">
+                                        <select name="selectInsClass" class="form-control"
+                                                ng-model="CommissionObj.InsuranceClassID"
+                                                ng-options="InsClass.InsuranceClassID as InsClass.InsuranceCode for InsClass in availableInsClass"
+                                                ng-change="LoadSubInsClass(CommissionObj.InsuranceClassID)"
+                                                ng-required="true">
+                                            <option value="">--Select a Ins Class--</option>
+                                        </select>
+                                        <span class="help-block" style="color:red" ng-show="comStructHeaderData.selectInsClass.$error.required">Required Field *</span>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label">Insurance Sub Class</label>
+                                    <div class="col-md-8">
+                                        <select name="selectInsSubClass"
+                                                class="form-control"
+                                                ng-model="CommissionObj.InsuranceSubClassID"
+                                                ng-options="InsSubClass.InsuranceSubClassID as InsSubClass.Description for InsSubClass in availableInsSubClass"
+                                                ng-required="true">
+                                            <option value="">--Select a Ins Sub Class--</option>
+                                        </select>
+                                        <span class="help-block" style="color:red" ng-show="comStructHeaderData.selectInsSubClass.$error.required">
+                                            Required Field *
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label"></label>
+                                    <div class="col-md-8">
+                                        <div class="fa fa-save btn btn-primary"
+                                             ng-disabled="!comStructHeaderData.$valid"
+                                             ng-click="addCommissionHeader()">
+                                            Add Commission Structure Header<i class="icon-arrow-right14 position-right"></i>
+                                        </div>
+                                        <button type="button" class="btn btn-default" ng-click="ClearFields()">Clear<span class="glyphicon glyphicon-erase fa-right"></span></button>
+                                        @*<div class="glyphicon glyphicon-refresh btn  btn-default"
+                             ng-click="ClearFields()">
+                            Clear<i class="icon-arrow-right14 position-right"></i>
+                        </div>*@
+                                    </div>
+                                </div>
+
+                                @*<div class="form-group">
+                    <label class="col-md-4 control-label">Rate Category</label>
+                    <div class="col-md-8">
+                        <select name="selectRateCategory" class="form-control" ng-model="comObj.RateCategoryID"
+                                ng-options="RT.RateCategoryID as RT.RateCategoryName for RT in availableRateCat"
+                                ng-required="true">
+                            <option value="">--Select a Rate Category--</option>
+                        </select>
+                        <span class="help-block" style="color:red" ng-show="comStructLine.selectRateCategory.$error.required">Required Field *</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-4 control-label">Is Age Consider</label>
+                    <div class="col-md-8">
+                        <input type="checkbox" ng-model="comObj.IsAgeConsider" id="isTaxable">
+                    </div>
+                </div>
+                <div class="form-group" ng-show="comObj.IsAgeConsider">
+                    <label class="col-md-4 control-label">Age From</label>
+                    <div class="col-md-8">
+                        <input type="number" name="inputAgeFrom" class="form-control" onkeypress="return IsNumber(event)"
+                               ng-model="comObj.AgeFrom" min="0" max="{{comObj.AgeTo}}" ng-required="comObj.IsAgeConsider">
+                        <span class="help-block" style="color:red" ng-show="comStructLine.inputAgeFrom.$error.required">Required Field *</span>
+                        <span class='help-block' style="color:red" ng-show='comStructLine.inputAgeFrom.$error.max'>Age From should be less than or equal {{comObj.AgeTo}}</span>
+                    </div>
+                </div>
+                <div class="form-group" ng-show="comObj.IsAgeConsider">
+                    <label class="col-md-4 control-label">Age To</label>
+                    <div class="col-md-8">
+                        <input type="number" name="inputAgeTo"
+                               class="form-control" onkeypress="return IsNumber(event)" ng-model="comObj.AgeTo"
+                               min="{{comObj.AgeFrom}}" ng-required="comObj.IsAgeConsider">
+                        <span class="help-block" style="color:red" ng-show="comStructLine.inputAgeTo.$error.required">Required Field *</span>
+                        <span class='help-block' style="color:red" ng-show='comStructLine.inputAgeTo.$error.min'>Age To should be greater than or equal {{comObj.AgeFrom}}</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-4 control-label">Is Fixed</label>
+                    <div class="col-md-8">
+                        <input type="checkbox" ng-model="comObj.IsFixed" id="isTaxables">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-4 control-label">Rate Value</label>
+                    <div class="col-md-8">
+                        <input type="number"
+                               name="inputRate"
+                               class="form-control"
+                               ng-model="comObj.RateValue" onkeyup="checkInputRate(this);"
+                               ng-change="checkInputRateByValue()"
+                               min="0"
+                               ng-required="true" />
+                        <span class="help-block" style="color:red" ng-show="comStructLine.inputRate.$error.required">Required Field *</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-4 control-label"></label>
+                    <div class="col-md-8">
+                        <div type="button" class="btn btn-primary"
+                             ng-disabled="!comStructLine.$valid"
+                             ng-click="addCommisionLine()">Add Commission Structrue Line<i class="icon-arrow-right14 position-right"></i></div>
+                        <div class="glyphicon glyphicon-refresh btn  btn-default"
+                             ng-click="ClearFields()">
+                            Clear<i class="icon-arrow-right14 position-right"></i>
+                        </div>
+                    </div>
+                </div>*@
+
+
+                            </form>
+                        </div>
+                        <div class="col-md-6">
+                            <form name="comStructLine" class="form-horizontal" novalidate role="form">
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label">Commission Structure Header</label>
+                                    <div class="col-md-8">
+                                            <select name="selectComStructHeader" class="form-control" ng-model="comObj.CommissionStructureID"
+                                                    ng-options="CSH.CommisionStructureID as CSH.CommisionStructureName for CSH in availableComStrct"
+                                                    ng-required="true">
+                                                <option value="">--Select a Commission Structure--</option>
+                                            </select>
+                                            <span class="help-block" style="color:red" ng-show="comStructLine.selectComStructHeader.$error.required">Required Field *</span>
+                                     </div>
+                                  </div>
+
+                                  <div class="form-group">
+                                  <label class="col-md-4 control-label" >Rate Category</label>
+                                    <div class="col-md-8">
+                                        <select name="selectRateCategory" class="form-control" ng-model="comObj.RateCategoryID"
+                                                ng-options="RT.RateCategoryID as RT.RateCategoryName for RT in availableRateCat"
+                                         >
+                                            <option value="">--Select a Rate Category--</option>
+                                        </select>
+                                       
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label">Is Age Consider</label>
+                                    <div class="col-md-8">
+                                        <input type="checkbox" ng-model="comObj.IsAgeConsider" id="isTaxable">
+                                    </div>
+                                </div>
+                                <div class="form-group" ng-show="comObj.IsAgeConsider">
+                                    <label class="col-md-4 control-label">Age From</label>
+                                    <div class="col-md-8">
+                                        <input type="number" name="inputAgeFrom" class="form-control" onkeypress="return IsNumber(event)"
+                                               ng-model="comObj.AgeFrom" min="0" max="{{comObj.AgeTo}}" ng-required="comObj.IsAgeConsider">
+                                        <span class="help-block" style="color:red" ng-show="comStructLine.inputAgeFrom.$error.required">Required Field *</span>
+                                        <span class='help-block' style="color:red" ng-show='comStructLine.inputAgeFrom.$error.max'>Age From should be less than or equal {{comObj.AgeTo}}</span>
+                                    </div>
+                                </div>
+                                <div class="form-group" ng-show="comObj.IsAgeConsider">
+                                    <label class="col-md-4 control-label">Age To</label>
+                                    <div class="col-md-8">
+                                        <input type="number" name="inputAgeTo"
+                                               class="form-control" onkeypress="return IsNumber(event)" ng-model="comObj.AgeTo"
+                                               min="{{comObj.AgeFrom}}" ng-required="comObj.IsAgeConsider">
+                                        <span class="help-block" style="color:red" ng-show="comStructLine.inputAgeTo.$error.required">Required Field *</span>
+                                        <span class='help-block' style="color:red" ng-show='comStructLine.inputAgeTo.$error.min'>Age To should be greater than or equal {{comObj.AgeFrom}}</span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label">Is Fixed</label>
+                                    <div class="col-md-8">
+                                        <input type="checkbox" ng-model="comObj.IsFixed" id="isTaxables">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label">Rate Value(%)</label>
+                                    <div class="col-md-8">
+                                        <input type="number"
+                                               name="inputRate"
+                                               class="form-control"
+                                               ng-model="comObj.RateValue" onkeyup="checkInputRate(this);"
+                                               ng-change="checkInputRateByValue()"
+                                               min="0"
+                                               ng-required="true" />
+                                        <span class="help-block" style="color:red" ng-show="comStructLine.inputRate.$error.required">Required Field *</span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label"></label>
+                                    <div class="col-md-8">
+                                        <div type="button" class="btn btn-primary"
+                                             ng-disabled="!comStructLine.$valid"
+                                             ng-click="addCommisionLine()">Add Commission Structrue Line<i class="icon-arrow-right14 position-right"></i></div>
+                                        <div class="glyphicon glyphicon-refresh btn  btn-default"
+                                             ng-click="ClearFields()">
+                                            Clear<i class="icon-arrow-right14 position-right"></i>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                            </form>
+                        </div>
+                    </div>
+            </div>
+        </div>
+        <div id="divLoading" ng-show="showLoader"></div>
+    </div>
+</div>
+ </div>

@@ -1,0 +1,7 @@
+
+Log Entry : 
+10/9/2019 10:12:41 AM
+Error in: http://localhost:39705/api/ClientRequest/GetAllRequestsByBusinessUnitID.
+Error Message:System.NullReferenceException: Object reference not set to an instance of an object.
+   at IBMS.Service.TransactionData.ManageClientRequest.GetAllRequestsByBusinessUnitID(Int32 businessUnitID)
+__________________________

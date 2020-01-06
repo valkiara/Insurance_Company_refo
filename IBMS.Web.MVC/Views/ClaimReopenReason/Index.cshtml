@@ -1,0 +1,144 @@
+﻿@{
+    ViewBag.Title = "Claim Re-Open Reason";
+}
+
+<style>
+    .form-control {
+        width: 100%;
+    }
+</style>
+
+<script src="~/Scripts/ng/Controllers/ClaimReopenReasonController.js"></script>
+<script src="~/Scripts/ng/Services/ClaimReopenReasonService.js"></script>
+
+
+
+<div class="breadcrumb-line">
+    <ul class="breadcrumb">
+        <li><a href="/Dashboard/Index"><i class="icon-home2 position-left"></i>Home</a></li>
+        <li>Master Details</li><li>Claim</li>
+        <li class="active"><b>Claim Re-Open Reason</b></li>
+    </ul>
+</div>
+
+<div ng-app="IBMSAPP" ng-controller="ClaimReopenReasonController" ng-init="init()" ng-cloak>
+ 
+
+
+            <div class="page-content-wrap">
+                <div class="panel panel-default tabs">
+
+                    <ul class="nav nav-tabs" role="tablist">
+                        <li class="active" id="tabView"><a href="#tab-first" role="tab" data-toggle="tab">View</a></li>
+                        <li id="tabEdit"><a href="#tab-second" role="tab" data-toggle="tab">New</a></li>
+                    </ul>
+
+                    <div class="panel-body tab-content">
+
+                        <div class="tab-pane active" id="tab-first">
+
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">
+                                        <strong>Claim Re-Open Reason</strong>
+                                    </h3>
+                                    <ul class="panel-controls">
+                                        <li><input type="text" style="font-size: 12px;width: 100%;border-radius: 0px;margin-right:2px;" class="form-control" placeholder="Search Re-Open Reason ..." ng-model="search_query" ng-change="searchTextChange(search_query)"></li>
+                                        <li><a href="#" class="panel-refresh" ng-click="refreshContent()"><span class="fa fa-refresh"></span></a></li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="panel-body">
+                                <div class="col-md-2">Show records per page </div>
+                                <div class="col=md-10">
+                                    <select class="form-control" style="width:100px;" ng-model="viewby" ng-change="setItemsPerPage(viewby)">
+                                        <option>5</option>
+                                        <option>10</option>
+                                        <option>20</option>
+                                        <option>30</option>
+                                        <option>40</option>
+                                        <option>50</option>
+                                    </select>
+                                </div>
+                                <div></div><br />
+                                <table class="table table-responsive" cellspacing="0">
+                                    <thead>
+                                        <tr>
+                                            <th>Re-Open Reason</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody ng-repeat="Reopen in filterdData = (data.slice(((currentPage-1)*itemsPerPage), ((currentPage)*itemsPerPage)))">
+                                        <tr id="view{{Reopen.ClaimReOpenReasonID}}">
+                                            <td hidden>
+                                                {{Reopen.ClaimReOpenReasonID}}
+                                            </td>
+                                            <td>
+                                                {{Reopen.ClaimReOpenReason}}
+                                            </td>
+                                            <td>
+                                                <div  class="fa fa-edit btn btn-success" style="width:90px;" ng-click="edit(Reopen)"> Edit</div>&nbsp;&nbsp;
+                                                <div  class="fa fa-trash-o btn btn-danger" style="width:90px;" ng-click="Delete(Reopen)"> Delete</div>
+                                            </td>
+                                        </tr>
+                                        <tr id="edit{{Reopen.ClaimReOpenReasonID}}" hidden>
+                                            <td hidden>
+                                                <input type="text"
+                                                       hidden class="form-control"
+                                                       value="{{Reopen.ClaimReOpenReasonID}}"
+                                                       ng-model="Reopen.ClaimReOpenReasonID">
+                                            </td>
+                                            <td>
+                                                <input type="text"
+                                                       value=" {{Reopen.ClaimReOpenReason}}"
+                                                       ng-model="Reopen.ClaimReOpenReason" class="form-control" style="width:100%" ng-required="true" />
+                                                <span class="help-block" style="color:red" ng-show="!Reopen.ClaimReOpenReason">Required Field *</span>
+                                            </td>
+                                            <td>
+                                                <div class="fa fa-save btn btn-info"  ng-disabled="!Reopen.ClaimReOpenReason" ng-click="update(Reopen)"> Update</div>&nbsp;&nbsp;
+                                                <div class="fa fa-times btn btn-default" ng-click="cancel(Reopen)"> Cancel</div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <pagination class="pull-left pagination-sm" total-items="totalItems" ng-model="currentPage" max-size="maxSize"  boundary-links="true" rotate="false" num-pages="numPages" items-per-page="itemsPerPage"></pagination>
+                            </div>
+                        </div>
+
+                        <div class="tab-pane" id="tab-second">
+
+                            
+                            <form class="form-horizontal col-md-10" role="form">
+                                <ng-form name="ClaimReopenReasonData">
+                                    <div class="form-group">
+                                        <label class="col-md-4 control-label">Claim Re-Open Reason</label>
+                                        <div class="col-md-4">
+                                            <input type="text" placeholder="Enter Reason" name="inputReopenReason" ng-model="ClaimReOpenReason" class="form-control" style="width:100%" ng-required="true"/>
+                                            <span class="help-block" style="color:red" ng-show="ClaimReopenReasonData.inputReopenReason.$error.required">Required Field *</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-md-4 control-label"></label>
+                                        <div class="col-md-8">
+                                            <div  class="btn btn-primary" ng-disabled="!ClaimReopenReasonData.$valid" ng-click="save()">Save <span class="fa fa-floppy-o fa-right"></span></div>
+                                            <button type="button" class="btn btn-default" ng-click="ClearFields()">Clear<span class="glyphicon glyphicon-erase fa-right"></span></button>
+  </div>
+                                    </div>
+
+
+
+
+                                </ng-form>
+                            </form>
+                        </div>
+                    </div>
+
+
+                </div>
+                <div id="divLoading" ng-show="showLoader"></div>
+            </div>
+
+
+        </div>

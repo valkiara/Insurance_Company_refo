@@ -1,0 +1,158 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{568978DA-E8EF-49E0-BB60-63A16AF8951C}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>IBMS.Shared.ViewModel</RootNamespace>
+    <AssemblyName>IBMS.Shared.ViewModel</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.Office.Interop.Excel, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+      <HintPath>..\packages\Microsoft.Office.Interop.Excel.15.0.4795.1000\lib\net20\Microsoft.Office.Interop.Excel.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.12.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AccessLevelTypeVM.cs" />
+    <Compile Include="AccountHandlerVM.cs" />
+    <Compile Include="AdmissionViewVM.cs" />
+    <Compile Include="BankTransVM.cs" />
+    <Compile Include="BupaPremiumClientVM.cs" />
+    <Compile Include="BUPAPremiumVM.cs" />
+    <Compile Include="CommissionFormatVM.cs" />
+    <Compile Include="EndorsementVM.cs" />
+    <Compile Include="FrequncyVM.cs" />
+    <Compile Include="IntegrationViewModel.cs" />
+    <Compile Include="Mapper\AgenCommissionMapper.cs" />
+    <Compile Include="Mapper\AmountMapper.cs" />
+    <Compile Include="Mapper\ChangeActiveStatusMapper.cs" />
+    <Compile Include="Mapper\ClaimListMapper.cs" />
+    <Compile Include="Mapper\CurrencyTypeMapper.cs" />
+    <Compile Include="Mapper\FilterMapper.cs" />
+    <Compile Include="Mapper\NewClientListMapper.cs" />
+    <Compile Include="Mapper\RenewalListMapper.cs" />
+    <Compile Include="MembershipVM.cs" />
+    <Compile Include="MemberStatusVM.cs" />
+    <Compile Include="QuatationDetail.cs" />
+    <Compile Include="QuotationDetail.cs" />
+    <Compile Include="QuotationLineView.cs" />
+    <Compile Include="ReceiveQuotation.cs" />
+    <Compile Include="ServiceChargesVM.cs" />
+    <Compile Include="SingaporeAdmissionInvoiceVM.cs" />
+    <Compile Include="SingaporeAdmissionVM.cs" />
+    <Compile Include="AdmissionVM.cs" />
+    <Compile Include="AgentVM.cs" />
+    <Compile Include="BankDetailsVM.cs" />
+    <Compile Include="BusinessUnitVM.cs" />
+    <Compile Include="CauseOfLossVM.cs" />
+    <Compile Include="ChargeTypeVM.cs" />
+    <Compile Include="ClaimPaymentVM.cs" />
+    <Compile Include="ClaimRecordingVM.cs" />
+    <Compile Include="ClaimRejectReasonVM.cs" />
+    <Compile Include="ClaimReOpenReasonVM.cs" />
+    <Compile Include="ClientRequestVM.cs" />
+    <Compile Include="ClientWithQuotationCount.cs" />
+    <Compile Include="CommisionStructureHeaderVM.cs" />
+    <Compile Include="CommisionStructureLineVM.cs" />
+    <Compile Include="CommisionTypeVM.cs" />
+    <Compile Include="CommonInsuranceScopeVM.cs" />
+    <Compile Include="CompanyVM.cs" />
+    <Compile Include="CountryVM.cs" />
+    <Compile Include="CoverNoteVM.cs" />
+    <Compile Include="CurrencyVM.cs" />
+    <Compile Include="DashboardVM.cs" />
+    <Compile Include="DesignationVM.cs" />
+    <Compile Include="DocCategoryVM.cs" />
+    <Compile Include="DocumentVM.cs" />
+    <Compile Include="EmployeeVM.cs" />
+    <Compile Include="FamilyDiscountVM.cs" />
+    <Compile Include="FamilyMembersVM.cs" />
+    <Compile Include="InsCommissionStructureHeaderVM.cs" />
+    <Compile Include="InsCommissionStructureLineVM.cs" />
+    <Compile Include="InsuranceClassVM.cs" />
+    <Compile Include="InsuranceCompanyVM.cs" />
+    <Compile Include="InsuranceSubClassVM.cs" />
+    <Compile Include="InternalPolicyNumSetupVM.cs" />
+    <Compile Include="IntroducerVM.cs" />
+    <Compile Include="LoadingTypeVM.cs" />
+    <Compile Include="LogUserEvents.cs" />
+    <Compile Include="PartnerMappingVM.cs" />
+    <Compile Include="PartnerVM.cs" />
+    <Compile Include="PaymentMethodsVM.cs" />
+    <Compile Include="PaymentTypeVM.cs" />
+    <Compile Include="PaymentVM.cs" />
+    <Compile Include="PolicyCategoryVM.cs" />
+    <Compile Include="PolicyInfoRecVM.cs" />
+    <Compile Include="PolicyRenewalHistoryVM.cs" />
+    <Compile Include="PolicyVM.cs" />
+    <Compile Include="PremiumVM.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="QueryResult.cs" />
+    <Compile Include="QuotationHeaderVM.cs" />
+    <Compile Include="QuoteInfoInsCompanyLineVM.cs" />
+    <Compile Include="RateCategoryVM.cs" />
+    <Compile Include="RequiredDocumentVM.cs" />
+    <Compile Include="RoleVM.cs" />
+    <Compile Include="SettingVM.cs" />
+    <Compile Include="TaxTypeVM.cs" />
+    <Compile Include="TransactionTypeVM.cs" />
+    <Compile Include="UserVM.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\IBMS.Repository\IBMS.Repository.csproj">
+      <Project>{2428c7af-8347-4e44-9bb1-2dd981fb608f}</Project>
+      <Name>IBMS.Repository</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

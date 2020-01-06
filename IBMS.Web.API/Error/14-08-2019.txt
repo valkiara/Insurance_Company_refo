@@ -1,0 +1,33 @@
+
+Log Entry : 
+08/14/2019 2:09:29 PM
+Error in: http://localhost:39705/api/ClientRequest/loadPaymentDetails.
+Error Message:The type of one of the primary key values did not match the type defined in the entity. See inner exception for details.
+Parameter name: keyValues
+__________________________
+
+Log Entry : 
+08/14/2019 3:54:38 PM
+Error in: http://localhost:39705/api/ClientRequest/getAllHistoryClientRequestsByBUID.
+Error Message:Nullable object must have a value.
+__________________________
+
+Log Entry : 
+08/14/2019 3:57:18 PM
+Error in: http://localhost:39705/api/ClientRequest/getAllHistoryClientRequestsByBUID.
+Error Message:Nullable object must have a value.
+__________________________
+
+Log Entry : 
+08/14/2019 4:03:52 PM
+Error in: http://localhost:39705/api/ClientRequest/getAllHistoryClientRequestsByBUID.
+Error Message:Index was out of range. Must be non-negative and less than the size of the collection.
+Parameter name: index
+__________________________
+
+Log Entry : 
+08/14/2019 4:09:21 PM
+Error in: http://localhost:39705/api/ClientRequest/getAllHistoryClientRequestsByBUID.
+Error Message:Index was out of range. Must be non-negative and less than the size of the collection.
+Parameter name: index
+__________________________

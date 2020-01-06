@@ -1,0 +1,168 @@
+﻿
+@{
+
+    Layout = "~/Views/Shared/_index.cshtml";
+    ViewBag.Title = "Common Insurance Scope";
+}
+
+<script src="~/Scripts/ng/Services/CommonInsuranceService.js"></script>
+<script src="~/Scripts/ng/Controllers/CommonInsuranceController.js"></script>
+
+<div class="breadcrumb-line">
+    <ul class="breadcrumb">
+        <li><a href="/Dashboard/Index"><i class="icon-home2 position-left"></i>Home</a></li>
+        <li>Master Details</li><li>Insurance</li>
+        <li class="active"><b>Common Insurance Scope</b></li>
+    </ul>
+</div>
+
+<div class="content" ng-app="IBMSAPP">
+    <div ng-controller="CommonInsuranceController" ng-init="init()" ng-cloak>
+        <div class="page-content-wrap">
+
+            <div class="panel panel-default tabs">
+                <ul class="nav nav-tabs" role="tablist">
+                    <li class="active"><a href="#tab-first" role="tab" data-toggle="tab">View</a></li>
+                    <li><a href="#tab-second" role="tab" data-toggle="tab">New</a></li>
+                    @*<li><a href="#tab-third" role="tab" data-toggle="tab">Edit</a></li>*@
+                </ul>
+                <div class="panel-body tab-content">
+                    <div class="tab-pane active" id="tab-first">
+
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">
+                                    <strong>Common Insurance Scope</strong>
+                                </h3>
+                                <ul class="panel-controls">
+                                    <li><input type="text" style="font-size: 12px;width: 100%;border-radius: 0px;margin-right:2px;" class="form-control" placeholder="Search Common insurance Scope..." ng-model="search_query" ng-change="searchTextChange(search_query)"></li>
+                                    <li><a href="#" ng-click="refreshContent()"><span class="fa fa-refresh"></span></a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="panel-body">
+                            <div class="col-md-2">Show records per page </div>
+                            <div class="col=md-10">
+                                <select class="form-control" style="width:100px;" ng-model="viewby" ng-change="setItemsPerPage(viewby)">
+                                    <option>5</option>
+                                    <option>10</option>
+                                    <option>20</option>
+                                    <option>30</option>
+                                    <option>40</option>
+                                    <option>50</option>
+                                </select>
+                            </div>
+                            <div></div><br />
+                            <table class="table table-responsive" cellspacing="0">
+                                <thead>
+                                    <tr>
+
+                                        <th>Common Insurance</th>
+                                        <th>Insurance Class</th>
+                                        <th>Insurance Sub Class</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody ng-repeat="CommonInsurance in data.slice(((currentPage-1)*itemsPerPage), ((currentPage)*itemsPerPage))">
+                                    <!--<tr  >-->
+                                    <tr id="view{{CommonInsurance.CommonInsuranceScopeID}}">
+                                        <td hidden>{{CommonInsurance.CommonInsuranceScopeID}}</td>
+                                        <td>{{CommonInsurance.Description}}</td>
+                                        <td>{{CommonInsurance.InsuranceClassCode}}</td>
+                                        <td>{{CommonInsurance.InsuranceSubClassName}}</td>
+                                        <td>
+                                            <div class="fa fa-edit btn btn-success" style="width:90px;" ng-click="editCI(CommonInsurance)">&nbsp;&nbsp;Edit</div>
+                                            <div class="fa fa-trash-o btn btn-danger" style="width:90px;" ng-click="deleteCI(CommonInsurance.CommonInsuranceScopeID)">&nbsp;&nbsp;Delete</div>
+                                        </td>
+                                    </tr>
+                                    <tr id="edit{{CommonInsurance.CommonInsuranceScopeID}}" hidden>
+                                        <td hidden>
+                                            <input type="text" hidden class="form-control"
+                                                   value="{{CommonInsurance.CommonInsuranceScopeID}}"
+                                                   ng-model="CommonInsurance.CommonInsuranceScopeID">
+                                        </td>
+                                        <td>
+                                            <input type="text" style="font-size: 12px;width: 100%;border-radius: 0px;margin-right:2px;" hidden class="form-control"
+                                                   value="{{CommonInsurance.Description}}"
+                                                   ng-model="CommonInsurance.Description">
+                                            <span class="help-block" style="color:red" ng-show="!CommonInsurance.Description">Required Field *</span>
+                                        </td>
+                                        <td>
+                                            <select class="form-control" ng-model="CommonInsurance.InsuranceClassID" ng-options="InsuranceClass.InsuranceClassID as InsuranceClass.InsuranceCode for InsuranceClass in availableInsuranceClass" ng-required="true" ng-change="getAllInsuranceSubClassByInsClass(CommonInsurance.InsuranceClassID)" style="width:100%">
+                                                <option value={{CommonInsurance.InsuranceClassID}}></option>
+                                            </select>
+                                            <span class="help-block" style="color:red" ng-show="!CommonInsurance.InsuranceClassCode">Required Field *</span>
+                                        </td>
+                                        <td>
+                                            <select class="form-control" ng-model="CommonInsurance.InsuranceSubClassID" ng-options="InsuranceSubClass.InsuranceSubClassID as InsuranceSubClass.Description for InsuranceSubClass in availableInsuranceSubClass" ng-required="true" style="width:100%">
+                                                <option value={{CommonInsurance.InsuranceSubClassID}}></option>
+                                            </select>
+                                            <span class="help-block" style="color:red" ng-show="!CommonInsurance.InsuranceSubClassName">Required Field *</span>
+                                        </td>
+
+                                        <td>
+                                            <button class="fa fa-save btn btn-info" style="width:90px;" ng-disabled="!(CommonInsurance.Description)" ng-click="updateCI(CommonInsurance)">&nbsp;&nbsp;Update</button>&nbsp;
+                                            <button ng-click="cancel(CommonInsurance)" class="fa fa-times btn btn-default" style="width:90px;">&nbsp;&nbsp;Cancel</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <pagination class="pull-left" total-items="totalItems" ng-model="currentPage" max-size="maxSize" class="pagination-sm" boundary-links="true" rotate="false" num-pages="numPages" items-per-page="itemsPerPage"></pagination>
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="tab-second">
+                        <form class="form-horizontal col-md-10" role="form">
+                            <ng-form name="comInsuranceData" novalidate>
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label">Common Insurance</label>
+                                    <div class="col-md-8">
+                                        <input type="text" name="commonInsurance" ng-model="buObj1.CommonInsurance" class="form-control" value="" ng-required="true" />
+                                        <span class="help-block" style="color:red" ng-show="comInsuranceData.commonInsurance.$error.required">Required Field *</span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label">Insurance Class</label>
+                                    <div class="col-md-8">
+                                        <select name="selectInsuranceClass" id="timeZone"
+                                                class="form-control" ng-model="buObj1.InsClassID"
+                                                ng-options="InsuranceClass.InsuranceClassID as InsuranceClass.InsuranceCode for InsuranceClass in availableInsuranceClass"
+                                                ng-required="true"
+                                                ng-change="getAllInsuranceSubClassByInsClass(buObj1.InsClassID)">
+                                            <option value="">--Select a Insurance Class--</option>
+                                        </select>
+                                        <span class="help-block" style="color:red" ng-show="comInsuranceData.selectInsuranceClass.$error.required">Required Field *</span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label">Insurance Sub Class</label>
+                                    <div class="col-md-8">
+                                        <select name="selectInsuranceSubClass" id="timeZone"
+                                                class="form-control" ng-model="buObj1.InsSubClassID"
+                                                ng-options="InsuranceSubClass.InsuranceSubClassID as InsuranceSubClass.Description for InsuranceSubClass in availableInsuranceSubClass"
+                                                ng-required="true">
+                                            <option value="">--Select a Insurance Sub Class--</option>
+                                        </select><span class="help-block" style="color:red" ng-show="comInsuranceData.selectInsuranceSubClass.$error.required">Required Field *</span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label"></label>
+                                    <div class="col-md-8">
+
+                                        <div class="btn btn-primary" ng-disabled="!comInsuranceData.$valid" ng-click="addCommonInsurance()">Add Common Insurance<span class="fa fa-floppy-o fa-right"></span></div>
+                                        <button type="button" class="btn btn-default" ng-click="ClearFields()">Clear<span class="glyphicon glyphicon-erase fa-right"></span></button>
+                                        
+                                    </div>
+                                </div>
+                            </ng-form>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="divLoading" ng-show="showLoader"></div>
+    </div>
+</div>
+
+
+
+

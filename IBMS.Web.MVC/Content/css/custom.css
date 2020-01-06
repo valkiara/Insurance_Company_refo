@@ -1,0 +1,14 @@
+﻿#divLoading {
+    display: block;
+    position: fixed;
+    z-index: 9999;
+    background-image: url('../img/loader.gif');
+    background-color: rgba(102, 102, 102, 0.5);
+    opacity: 0.9;
+    background-repeat: no-repeat;
+    background-position: center;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    top: 0;
+}

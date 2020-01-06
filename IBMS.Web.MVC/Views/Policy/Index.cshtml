@@ -1,0 +1,227 @@
+﻿
+@*@{
+    ViewBag.Title = "Policy";
+}
+@{
+    Layout = "~/Views/Shared/_index.cshtml";
+}
+
+<h2>Insurance Policy</h2>*@
+
+
+<script src="~/Scripts/ng/Services/PolicyServices.js"></script>
+<script src="~/Scripts/ng/Controllers/PolicyController.js"></script>
+<script>
+    function checkInputRate(rateVal) {
+        var regEx = /^[0-9]+\.?[0-9]*$/;
+        if (regEx.test(rateVal.value) == false) {
+            rateVal.value = rateVal.value.substring(0, rateVal.value.length - 1);
+        }
+    }
+</script>
+
+<div class="breadcrumb-line">
+    <ul class="breadcrumb">
+        <li><a href="/Dashboard/Index"><i class="icon-home2 position-left"></i>Home</a></li>
+        <li>Master Details</li>
+        <li class="active"><b>Policy</b></li>
+    </ul>
+</div>
+<div class="content" ng-app="IBMSAPP">
+    <div ng-controller="PolicyController" ng-init="init()" ng-cloak>
+        <div class="page-content-wrap">
+
+            <div class="panel panel-default tabs">
+                <ul class="nav nav-tabs" role="tablist">
+                    <li class="active"><a href="#tab-first" role="tab" data-toggle="tab">View</a></li>
+                    <li><a href="#tab-second" role="tab" data-toggle="tab">New</a></li>
+                    @*<li><a href="#tab-third" role="tab" data-toggle="tab">Edit</a></li>*@
+                </ul>
+                <div class="panel-body tab-content">
+                    <div class="tab-pane active" id="tab-first">
+
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">
+                                    <strong>Policy</strong>
+                                </h3>
+                                <ul class="panel-controls">
+                                    <li><input type="text" style="font-size: 12px;width: 100%;border-radius: 0px;margin-right:2px;" class="form-control" placeholder="Search Policy. . . . . ." ng-model="search_query" ng-change="searchTextChange(search_query)"></li>
+                                    <li><a href="#" ng-click="refreshContent()"><span class="fa fa-refresh"></span></a></li>
+                                </ul>
+                            </div>
+                        </div>
+                       @* {{availableBusinessUnit}}*@
+                         
+                        @*{{gridOptionsPolicy}}*@
+
+                        
+                        <div class="panel-body">
+                            <div class="col-md-2">Show records per page </div>
+                            <div class="col=md-10">
+                                <select class="form-control" style="width:100px;"
+                                        ng-model="viewby"
+                                        ng-change="setItemsPerPage(viewby)">
+                                    <option>5</option>
+                                    <option>10</option>
+                                    <option>20</option>
+                                    <option>30</option>
+                                    <option>40</option>
+                                    <option>50</option>
+                                </select>
+                            </div>
+                        <div><br></div>
+
+                                <table class="table table-responsive" cellspacing="0">
+                                    <thead>
+                                        <tr>
+                                            <th hidden>Policy ID</th>
+                                            <th>Policy Name</th>
+                                            <th>Policy Rate</th>
+                                            <th>Policy Category</th>
+                                            <th>Business Unit</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody ng-repeat="Policy in data.slice(((currentPage-1)*itemsPerPage), ((currentPage)*itemsPerPage))">
+                                        <!--<tr  >-->
+                                        <tr id="view{{Policy.PolicyID}}">
+                                            <td hidden>{{Policy.PolicyID}}</td>
+                                            <td>{{Policy.PolicyName}}</td>
+                                            <td>{{Policy.Rate}}</td>
+                                            <td>{{Policy.PolicyCategoryName}}</td>
+                                            <td>{{Policy.BusinessUnitName}}</td>
+                                           
+                                            <td>
+                                                <div class="fa fa-edit btn btn-success " ng-click="editPolicy(Policy)">&nbsp;&nbsp;Edit</div>&nbsp;&nbsp;<div class="fa fa-trash-o btn btn-danger" ng-click="deletePolicy(Policy.PolicyID)">&nbsp;&nbsp;Delete</div>
+                                            </td>
+
+
+                                        </tr>
+
+                                        <tr id="edit{{Policy.PolicyID}}" hidden>
+                                            <td hidden>
+                                                <input type="text" hidden class="form-control"
+                                                       value="{{Policy.PolicyID}}"
+                                                       ng-model="Policy.PolicyID">
+                                            </td>
+                                            <td>
+                                                <input type="text" hidden class="form-control"
+                                                       value="{{Policy.PolicyName}}"
+                                                       ng-model="Policy.PolicyName" style="width:100%">
+                                                <span class="help-block" style="color:red" ng-show="!Policy.PolicyName">Required Field *</span>
+                                            </td>
+                                            <td>
+                                                <input type="number" hidden class="form-control"
+                                                       value="{{Policy.Rate}}"
+                                                       ng-model="Policy.Rate" ng-change="checkInputRateByValue()" min="0">
+                                                <span class="help-block" style="color:red" ng-show="!Policy.Rate">Required Field *</span>
+                                            </td>
+                                            <td>
+                                              
+                                                     <select name="selectPolicyCategory" class="form-control" style="width:100%" ng-model="Policy.PolicyCategoryID" ng-options="PolicyCategory.PolicyCategoryID as PolicyCategory.PolicyCategoryName for PolicyCategory in availablePolicyCategory" ng-required="true">
+                                                    <option value="">--Select Policy Category--</option>
+                                                </select>
+                                                <span class="help-block" style="color:red" ng-show="!Policy.PolicyCategoryID">Required Field *</span>
+                                            </td>
+
+
+                                            <td>
+                                                <select name="selectBusinessunit" id="timeZone" style="width:100%" class="form-control" ng-model="Policy.BusinessUnitID" ng-options="BusinessUnit.BusinessUnitID as BusinessUnit.BusinessUnit for BusinessUnit in filteredBusinessUnits" ng-required="true">
+                                                    <option value="">--Select Business Unit--</option>
+                                                </select>
+                                                <span class="help-block" style="color:red" ng-show="!Policy.BusinessUnitID">Required Field *</span>
+                                            </td>
+                                            <td> 
+                                                <div class="fa fa-save btn btn-info" ng-disabled="!(Policy.PolicyName && Policy.Rate && Policy.PolicyCategoryID && Policy.BusinessUnitID)" ng-click="update(Policy)">&nbsp;&nbsp;Update</div>&nbsp;
+                                                <div ng-click="cancel(Policy)" class="fa fa-times btn btn-default">&nbsp;&nbsp;Cancel</div>
+                                            </td>
+
+
+                                        </tr>
+
+                                    </tbody>
+
+                                </table>
+                                <pagination class="pull-left" total-items="totalItems" ng-model="currentPage" max-size="maxSize" class="pagination-sm" boundary-links="true" rotate="false" num-pages="numPages" items-per-page="itemsPerPage"></pagination>
+
+                            </div>
+
+
+                        </div>
+
+                        <div class="tab-pane" id="tab-second">
+                            <form class="form-horizontal col-md-10" role="form">
+                                <ng-form name="PolicyData" novalidate>
+
+
+                                    <div class="form-group">
+
+                                        <label class="col-md-4 control-label">Policy Name</label>
+
+                                        <div class="col-md-8">
+                                            <input type="text" name="inputPolicyName" ng-model="PolicyObj.PolicyName" class="form-control" value="Some text value..." ng-required="true" /><span class="help-block" style="color:red" ng-show="PolicyData.inputPolicyName.$error.required">Required Field *</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+
+                                        <label class="col-md-4 control-label">Policy Rate</label>
+
+                                        <div class="col-md-8">
+                                            <input type="number"
+                                                   class="form-control"
+                                                   name="inputPolicyRate"
+                                                   ng-model="PolicyObj.RateValue"
+                                                   ng-required="true"
+                                                   ng-change="checkInputRateByValue()"
+                                                   min="0" />
+                                            @*<input type="text" name="inputPolicyRate" ng-model="PolicyObj.Rate" class="form-control" value="Some text value..." ng-required="true" />*@<span class="help-block" style="color:red" ng-show="PolicyData.inputPolicyRate.$error.required">Required Field *</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-md-4 control-label">Policy Category</label>
+                                        <div class="col-md-8">
+                                            <select name="selectPolicyCategory" class="form-control" ng-model="PolicyObj.PolicyCategoryID" ng-options="PolicyCategory.PolicyCategoryID as PolicyCategory.PolicyCategoryName for PolicyCategory in availablePolicyCategory" ng-required="true">
+                                                <option value="">--Select Policy Category--</option>
+                                            </select><span class="help-block" style="color:red" ng-show="PolicyData.selectPolicyCategory.$error.required">Required Field *</span>
+                                        </div>
+                                    </div>
+
+
+
+                                    <div class="form-group">
+                                        <label class="col-md-4 control-label">Business Unit</label>
+
+                                        @* <selectize name="inputProductType" placeholder="Select a bussiness unit" options="availableBusinessUnit" config="dropDownConfig" ng-model="PolicyObj.PolicyObj" ng-required="true" ng-change="BusinessUnitChange(PolicyObj.buID)"></selectize>*@
+                                        <div class="col-md-8">
+                                            <select name="selectBusinessunit" id="timeZone" class="form-control" ng-model="PolicyObj.buID" ng-options="BusinessUnit.BusinessUnitID as BusinessUnit.BusinessUnit for BusinessUnit in filteredBusinessUnits" ng-required="true">
+                                                <option value="">--Select Business Unit--</option>
+                                            </select><span class="help-block" style="color:red" ng-show="PolicyData.selectBusinessunit.$error.required">Required Field *</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-4 control-label"></label>
+                                        <div class="col-md-8">
+                                            <button type="button" class="btn btn-primary" ng-disabled="!PolicyData.$valid" ng-click="addPolicy()">Add Policy <span class="fa fa-floppy-o fa-right"></span></button>
+                                            <button type="button" class="btn btn-default" ng-click="ClearFields()">Clear<span class="glyphicon glyphicon-erase fa-right"></span></button>
+                                        </div>
+
+                                    </div>
+
+                                    @*{{PolicyObj}}*@
+                                </ng-form>
+                            </form>
+
+</div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div id="divLoading" ng-show="showLoader"></div>
+    </div>
+</div>
+

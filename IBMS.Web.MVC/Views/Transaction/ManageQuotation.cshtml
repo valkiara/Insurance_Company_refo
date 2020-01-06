@@ -1,0 +1,1618 @@
+﻿
+@{
+    ViewBag.Title = "Manage Quotation";
+    Layout = "~/Views/Shared/_index.cshtml";
+}
+<style>
+    .form-control {
+        width: 100%;
+    }
+
+    .set-header {
+        background-color: #1caf9a;
+        height: 30px;
+        padding: 2px;
+        /*margin-bottom: 15px;*/
+    }
+
+    .set-header-property {
+        background-color: #e47080;
+        height: 40px;
+        padding: 2px;
+        /*margin-bottom: 15px;*/
+    }
+
+    .set-header-scope {
+        background-color: #e4a670;
+        height: 30px;
+        padding: 2px;
+        /*margin-bottom: 15px;*/
+    }
+
+    .set-header-insCompany {
+        background-color: #95b75d;
+        height: 30px;
+        padding: 2px;
+        /*margin-bottom: 15px;*/
+    }
+
+    /*------------------Popup---------------------*/
+    @@media screen and (max-width: 1024px) {
+        .app-modal-window-Line .modal-dialog {
+            width: 95%;
+        }
+    }
+
+    @@media screen and (max-width: 1024px) {
+        .app-modal-window-Scope .modal-dialog {
+            width: 95%;
+        }
+    }
+
+    @@media screen and (min-width: 1024px) {
+        .app-modal-window-Line .modal-dialog {
+            width: 70%;
+        }
+    }
+
+    @@media screen and (min-width: 1024px) {
+        .app-modal-window-Scope .modal-dialog {
+            width: 80%;
+        }
+    }
+    /*------------------Popup---------------------*/
+
+    /*------------------Text Editor---------------------*/
+    .mce-menu {
+        position: fixed !important;
+    }
+
+    .mce-floatpanel {
+        position: fixed !important;
+    }
+    /*------------------Text Editor---------------------*/
+</style>
+
+<script src="~/Scripts/ng/Services/QuotationService.js"></script>
+<script src="~/Scripts/ng/Controllers/QuotationController.js"></script>
+<script src="~/Scripts/ng/Services/PolicyInfoRecService.js"></script>
+
+
+
+<script type="text/javascript">
+    function IsNumber(evt) {
+        evt = (evt) ? evt : window.event;
+        var charCode = (evt.which) ? evt.which : evt.keyCode;
+        if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+            return false;
+        }
+        return true;
+    }
+
+    function checkInputRate(rateVal) {
+        var regEx = /^[0-9]+\.?[0-9]*$/;
+        if (regEx.test(rateVal.value) == false) {
+            rateVal.value = rateVal.value.substring(0, rateVal.value.length - 1);
+        }
+    }
+</script>
+
+<div class="breadcrumb-line">
+    <ul class="breadcrumb">
+        <li>
+            <a href="/Dashboard/Index"><i class="icon-home2 position-left"></i>Home</a>
+        </li>
+        <li>Transaction</li>
+        <li>Quotation </li>
+        <li class="active">
+            <b>Quotation Request</b>
+        </li>
+    </ul>
+</div>
+
+<div class="content" ng-app="IBMSAPP">
+    <div ng-controller="QuotationController" ng-init="init()" ng-cloak>
+        <div class="page-content-wrap">
+            <div class="panel panel-default tabs">
+                <ul class="nav nav-tabs" role="tablist">
+                    <li id="list-tab-1" class="active">
+                        <a href="#tab-1" role="tab" data-toggle="tab" ng-click="activateQuotationListTab()">View</a>
+                    </li>
+                    <li id="list-tab-2">
+                        <a href="#tab-2" role="tab" data-toggle="tab" ng-click="activateQuotationTab()">Edit Quotation</a>
+                    </li>
+                </ul>
+                <div class="panel-body tab-content">
+                    <div class="tab-pane active" id="tab-1">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">
+                                    <strong>Quotation</strong>
+                                </h3>
+                                <ul class="panel-controls">
+                                    <li>
+                                        <input type="text" style="font-size: 12px;width: 100%;border-radius: 0px;margin-right:2px;" class="form-control" placeholder="Search Quototion Request ..." ng-model="search_query" ng-change="searchTextChange(search_query)">
+                                    </li>
+                                    <li>
+                                        <a href="#" ng-click="refreshContent()"><span class="fa fa-refresh"></span></a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="panel-body">
+                            <div class="col-md-2">Show records per page</div>
+                            <div class="col=md-10">
+                                <select class="form-control" style="width:100px;"
+                                        ng-model="viewby"
+                                        ng-change="setItemsPerPage(viewby)">
+                                    <option>10</option>
+                                    <option>20</option>
+                                    <option>30</option>
+                                    <option>40</option>
+                                    <option>50</option>
+                                </select>
+                            </div>
+                            <div>
+                                <br>
+                            </div>
+                            <table class="table table-responsive" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th>Quotation Header ID</th>
+                                        @*<th>Request Number</th>*@
+                                        <th>Client Name</th>
+                                        <th>Introduced By</th>
+                                        <th>Request Date</th>
+                                        <th>Created Date</th>
+                                        <th>Status</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody ng-repeat="quotation in data.slice(((currentPage-1)*itemsPerPage), ((currentPage)*itemsPerPage))">
+                                    <tr id="view{{quotation.QuotationHeaderID}}">
+                                        <td>{{quotation.QuotationHeaderID}}</td>
+                                        @*<td>{{quotation.ClientRequestHeaderID}}</td>*@
+                                        <td>{{quotation.ClientName}}</td>
+                                        <td>{{quotation.PartnerName}}</td>
+                                        <td>{{quotation.RequestedDate}}</td>
+                                        <td>{{quotation.CreatedDate}}</td>
+                                        @*<td><center><span style="font-size:medium" ng-bind-html='quotation.Status | return_status'></span></center></td>*@
+                                        <td>{{quotation.QuotationStatusCodeDescription}}</td>
+                                        <td>
+                                            <button style="width:50px; font-size : 10px;" class="btn btn-success" ng-disabled="quotation.QuotationStatusCode == 'QR' || quotation.QuotationStatusCode == 'CA' || quotation.QuotationStatusCode == 'TCNI'" ng-click="loadClientRequestDetailsByID(quotation,'false')">Update</button>
+                                            <button style="width:50px;display:none" class="btn btn-default" ng-disabled="quotation.QuotationStatusCode == 'QR'" @*ng-click="requestapprovecustomer(qHeader)"*@>CAR</button>
+                                            <button style="width:50px; font-size : 10px;" class="btn btn-info" ng-click="loadClientRequestDetailsByID(quotation,'true')">View</button>
+                                            <button style="width:30px; font-size : 10px;" class="btn btn-info" ng-click="LoadQuotation(quotation)">Print</button>
+                                            <button style="width:70px; font-size : 10px;" type="button" class="btn btn-danger" ng-click="sendEmailClientRequest(quotation)">Send Email</button>
+                                            @*<button style="width:110px; font-size : 12px;" class="btn btn-success" ng-show="quotation.QuotationStatusCode == 'TCNI'" ng-click="loadProposalForm(quotation)">Proposal Form</button>*@
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <pagination total-items="totalItems"
+                                        ng-model="currentPage"
+                                        max-size="maxSize"
+                                        class="pagination-sm pull-left"
+                                        boundary-links="true"
+                                        rotate="false"
+                                        num-pages="numPages"
+                                        items-per-page="itemsPerPage"></pagination>
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="tab-2">
+                        <div ng-if="!isQuotationEditMode" style="padding-top:10px;">
+                            <center><span class="label label-danger" style="font-size:small;">Please select any quotation from the list</span></center>
+                        </div>
+                        <div ng-if="isQuotationEditMode">
+                            <form name="manangeQuotation" novalidate>
+                                <ng-form name="viewClient" novalidate>
+                                    <div class="panel panel-default">
+                                        <div class="panel-heading">
+                                            <h3 class="panel-title">
+                                                <strong>Quotation Details</strong>
+                                            </h3>
+                                        </div>
+                                    </div>
+                                    <div class="panel-body">
+                                        <div class="row">
+                                            <div class="col-md-5">
+                                                <h3 style="margin-top: 5px;">{{cusObj.ClientName }}</h3>
+                                                <h5 style="color:red">{{cusObj.Email}}</h5>
+                                                <h4>{{cusObj.ClientAddress}}</h4>
+                                                <h6>Phone:&nbsp;{{cusObj.ContactNo}}/{{cusObj.FixedLine}}</h6>
+                                                <h6>NIC:&nbsp;{{cusObj.NIC}}</h6>
+                                                <h6>DOB:&nbsp;{{cusObj.DOB}}</h6>
+                                            </div>
+                                            <div class="col-md-5" style="border:double">
+                                                <div class="contact-info">
+                                                    <div class="row">
+                                                        <div class="col-md-6">
+                                                            <p>
+                                                                <medium><b>Quotation No</b></medium>
+                                                                <br>{{quotationHeaderObj.QuotationHeaderID}}
+                                                            </p>
+                                                            <p>
+                                                                <medium><b>Client Request No</b></medium>
+                                                                <br>{{quotationHeaderObj.ClientRequestHeaderID}}
+                                                            </p>
+                                                            <p>
+                                                                <medium><b>Quotation Status</b></medium>
+                                                                <br>{{quotationHeaderObj.QuotationStatusCodeDescription}} &nbsp;&nbsp;
+                                                                <a href="" ng-click="manageQuotationStatus(quotationHeaderObj.QuotationStatusCode)"><span title="Edit Quotation Status" style="font-size:medium" class="glyphicon glyphicon-edit"></span></a>
+                                                            </p>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <p>
+                                                                <medium><b>Business Unit</b></medium>
+                                                                <br>{{cusReqObj.BusinessUnitName}}
+                                                            </p>
+                                                            <p>
+                                                                <medium><b>Introduced By</b></medium>
+                                                                <br>{{cusReqObj.PartnerName}}
+                                                            </p>
+                                                            <p>
+                                                                <medium><b>Requested Date</b></medium>
+                                                                <br>{{cusReqObj.RequestedDate}}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <button style="width:110px; font-size : 12px;" class="btn btn-success" ng-disabled="quotationHeaderObj.QuotationStatusCode == 'QR' || quotationHeaderObj.QuotationStatusCode == 'CA' ||quotationHeaderObj.QuotationStatusCode == 'QP' ||quotationHeaderObj.QuotationStatusCode == 'QNC' ||quotationHeaderObj.QuotationStatusCode == 'NA' ||quotationHeaderObj.QuotationStatusCode == 'CA'" ng-show="isQuotationViewMode" ng-click="loadProposalForm(quotationHeaderObj)">Proposal Form</button>
+
+                                            </div>
+                                        </div>
+                                        <div class="row">
+
+                                        </div>
+                                    </div>
+                                </ng-form>
+                                <ng-form name="manageClientRequest" novalidate>
+                                    <div class="panel panel-default">
+                                        <div class="panel-heading">
+                                            <h3 class="panel-title">
+                                                <strong>Added Customer Request Details</strong>
+                                            </h3>
+                                        </div>
+                                    </div>
+                                    <div class="panel-body">
+                                        <div class="row">
+                                            <div class="col-lg-12 set-header">
+                                                <div class="row">
+                                                    <div class="col-sm-1" align="center">
+                                                        <h5>
+                                                            <b>#</b>
+                                                        </h5>
+                                                    </div>
+                                                    <div class="col-md-2" align="center">
+                                                        <h5>
+                                                            <b>Insuarnce Class</b>
+                                                        </h5>
+                                                    </div>
+                                                    <div class="col-md-2" align="center">
+                                                        <h5>
+                                                            <b>Insuarnce Sub Class</b>
+                                                        </h5>
+                                                    </div>
+                                                    <div class="col-md-2" align="center">
+                                                        <h5>
+                                                            <b>Insurance Company</b>
+                                                        </h5>
+                                                    </div>
+                                                    <div class="col-sm-1" align="center">
+                                                        <h5>
+                                                            <b>Request</b>
+                                                        </h5>
+                                                    </div>
+                                                    <div class="col-md-2" align="center">
+                                                        <h5>
+                                                            <b>Requested Date</b>
+                                                        </h5>
+                                                    </div>
+                                                    <div class="col-md-1" align="center">
+
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-12" ng-repeat="quotationLine in quotationLine.quotations" style="background-color:#d9f7f7">
+                                                <ng-form name="manageClientReqLine" novalidate>
+                                                    <div class="row">
+                                                        <div class="col-sm-1">
+                                                            <div class="panel-body no-padding" align="center">
+                                                                <h6 label>{{$index+1}}</h6>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <div class="panel-body no-padding" align="center">
+                                                                <select name="selectCompany" class="form-control" ng-model="quotationLine.InsuranceClassID"
+                                                                        ng-options="ins.InsuranceClassID as ins.InsuranceCode for ins in availableInsClass"
+                                                                        ng-change="LoadInsSubClass(quotationLine.InsuranceClassID)"
+                                                                        ng-required="true">
+                                                                    <option value="">--Select Insurance Class--</option>
+                                                                </select><span class="help-block" style="color:red" ng-show="insSubData.selectCompany.$error.required">Required Field *</span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <div class="panel-body no-padding" align="center">
+                                                                <select name="selectInsuranceClass" id="insclas"
+                                                                        class="form-control" ng-model="quotationLine.InsuranceSubClassID" style="width:100%"
+                                                                        ng-options="InsuranceClass.InsuranceSubClassID as InsuranceClass.Description for InsuranceClass in availableInsuranceClass"
+                                                                        @*ng-options="InsuranceClass.InsuranceSubClassID as InsuranceClass.Description for InsuranceClass in quotationLine.subInsuranceClasses"*@
+                                                                        ng-required="true"
+                                                                        ">
+                                                                    <option value="">--Select a Insurance Class--</option>
+                                                                </select>
+                                                                @*<selectize name="selectInsuranceClass" placeholder="Select Insurance" options="availableInsuranceClass" config="{maxItems: 1}" ng-model="quotationLine.InsuranceSubClassID" ng-change="getInsChargeType(quotationHeaderObj.QuotationHeaderID,policyInfoRecObj.InsuranceCompanyID)" ng-required="true"></selectize>*@
+                                                                <span class="help-block" style="color:red" ng-show="managePolicyInfoRecording.SelectPremiumIncludingTaxCurrency.$error.required">Required Field *</span>
+                                                            </div>
+
+
+                                                        </div>
+
+
+
+                                                        <div class="col-md-2">
+                                                            <div class="panel-body no-padding" align="center">
+                                                                <selectize name="SelectInsuranceCompanyID" placeholder="Select Insurance Company" options="availableQuoteInfoInsCompanys" config="{maxItems: 1}" ng-model="quotationLine.CompId" ng-change="getInsChargeType(quotationHeaderObj.QuotationHeaderID,policyInfoRecObj.InsuranceCompanyID)" ng-required="true"></selectize>
+                                                                <span class="help-block" style="color:red" ng-show="managePolicyInfoRecording.SelectInsuranceCompanyID.$error.required">Required Field *</span>
+
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="col-md-1">
+                                                            <div class="panel-body" align="left">
+                                                                <div><label><input type="checkbox" ng-model="quotationLine.IsRequest" id="IsRecievedCheckBox"></label></div>
+                                                            </div>
+
+                                                        </div>
+
+                                                        <div class="col-md-2">
+
+                                                            <div class="panel-body no-padding" align="center">
+                                                                <input type="text"
+                                                                       id="dob"
+                                                                       @*readonly*@
+                                                                       name="selectDOB"
+                                                                       class="form-control date"
+                                                                       ng-change="textChange()"
+                                                                       ng-click="dob=true"
+                                                                       datepicker-popup="dd/MM/yyyy"
+                                                                       ng-model="quotationLine.RequestedDate"
+                                                                       is-open="dob"
+                                                                       datepicker-options="dateOptions"
+                                                                       placeholder="Date of requested"
+                                                                       @*min-date="currentDate"*@
+                                                                       @*max-date="purchaseOrderObj.DatePaid"*@
+                                                                       ng-required="true"
+                                                                       close-text="Close" />
+                                                            </div>
+                                                        </div>
+
+
+
+                                                        <div class="col-md-2">
+                                                            <div class="panel-body no-padding">
+                                                                <input type="file" class="form-control" id="file" name="file" ng-model="quotationLine.File" multiple onchange="angular.element(this).scope().getDocumentIntoArray(this)" />
+                                                                <button type="button" class="btn btn-default" ng-click="deleteItem($index)" ng-if="$index>0">
+                                                                    <span class="glyphicon glyphicon-remove-circle"></span>
+                                                                </button>
+                                                                @*<button type="button" class="btn btn-default" ng-click="sendAttachment($index)" ng-disabled="IsEmailDisable" >*@
+                                                                <button type="button" class="btn btn-default" ng-click="sendEmailRequest($index)" ng-disabled="IsEmailDisable">
+                                                                    <span class="glyphicon glyphicon-envelope"></span>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </ng-form>
+                                            </div>
+                                            <br />
+
+                                            <div class="col-md-12">
+                                                <br />
+                                                <div class="row">
+                                                    <div class="col-md-1">
+                                                        <div class="panel-body no-padding" align="center">
+                                                            <button type="button" class="btn btn-default" ng-click="addItem()">
+                                                                <span class="glyphicon glyphicon-plus"></span>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+
+
+                                </ng-form>
+
+
+
+
+                                <div class="row">
+                                    <div class="col-md-12 modal-footer">
+                                        <button class="btn btn-primary" @*ng-disabled="!manageSelectedInsCompany.$valid"*@ ng-show="!isQuotationViewMode" ng-click="saveDoc()">Update Quotation<span class="fa fa-floppy-o fa-right"></span></button>
+                                        <button class="btn btn-default" ng-click="cancelQuotation()">Cancel</button>
+                                    </div>
+                                </div>
+                                <br />
+
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="divLoading" ng-show="showLoader"></div>
+        <script type="text/ng-template" id="ngTemplateProperty">
+            <div class="modal-header bg-primary" style="background-color:#1caf9a !important">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true" ng-click="cancel()">x</button>
+                <h4>Added Properties</h4>
+            </div>
+            <div class="modal-body">
+                <ng-form name="manageProperty" novalidate>
+                    <div class="content">
+                        <div class="row">
+                            <div class="col-md-11 set-header-property">
+                                <div class="row">
+                                    <div class="col-md-1" align="center">
+                                        <h5>
+                                            <b>#</b>
+                                        </h5>
+                                    </div>
+                                    <div class="col-md-4" align="center">
+                                        <h5>
+                                            <b>Property Name</b>
+                                        </h5>
+                                    </div>
+                                    <div class="col-md-3" align="center">
+                                        <h5>
+                                            <b>BR No</b>
+                                        </h5>
+                                    </div>
+                                    <div class="col-md-3" align="center">
+                                        <h5>
+                                            <b>VAT No</b>
+                                        </h5>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-11" ng-repeat="property in clientPropertyDetailsTemp" style="background-color:#f5eaec">
+                                <ng-form name="manageClientProperty" novalidate>
+                                    <div class="row">
+                                        <div class="col-md-1">
+                                            <div class="panel-body no-padding" align="center">
+                                                <h6 label>{{$index+1}}</h6>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="panel-body no-padding" style="align-content:center">
+                                                {{property.ClientPropertyName}}
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="panel-body no-padding" align="center">
+                                                {{property.BRNo}}
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="panel-body no-padding" align="center">
+                                                {{property.VATNo}}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </ng-form>
+                            </div>
+                        </div>
+                        <br />
+                        <div class="row">
+                            <div class="col-md-12 modal-footer">
+                                <button class="btn btn-default" ng-click="cancel()">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </ng-form>
+            </div>
+            <div id="divLoading" ng-show="showLoader"></div>
+        </script>
+        <script type="text/ng-template" id="ngTemplateScopes">
+            <div class="modal-header bg-primary" style="background-color:#1caf9a !important">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true" ng-click="cancel()">x</button>
+                <h4>Added Scopes</h4>
+            </div>
+            <div class="modal-body">
+                <ng-form name="manageScopes" novalidate>
+                    <div class="content">
+                        <div class="row">
+                            <div class="col-md-10 set-header-scope">
+                                <div class="row">
+                                    <div class="col-md-1" align="center">
+                                        <h5>
+                                            <b>#</b>
+                                        </h5>
+                                    </div>
+                                    <div class="col-md-8" align="center">
+                                        <h5>
+                                            <b>Insurance Sub Class Scope</b>
+                                        </h5>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-10" ng-repeat="scope in insSubClassScopeDetailsTemp" style="background-color:#ffeed0">
+                                <ng-form name="manageInsSubClassScope" novalidate>
+                                    <div class="row">
+                                        <div class="col-md-1">
+                                            <div class="panel-body no-padding" align="center">
+                                                <h6 label>{{$index+1}}</h6>lass
+                                            </div>
+                                        </div>
+                                        <div class="col-md-8">
+                                            <div class="panel-body no-padding" style="align-content:center">
+                                                <center>{{scope.CommonInsScopeName}}</center>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </ng-form>
+                            </div>
+                        </div>
+                        <br />
+                        <div class="row">
+                            <div class="col-md-12 modal-footer">
+                                <button class="btn btn-default" ng-click="cancel()">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </ng-form>
+            </div>
+            <div id="divLoading" ng-show="showLoader"></div>
+        </script>
+        <div class="modal fade" id="coverNote" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="col-md-6">
+                                    <h3>Temporary Cover Note</h3>
+                                </div>
+
+                            </div>
+                            <div class="panel panel-default tabs">
+                                <ul class="nav nav-tabs" role="tablist">
+                                    <li class="active">
+                                        <a href="#addTCN" role="tab" data-toggle="tab">Issue TCN</a>
+                                    </li>
+                                    <li>
+                                        <a href="#TCNHistory" role="tab" data-toggle="tab">TCN History</a>
+                                    </li>
+
+
+                                </ul>
+
+                                <div class="panel-body tab-content" style="background-color:transparent!important">
+                                    <div class="tab-pane active" id="addTCN">
+
+                                        @*<div class="panel panel-default">
+                                            <div class="panel-heading">
+                                                <h5 class="panel-title">Issue TCN</h5>
+                                                <h3 class="panel-title"></h3>
+                                                <ul class="panel-controls">*@
+                                        @*<li><input type="text" ng-style="{'background-color': data.backgroundCol}" class="form-control" placeholder="Search  ..." ng-model="search_query"></li>
+                                            <li><a href="#" class="panel-collapse"><span class="fa fa-angle-down"></span></a></li>
+                                            <li><a href="#" class="panel-refresh" ng-click="refresh()"><span class="fa fa-refresh"></span></a></li>
+                                            <li><a href="#" class="panel-remove"><span class="fa fa-times"></span></a></li>*@
+                                        @*</ul>
+                                                </div>
+                                            </div>*@
+                                        <div class="panel-body" style="background-color:transparent">
+                                            <div class="row" style="margin-top:10px;">
+                                                <ng-form name="managePolicyInfoRecording" novalidate>
+                                                    <div class="panel panel-default">
+                                                        <div class="panel-heading">
+                                                            <h3 class="panel-title">
+                                                                <strong>Add Tempory Cover Note Details</strong>
+                                                            </h3>
+                                                        </div>
+                                                    </div>
+                                                    <div class="panel-body">
+                                                        <div id="printArea">
+                                                            <div class="row">
+                                                                <label class="col-md-4 ">Cover Note Number</label>
+                                                                <div class="col-md-6">
+                                                                    <input type="text" placeholder="Cover Note Number" name="inputCoverNoteNumber" ng-model="coverNote.CoverNoteNo" class="form-control" ng-required="true" style="width:100%" />
+                                                                    <span class="help-block" style="color:red" ng-show="managePolicyInfoRecording.inputCoverNoteNumber.$error.required">Required Field *</span>
+                                                                </div>
+                                                            </div>
+                                                            <br />
+                                                            @*<div class="row">
+                                                                    <label class="col-md-2 ">Insurance Class</label>
+                                                                    <div class="col-md-6">
+                                                                        <input type="text" placeholder="Insurance Class" value="{{quotationHeaderObj.}}" name="inputInsuranceClass" ng-model="policyInfoRecObj.InsuranceClass" class="form-control" ng-required="true" style="width:100%" />
+                                                                        @*<span class="help-block" style="color:red" ng-show="managePolicyInfoRecording.inputInsuranceClass.$error.required">Required Field *</span>
+                                                                    </div>
+                                                                </div>*@
+                                                            <div class="row">
+                                                                <label class="col-md-4 ">Insurance Class</label>
+                                                                <div class="col-md-6">
+                                                                    <input type="text" name="inputInsuranceSubClass" value="{{coverNote.inscompany.InsClass}}" class="form-control" style="width:100%" />
+
+                                                                </div>
+                                                            </div>
+                                                            <br />
+                                                            <div class="row">
+                                                                <label class="col-md-4 ">Insurance SubClass</label>
+                                                                <div class="col-md-6">
+                                                                    <input type="text" name="inputInsuranceCompany" value="{{coverNote.inscompany.InsSubClass}}" class="form-control" style="width:100%" />
+
+                                                                </div>
+                                                            </div>
+                                                            <br />
+                                                            <div class="row">
+                                                                <label class="col-md-4 ">Insurance Company</label>
+                                                                <div class="col-md-6">
+                                                                    <input type="text" name="inputInsuranceSubClass" value="{{coverNote.inscompany.InsuranceCompanyName}}" class="form-control" style="width:100%" />
+
+                                                                </div>
+                                                            </div>
+                                                            <br />
+
+                                                            <div class="row">
+                                                                <label class="col-md-4 ">Requested Date</label>
+                                                                <div class="col-md-6">
+                                                                    <input type="text" placeholder="Requested Date" name="inputRequestedDate" value="{{coverNote.RequestedDate}}" class="form-control" style="width:100%" />
+
+                                                                </div>
+                                                            </div>
+                                                            <br />
+                                                            <div class="row">
+                                                                <label class="col-md-4 ">Confirmation Method</label>
+                                                                <div class="col-md-6">
+                                                                    <select class="col-md-12 form-control " data-live-search="true" name="inputConfirmation" ng-model="coverNote.ConfirmationMethod">
+                                                                        <option value="Email">  Email</option>
+                                                                        <option value="Post"> Post </option>
+                                                                        <option value="Call"> Call </option>
+
+                                                                    </select>
+                                                                    <span class="help-block" style="color:red" ng-show="managePolicyInfoRecording.inputConfirmation.$error.required">
+                                                                        Required Field *
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                            <br />
+                                                            <div class="row">
+                                                                <label class="col-md-4 ">From Date</label>
+                                                                <div class="col-md-6">
+                                                                    <div class="input-group">
+                                                                        <input type="text"
+                                                                               readonly
+                                                                               name="selectCoverFromDate"
+                                                                               class="form-control date"
+                                                                               ng-click="coverFromDateView=true"
+                                                                               datepicker-popup="dd/MM/yyyy"
+                                                                               ng-model="coverNote.FromDate"
+                                                                               is-open="coverFromDateView"
+                                                                               datepicker-options="dateOptions"
+                                                                               placeholder="Period of Cover From Date"
+                                                                               max-date="coverNote.ToDate"
+                                                                               style="color:black"
+                                                                               ng-required="true"
+                                                                               close-text="Close">
+                                                                        <span class="input-group-btn">
+                                                                            <button class="btn btn-default glyphicon glyphicon-calendar" ng-click="coverFromDateView=true;$event.stopPropagation();"></button>
+                                                                        </span>
+                                                                    </div>
+                                                                    <span class="help-block" style="color:red" ng-show="managePolicyInfoRecording.selectCoverFromDate.$error.required">
+                                                                        Required Field *
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                            <br />
+                                                            <div class="row">
+                                                                <label class="col-md-4 ">To Date</label>
+                                                                <div class="col-md-6">
+                                                                    <div class="input-group">
+                                                                        <input type="text"
+                                                                               readonly
+                                                                               name="selectCoverToDate"
+                                                                               class="form-control date"
+                                                                               ng-click="coverToDateView=true"
+                                                                               datepicker-popup="dd/MM/yyyy"
+                                                                               ng-model="coverNote.ToDate"
+                                                                               is-open="coverToDateView"
+                                                                               datepicker-options="dateOptions"
+                                                                               placeholder="Period of Cover To Date"
+                                                                               min-date="coverNote.FromDate"
+                                                                               style="color:black"
+                                                                               ng-required="true"
+                                                                               close-text="Close">
+                                                                        <span class="input-group-btn">
+                                                                            <button class="btn btn-default glyphicon glyphicon-calendar" ng-click="coverToDateView=true;$event.stopPropagation();"></button>
+                                                                        </span>
+                                                                    </div>
+                                                                    <span class="help-block" style="color:red" ng-show="managePolicyInfoRecording.selectCoverToDate.$error.required">
+                                                                        Required Field *
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                            <br />
+                                                            <div class="row">
+                                                                <label class="col-md-4 ">Pending Documnet</label>
+                                                                <div class="col-md-6">
+                                                                    <input type="text" name="inputPendingDoc" ng-model="coverNote.PendingDocItem" class="form-control" ng-required="true" style="width:100%" />
+                                                                    <span class="help-block" style="color:red" ng-show="managePolicyInfoRecording.inputPendingDoc.$error.required">
+                                                                        Required Field *
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        @*{{coverNote}}*@
+                                                        <div class="row">
+                                                            <div class="col-md-12 modal-footer">
+                                                                <button class="btn btn-primary" ng-click="printDiv('printArea');">Print Div</button>
+                                                                <button class="btn btn-primary" ng-disabled="!managePolicyInfoRecording.$valid" ng-click="saveTemCoverNoteDetails()">Save Tempory Cover Note<span class="fa fa-floppy-o fa-right"></span></button>
+                                                                @*<button class="btn btn-primary" ng-disabled="!managePolicyInfoRecording.$valid" ng-show="!isClientReqAddMode && !isViewMode" ng-click="updatePolicyInfoRecording()">Update Policy Info Recording<span class="fa fa-floppy-o fa-right"></span></button>*@
+                                                                <button class="btn btn-default" ng-click="cancelCustomerRequest()">Cancel</button>
+                                                            </div>
+                                                        </div>
+                                                        <br />
+                                                    </div>
+                                                </ng-form>
+
+                                            </div>
+
+                                        </div>
+
+
+
+
+                                    </div>
+
+                                    <div class="tab-pane " id="TCNHistory" style="background-color:transparent!important">
+
+                                        <div class="panel panel-default">
+                                            <div class="panel-heading">
+                                                <h5 class="panel-title"> TCN History</h5>
+                                                <h3 class="panel-title"></h3>
+                                                @*<ul class="panel-controls">
+                                                        <li>
+                                                            <input type="text" ng-model="search_coverNotes_query" ng-style="{'background-color': data.backgroundCol}" class="form-control" placeholder="Search  ..." ng-model="search_query">
+                                                        </li>
+                                                        <li>
+                                                            <a href="#" class="panel-collapse"><span class="fa fa-angle-down"></span></a>
+                                                        </li>
+                                                        <li>
+                                                            <a href="#" class="panel-refresh" ng-click="refresh()"><span class="fa fa-refresh"></span></a>
+                                                        </li>
+                                                        <li>
+                                                            <a href="#" class="panel-remove"><span class="fa fa-times"></span></a>
+                                                        </li>
+                                                    </ul>*@
+                                            </div>
+                                        </div>
+                                        <div class="panel-body" style="background-color:transparent">
+
+
+
+                                            <div class="row" style="margin-top:10px;font-size:8px;">
+                                                <table class="table table-bordered">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>CoverNoteNo</th>
+                                                            <th>Insurance SubClass Name</th>
+                                                            <th>Confirmation Method </th>
+                                                            <th>Pending Doc Item</th>
+                                                            <th>From Date</th>
+                                                            <th>To Date</th>
+                                                            <th>Issued Date</th>
+                                                        </tr>
+                                                    </thead>
+
+                                                    <!--<tr  >-->
+                                                    <tr ng-repeat="coverNote in coverNotes| filter:search_coverNotes_query">
+                                                        <td hidden>{{coverNote.CoverNoteID}} </td>
+                                                        <td hidden>{{coverNote.QuotationHeaderID}}</td>
+                                                        <td hidden>{{coverNote.InsuranceSubClassID}}</td>
+                                                        <td hidden>{{coverNote.InsuranceCompanyName}}</td>
+                                                        <td>{{coverNote.CoverNoteNo}}</td>
+
+                                                        <td>{{coverNote.InsuranceSubClassName}}</td>
+
+                                                        <td>{{coverNote.ConfirmationMethod}}</td>
+                                                        <td>{{coverNote.PendingDocItem}}</td>
+                                                        <td>{{coverNote.FromDate}}</td>
+                                                        <td>{{coverNote.ToDate}}</td>
+                                                        <td>{{coverNote.IssuedDate}}</td>
+                                                    </tr>
+
+
+
+                                                </table>
+
+
+
+                                            </div>
+
+
+
+
+                                        </div>
+
+
+
+
+
+                                    </div>
+                                </div>
+
+
+
+
+
+
+
+                            </div>
+
+
+
+
+
+
+
+
+
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="proposalform" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="col-md-6">
+                                    <h3>Upload Proposal Form</h3>
+                                </div>
+
+                            </div>
+                            @*<div class="panel panel-default tabs">
+                                <ul class="nav nav-tabs" role="tablist">
+                                    <li class="active">
+                                        <a href="#addTCN" role="tab" data-toggle="tab">Issue TCN</a>
+                                    </li>
+                                    <li>
+                                        <a href="#TCNHistory" role="tab" data-toggle="tab">TCN History</a>
+                                    </li>
+
+
+                                </ul>*@
+
+                            <div class="panel-body tab-content" style="background-color:transparent!important">
+                                @*<div class="tab-pane active" id="addTCN">*@
+
+                                @*<div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <h5 class="panel-title">Issue TCN</h5>
+                                        <h3 class="panel-title"></h3>
+                                        <ul class="panel-controls">*@
+                                @*<li><input type="text" ng-style="{'background-color': data.backgroundCol}" class="form-control" placeholder="Search  ..." ng-model="search_query"></li>
+                                    <li><a href="#" class="panel-collapse"><span class="fa fa-angle-down"></span></a></li>
+                                    <li><a href="#" class="panel-refresh" ng-click="refresh()"><span class="fa fa-refresh"></span></a></li>
+                                    <li><a href="#" class="panel-remove"><span class="fa fa-times"></span></a></li>*@
+                                @*</ul>
+                                        </div>
+                                    </div>*@
+                                <div class="panel-body" style="background-color:transparent">
+                                    <div class="row" style="margin-top:10px;">
+                                        <ng-form name="managePolicyInfoRecording" novalidate>
+                                            <div class="panel panel-default">
+                                                <div class="panel-heading">
+                                                    <h3 class="panel-title">
+                                                        <strong>Add Proposal Form</strong>
+                                                    </h3>
+                                                </div>
+                                            </div>
+                                            <div class="panel-body">
+                                                <div class="row">
+                                                    <div class="col-md-12">
+                                                        <h3 style="margin-top: 5px;">{{cusObj.ClientName }}</h3>
+                                                        <h5 style="color:red">{{cusObj.Email}}</h5>
+                                                        <h4>{{cusObj.ClientAddress}}</h4>
+                                                        <h6>Phone:&nbsp;{{cusObj.ContactNo}}/{{cusObj.FixedLine}}</h6>
+                                                        <h6>NIC:&nbsp;{{cusObj.NIC}}</h6>
+                                                        <h6>DOB:&nbsp;{{cusObj.DOB}}</h6>
+                                                    </div>
+                                                    <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />@*<br /><br /><br*@ @*<br /><br /><br />*@@*<br /><br /><br /><br /><br />*@
+                                                    <div class="col-md-12" style="border:double">
+                                                        <div class="contact-info">
+                                                            <div class="row">
+                                                                <div class="col-md-6">
+                                                                    <p>
+                                                                        <medium><b>Quotation No</b></medium>
+                                                                        <br>{{quotationHeaderObj.QuotationHeaderID}}
+                                                                    </p>
+                                                                    <p>
+                                                                        <medium><b>Client Request No</b></medium>
+                                                                        <br>{{quotationHeaderObj.ClientRequestHeaderID}}
+                                                                    </p>
+                                                                    <p>
+                                                                        <medium><b>Quotation Status</b></medium>
+                                                                        <br>{{quotationHeaderObj.QuotationStatusCodeDescription}} &nbsp;&nbsp;
+                                                                        @*<a href="" ng-click="manageQuotationStatus(quotationHeaderObj.QuotationStatusCode)"><span title="Edit Quotation Status" style="font-size:medium" class="glyphicon glyphicon-edit"></span></a>*@
+                                                                    </p>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <p>
+                                                                        <medium><b>Business Unit</b></medium>
+                                                                        <br>{{cusReqObj.BusinessUnitName}}
+                                                                    </p>
+                                                                    <p>
+                                                                        <medium><b>Introduced By</b></medium>
+                                                                        <br>{{cusReqObj.PartnerName}}
+                                                                    </p>
+                                                                    <p>
+                                                                        <medium><b>Requested Date</b></medium>
+                                                                        <br>{{cusReqObj.RequestedDate}}
+                                                                    </p>
+                                                                </div>
+                                                                <br />
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <br /><br /><br /><br /><br /><br /><br /><br /><br />@*<br /><br /><br /><br />*@
+                                                    <div class="col-md-12">
+                                                        <div class="row">
+                                                            <label class="col-md-4 ">Cover Note No</label>
+                                                            <div class="col-md-6">
+                                                                <input type="text" name="inputInsuranceSubClass" value="{{coverNoteProposal.CoverNoteNo}}" class="form-control" style="width:100%" />
+
+                                                            </div>
+                                                        </div>
+                                                        <br />
+                                                        <div class="row">
+                                                            <label class="col-md-4 ">Confirmation Method</label>
+                                                            <div class="col-md-6">
+                                                                <input type="text" name="inputInsuranceSubClass" value="{{coverNoteProposal.ConfirmationMethod}}" class="form-control" style="width:100%" />
+
+                                                            </div>
+                                                        </div>
+                                                        <br />
+                                                        <div class="row">
+                                                            <label class="col-md-4 ">Insurance Class</label>
+                                                            <div class="col-md-6">
+                                                                <input type="text" name="inputInsuranceSubClass" value="{{coverNoteProposal.InsuranceSubClassName}}" class="form-control" style="width:100%" />
+
+                                                            </div>
+                                                        </div>
+                                                        <br />
+                                                        <div class="row">
+                                                            <label class="col-md-4 ">Pending Document Item</label>
+                                                            <div class="col-md-6">
+                                                                <input type="text" name="inputInsuranceSubClass" value="{{coverNoteProposal.PendingDocItem}}" class="form-control" style="width:100%" />
+
+                                                            </div>
+                                                        </div>
+                                                        <br />
+                                                        <div class="row">
+                                                            <label class="col-md-4 ">From Date</label>
+                                                            <div class="col-md-6">
+                                                                <input type="text" name="inputInsuranceSubClass" value="{{coverNoteProposal.FromDate}}" class="form-control" style="width:100%" />
+
+                                                            </div>
+                                                        </div>
+                                                        <br />
+                                                        <div class="row">
+                                                            <label class="col-md-4 ">To Date</label>
+                                                            <div class="col-md-6">
+                                                                <input type="text" name="inputInsuranceSubClass" value="{{coverNoteProposal.ToDate}}" class="form-control" style="width:100%" />
+
+                                                            </div>
+                                                        </div>
+                                                        <br />
+                                                        <div class="row">
+                                                            <label class="col-md-4 ">Issued Date</label>
+                                                            <div class="col-md-6">
+                                                                <input type="text" name="inputInsuranceSubClass" value="{{coverNoteProposal.IssuedDate}}" class="form-control" style="width:100%" />
+
+                                                            </div>
+                                                        </div>
+                                                        <br />
+                                                        <div class="row">
+                                                            <label class="col-md-4 ">Upload Proposal Form</label>
+                                                            <div class="col-md-6">
+                                                                <input type="file" class="form-control" id="file" name="file" multiple onchange="angular.element(this).scope().getDocument(this)" /><br />
+
+                                                            </div>
+                                                        </div>
+                                                        <br />
+                                                        <div class="row">
+                                                            @*<label class="col-md-4 ">Upload Proposal Form</label>*@
+                                                            <div class="col-md-6">
+                                                                <input type="button" class="btn btn-primary" ng-click="saveDocument()" value="Save Proposal Form" />
+                                                            </div>
+                                                        </div>
+                                                        <br />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </ng-form>
+                                        @*{{coverNoteProposal}}*@@*{{quotationHeaderObj}}*@@*{{cusReqObj}}*@
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/ng-template" id="ngTemplateInsCompany">
+        <div class="modal-header bg-primary" style="background-color:#1caf9a !important">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true" ng-click="cancel()">x</button>
+            <h4>Requested Insurance Companies</h4>
+        </div>
+        <div class="modal-body">
+            <ng-form name="manageReqInsCompany" novalidate>
+                <div class="content">
+                    <div class="row">
+                        <div class="col-md-10 set-header-insCompany">
+                            <div class="row">
+                                <div class="col-md-1" align="center">
+                                    <h5>
+                                        <b>ID</b>
+                                    </h5>
+                                </div>
+                                <div class="col-md-8" align="center">
+                                    <h5>
+                                        <b>Insurance Company Name</b>
+                                    </h5>
+                                </div>
+                                <div class="col-md-1" align="center">
+                                    <h5>
+                                        <b>Select</b>
+                                    </h5>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-10" ng-repeat="insCompany in availableInsuranceCompanies" style="background-color:#daf3b1">
+                            <ng-form name="manageReqInsuranceCompany" novalidate>
+                                <div class="row">
+                                    <div class="col-md-1">
+                                        <div class="panel-body no-padding" align="center">
+                                            <h6 label>{{insCompany.InsuranceCompanyID}}</h6>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <div class="panel-body no-padding" align="center">
+                                            <center>{{insCompany.InsuranceCompanyName}}</center>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-1">
+                                        <div class="panel-body no-padding" style="align-content:center">
+                                            <label for="IC-{{insCompany.InsuranceCompanyID}}">
+                                                <input type="checkbox" ng-model="insCompany.IsChecked" name="group" id="IC-{{insCompany.InsuranceCompanyID}}" />
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </ng-form>
+                        </div>
+                    </div>
+                    <br />
+                    <div class="row">
+                        <div class="col-md-12 modal-footer">
+                            <button class="btn btn-primary" ng-click="addInsCompany()">Add</button>
+                            <button class="btn btn-default" ng-click="cancel()">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </ng-form>
+        </div>
+        <div id="divLoading" ng-show="showLoader"></div>
+    </script>
+    <script type="text/ng-template" id="ngTemplateInsCompanyLine">
+        <div class="modal-header bg-primary" style="background-color:#1caf9a !important">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true" ng-click="cancel()">x</button>
+            <h4>Manage Insurance Company</h4>
+        </div>
+        <div class="modal-body">
+            <ng-form name="manageInsCompanyLine" novalidate>
+                <div class="content">
+                    <div class="row">
+                        <div class="col-md-12 set-header-scope">
+                            <div class="row">
+                                <div class="col-md-1" align="center">
+                                    <h5>
+                                        <b>#</b>
+                                    </h5>
+                                </div>
+                                <div class="col-md-3" align="center">
+                                    <h5>
+                                        <b>Insurance Sub Class</b>
+                                    </h5>
+                                </div>
+                                <div class="col-md-3" align="center">
+                                    <h5>
+                                        <b>Sum Insured(LKR)</b>
+                                    </h5>
+                                </div>
+                                <div class="col-md-3" align="center">
+                                    <h5>
+                                        <b>Manage Scope</b>
+                                    </h5>
+                                </div>
+                                <div class="col-md-2" align="center"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-12" ng-repeat="insCompanyLine in quotationDetailsInsCompanyLineDetailsTemp" style="background-color:#ffeed0">
+                            <ng-form name="manageInsSubClassScope" novalidate>
+                                <div class="row">
+                                    <div class="col-md-1">
+                                        <div class="panel-body no-padding" align="center">
+                                            <h6 label>{{$index+1}}</h6>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="panel-body no-padding" style="align-content:center">
+                                            <center>{{insCompanyLine.InsuranceSubClassDescription}}</center>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="panel-body no-padding" style="align-content:center">
+                                            <input type="number" name="inputSumInsured" placeholder="Sum Insured" ng-model="insCompanyLine.SumInsured" ng-init="insCompanyLine.SumInsured='0'" class="form-control" onkeyup="checkInputRate(this);" min="0" @*ng-required="true"*@>
+                                            @*<span class="help-block" style="color:red" ng-show="manageInsCompanyLine.inputSumInsured.$error.required">
+                                                    Required Field *
+                                                </span>*@
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="panel-body no-padding" style="align-content:center">
+                                            <button type="button" class="btn btn-danger" ng-click="manageInsCompanyScopeDetails($index)">Manage Scope</button>
+                                            <input type="text" ng-model="scopeValidateTemp" @*ng-required="insCompanyLine.QuotationDetailsInsCompanyScopeDetails.length==0"*@ ng-show="false" />
+                                            <span ng-if="insCompanyLine.QuotationDetailsInsCompanyScopeDetails.length>0"><i style="color:green" class="glyphicon glyphicon-ok"></i></span>
+                                            <span ng-if="insCompanyLine.QuotationDetailsInsCompanyScopeDetails.length==0"><i style="color:red" class="glyphicon glyphicon-remove"></i></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2" ng-if="$index>0">
+                                        <div class="panel-body no-padding">
+                                            <button type="button" class="btn btn-default" ng-click="deleteInsCompanyLineDetails($index)">
+                                                <span class="glyphicon glyphicon-remove"></span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </ng-form>
+                        </div>
+                        <div class="col-md-12">
+                            <br />
+                            <div class="row">
+                                <div class="col-md-1">
+                                    <div class="panel-body no-padding" align="center">
+                                        <button type="button" class="btn btn-default" ng-click="addInsCompanyLineDetails()">
+                                            <span class="glyphicon glyphicon-plus"></span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+                    <div class="row">
+                        <div class="col-md-12 modal-footer">
+                            <button class="btn btn-primary" ng-disabled="!manageInsCompanyLine.$valid" ng-click="saveInsCompanyLineDetails()">Add</button>
+                            <button class="btn btn-default" ng-click="cancel()">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </ng-form>
+        </div>
+        <div id="divLoading" ng-show="showLoader"></div>
+    </script>
+
+    <script type="text/ng-template" id="ngTempTempCoverNote">
+        <div class="modal-header bg-primary" style="background-color:#1caf9a !important">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true" ng-click="cancel()">x</button>
+            <h4>Tempory Cover Note Issue</h4>
+        </div>
+        <div class="modal-body">
+            <ng-form name="managePolicyInfoRecording" novalidate>
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">
+                            <strong>Add Tempory Cover Note Details</strong>
+                        </h3>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div class="row">
+                        <label class="col-md-2 ">Cover Note Number</label>
+                        <div class="col-md-6">
+                            <input type="text" placeholder="Cover Note Number" name="inputCoverNoteNumber" ng-model="policyInfoRecObj.CoverNoteNumber" class="form-control" ng-required="true" style="width:100%" />
+                            <span class="help-block" style="color:red" ng-show="managePolicyInfoRecording.inputCoverNoteNumber.$error.required">Required Field *</span>
+                        </div>
+                    </div>
+                    {{coverNote}}{}
+                    @*<div class="row">
+                            <label class="col-md-2 ">Insurance Class</label>
+                            <div class="col-md-6">
+                                <input type="text" placeholder="Insurance Class" value="{{quotationHeaderObj.}}" name="inputInsuranceClass" ng-model="policyInfoRecObj.InsuranceClass" class="form-control" ng-required="true" style="width:100%" />
+                                @*<span class="help-block" style="color:red" ng-show="managePolicyInfoRecording.inputInsuranceClass.$error.required">Required Field *</span>
+                            </div>
+                        </div>*@
+                    <div class="row">
+                        <label class="col-md-2 ">Insurance Company</label>
+                        <div class="col-md-6">
+
+                            <input type="text" name="inputInsuranceSubClass" ng-model="tempObj.InsuranceCompanyName" class="form-control" ng-required="true" style="width:100%" />
+
+                        </div>
+                    </div>
+                    <div class="row">
+                        <label class="col-md-2 ">Insurance SubClass</label>
+                        <div class="col-md-6">
+                            <input type="text" name="inputInsuranceCompany" ng-model="tempObj.QuotationLineDetails.InsuranceSubClassDescription" class="form-control" ng-required="true" style="width:100%" />
+
+                        </div>
+                    </div>
+                    <div class="row">
+                        <label class="col-md-2 ">Requested Date</label>
+                        <div class="col-md-6">
+                            <input type="text" placeholder="Requested Date" name="inputRequestedDate" ng-model="tempObj.RequestedDate" class="form-control" ng-required="true" style="width:100%" />
+
+                        </div>
+                    </div>
+                    <br />
+                    <div class="row">
+                        <label class="col-md-2 ">From Date</label>
+                        <div class="col-md-4">
+                            <div class="input-group">
+                                <input type="text"
+                                       readonly
+                                       name="selectCoverFromDate"
+                                       class="form-control date"
+                                       ng-click="coverFromDateView=true"
+                                       datepicker-popup="dd/MM/yyyy"
+                                       ng-model="policyInfoRecObj.PeriodOfCoverFromDate"
+                                       is-open="coverFromDateView"
+                                       datepicker-options="dateOptions"
+                                       placeholder="Period of Cover From Date"
+                                       max-date="policyInfoRecObj.PeriodOfCoverToDate"
+                                       style="color:black"
+                                       ng-required="true"
+                                       close-text="Close">
+                                <span class="input-group-btn">
+                                    <button class="btn btn-default glyphicon glyphicon-calendar" ng-click="coverFromDateView=true;$event.stopPropagation();"></button>
+                                </span>
+                            </div>
+                            <span class="help-block" style="color:red" ng-show="managePolicyInfoRecording.selectCoverFromDate.$error.required">
+                                Required Field *
+                            </span>
+                        </div>
+                    </div>
+                    <br />
+                    <div class="row">
+                        <label class="col-md-2 ">To Date</label>
+                        <div class="col-md-4">
+                            <div class="input-group">
+                                <input type="text"
+                                       readonly
+                                       name="selectCoverToDate"
+                                       class="form-control date"
+                                       ng-click="coverToDateView=true"
+                                       datepicker-popup="dd/MM/yyyy"
+                                       ng-model="policyInfoRecObj.PeriodOfCoverToDate"
+                                       is-open="coverToDateView"
+                                       datepicker-options="dateOptions"
+                                       placeholder="Period of Cover To Date"
+                                       min-date="policyInfoRecObj.PeriodOfCoverFromDate"
+                                       style="color:black"
+                                       ng-required="true"
+                                       close-text="Close">
+                                <span class="input-group-btn">
+                                    <button class="btn btn-default glyphicon glyphicon-calendar" ng-click="coverToDateView=true;$event.stopPropagation();"></button>
+                                </span>
+                            </div>
+                            <span class="help-block" style="color:red" ng-show="managePolicyInfoRecording.selectCoverToDate.$error.required">
+                                Required Field *
+                            </span>
+                        </div>
+                    </div>
+                    <br />
+                    <div class="row">
+                        <label class="col-md-2 ">Pending Documnet</label>
+                        <div class="col-md-6">
+                            <input type="text" name="inputInsuranceSubClass" ng-model="tempObj.PendingDocument" class="form-control" ng-required="true" style="width:100%" />
+
+                        </div>
+                    </div>
+                    @*{{quotationHeaderObj}}*@
+                    @*{{tempObj}}*@
+                    @*{{policyInfoRecObj}}*@
+
+                    <div class="row">
+                        <div class="col-md-12 modal-footer">
+                            <button class="btn btn-primary" ng-disabled="!managePolicyInfoRecording.$valid" ng-click="saveTemCoverNoteDetails()">Save Tempory Cover Note<span class="fa fa-floppy-o fa-right"></span></button>
+                            @*<button class="btn btn-primary" ng-disabled="!managePolicyInfoRecording.$valid" ng-show="!isClientReqAddMode && !isViewMode" ng-click="updatePolicyInfoRecording()">Update Policy Info Recording<span class="fa fa-floppy-o fa-right"></span></button>*@
+                            <button class="btn btn-default" ng-click="cancelCustomerRequest()">Cancel</button>
+                        </div>
+                    </div>
+                    <br />
+                </div>
+            </ng-form>
+            {{coverNote}}
+        </div>
+        <div id="divLoading" ng-show="showLoader"></div>
+    </script>
+
+
+    <script type="text/ng-template" id="ngTemplateInsCompanyScope">
+        <div class="modal-header bg-primary" style="background-color:#1caf9a !important">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true" ng-click="cancel()">x</button>
+            <h4>Manage Insurance Company Scope</h4>
+        </div>
+        <div class="modal-body">
+            <ng-form name="manageInsuranceCompanyScope" novalidate>
+                <div class="content">
+                    <div class="row">
+                        <div class="col-md-12 set-header-scope">
+                            <div class="row">
+                                <div class="col-md-1" align="center">
+                                    <h5>
+                                        <b>#</b>
+                                    </h5>
+                                </div>
+                                <div class="col-md-3" align="center">
+                                    <h5>
+                                        <b>Scope Description</b>
+                                    </h5>
+                                </div>
+                                <div class="col-md-3" align="center">
+                                    <h5>
+                                        <b>Excess Type</b>
+                                    </h5>
+                                </div>
+                                <div class="col-md-3" align="center">
+                                    <h5>
+                                        <b>Excess Amount</b>
+                                    </h5>
+                                </div>
+                                <div class="col-md-1" align="center"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-12" ng-repeat="insCompanyScope in quotationDetailsInsCompanyScopeTemp" style="background-color:#ffeed0">
+                            <ng-form name="manageInsCompanyScope" novalidate>
+                                <div class="row">
+                                    <div class="col-md-1">
+                                        <div class="panel-body no-padding" align="center">
+                                            <h6 label>{{$index+1}}</h6>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="panel-body no-padding" style="align-content:center">
+                                            <input type="text" placeholder="Scope Description" name="inputScopeDescription" ng-model="insCompanyScope.ScopeDescription" class="form-control" @*ng-required="true"*@ />
+                                            @*<span class="help-block" style="color:red" ng-show="manageInsCompanyScope.inputScopeDescription.$error.required">
+                                                    Required Field *
+                                                </span>*@
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="panel-body no-padding" style="align-content:center">
+                                            <input type="text" placeholder="Excess Type" name="inputExcessType" ng-model="insCompanyScope.ExcessType" class="form-control" @*ng-required="true"*@ />
+                                            @*<span class="help-block" style="color:red" ng-show="manageInsCompanyScope.inputExcessType.$error.required">
+                                                    Required Field *
+                                                </span>*@
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="panel-body no-padding">
+                                            <input type="number" name="inputExcessAmount" placeholder="Excess Amount" ng-model="insCompanyScope.ExcessAmount" ng-init="insCompanyScope.ExcessAmount='0'" class="form-control" onkeyup="checkInputRate(this);" min="0" @*ng-required="true"*@>
+                                            @*<span class="help-block" style="color:red" ng-show="manageInsCompanyScope.inputExcessAmount.$error.required">
+                                                    Required Field *
+                                                </span>*@
+                                        </div>
+                                    </div>
+                                    <div class="col-md-1" ng-if="$index>0">
+                                        <div class="panel-body no-padding">
+                                            <button type="button" class="btn btn-default" ng-click="deleteInsCompanyScopeDetails($index)">
+                                                <span class="glyphicon glyphicon-remove"></span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </ng-form>
+                        </div>
+                        <div class="col-md-12">
+                            <br />
+                            <div class="row">
+                                <div class="col-md-1">
+                                    <div class="panel-body no-padding" align="center">
+                                        <button type="button" class="btn btn-default" ng-click="addInsCompanyScopeDetails()">
+                                            <span class="glyphicon glyphicon-plus"></span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+                    <div class="row">
+                        <div class="col-md-12 modal-footer">
+                            <button class="btn btn-primary" ng-disabled="!manageInsuranceCompanyScope.$valid" ng-click="saveInsCompanyScopeDetails()">Add</button>
+                            <button class="btn btn-default" ng-click="cancel()">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </ng-form>
+        </div>
+        <div id="divLoading" ng-show="showLoader"></div>
+    </script>
+    <script type="text/ng-template" id="ngTemplateQS">
+        <div class="modal-header bg-primary" style="background-color:#1caf9a !important">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true" ng-click="cancel()">x</button>
+            <h4>Update Quotation Status</h4>
+        </div>
+        <div class="modal-body">
+            <ng-form name="manageQuotationStatus" novalidate>
+                <div class="content">
+                    <div class="row">
+                        <label class="col-md-3 control-label">Quotation Status</label>
+                        <div class="col-md-9">
+                            <div class="form-group">
+                                <selectize placeholder="Select Quotation Status" name="inputQuotationStatus" options="availableQuotationStatusList" config="{maxItems: 1}" ng-model="quotationStatus" ng-required="true"></selectize>
+                                <span class="help-block" style="color:red" ng-show="manageQuotationStatus.inputQuotationStatus.$error.required">
+                                    Required Field *
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+                    <div class="row">
+                        <div class="col-md-12 modal-footer">
+                            <button class="btn btn-primary" ng-disabled="!manageQuotationStatus.$valid" ng-click="updateQuotationStatus()">Update</button>
+                            <button class="btn btn-default" ng-click="cancel()">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </ng-form>
+        </div>
+        <div id="divLoading" ng-show="showLoader"></div>
+    </script>
+    <script type="text/ng-template" id="ngTemplateSendEmail">
+        <div class="modal-header bg-primary" style="background-color:#1caf9a !important">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true" ng-click="cancel()">x</button>
+            <h4>Send Email Request</h4>
+        </div>
+        <div class="modal-body">
+            <ng-form name="manageEmailRequest" novalidate>
+                <div class="content">
+                    <div class="row">
+                        <div class="form-group">
+                            <label class="control-label">Receiver Name</label>
+                            <input type="text" name="inputUserName" placeholder="Receiver Name" ng-model="emailObj.userName" ng-required="true" class="form-control" />
+                            <span class="help-block" style="color:red" ng-show="manageEmailRequest.inputUserName.$error.required">
+                                Required Field *
+                            </span>
+                        </div>
+                    </div>
+                    <br />
+                    <div class="row">
+                        <div class="form-group">
+                            <label class="control-label">To (Email)</label>
+                            <input type="email" name="inputEmailAddress" placeholder="To" ng-model="emailObj.emailAddress" class="form-control" ng-required="true" />
+                            <span class="error" ng-show="manageEmailRequest.inputEmailAddress.$error.email" style="color:red">
+                                Invalid Email
+                            </span>
+                            <span class="help-block" style="color:red" ng-show="manageEmailRequest.inputEmailAddress.$error.required">
+                                Required Field *
+                            </span>
+                        </div>
+                    </div>
+                    <br />
+                    <div class="row">
+                        <div class="form-group">
+                            <label class="control-label">BCC (Email)</label>
+                            <input type="email" name="inputEmailBCCAddress" placeholder="To" ng-model="emailObj.bccEmail" class="form-control" ng-required="false" />
+                            <span class="error" ng-show="manageEmailRequest.inputEmailBCCAddress.$error.email" style="color:red">
+                                Invalid Email
+                            </span>
+                            <span class="help-block" style="color:red" ng-show="manageEmailRequest.inputEmailAddress.$error.required">
+                                Required Field *
+                            </span>
+                        </div>
+                    </div>
+                    <br />
+
+                    <div class="row">
+                        <label class="control-label">Subject</label>
+                        <input type="text" name="inputEmailHeader" placeholder="Subject" ng-model="emailObj.emailHeader" ng-required="true" class="form-control" />
+                        <span class="help-block" style="color:red" ng-show="manageEmailRequest.inputEmailHeader.$error.required">
+                            Required Field *
+                        </span>
+                    </div>
+                    <br />
+                    <div class="row">
+                        <label class="control-label">Message</label>
+                        <textarea ui-tinymce="tinymceOptions" ng-model="emailObj.emailMessage" class="form-control" ng-required="true"></textarea>
+                    </div>
+                    <br />
+
+                    <br />
+                    <div class="row">
+                        <div class="col-md-12 modal-footer">
+                            <button class="btn btn-primary" ng-disabled="!manageEmailRequest.$valid" ng-click="sendEmail()">Send Email</button>
+                            @*<button class="btn btn-primary" ng-click="sendEmail()">Send Email</button>*@
+                            <button class="btn btn-default" ng-click="cancel()">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </ng-form>
+        </div>
+        <div id="divLoading" ng-show="showLoader"></div>
+    </script>
+
+    <script type="text/ng-template" id="ngTemplateClientSendEmail">
+        <div class="modal-header bg-primary" style="background-color:#1caf9a !important">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true" ng-click="cancel()">x</button>
+            <h4>Send Email Request For Client</h4>
+        </div>
+        <div class="modal-body">
+            <ng-form name="manageEmailRequest" novalidate>
+                <div class="content">
+                    <div class="row">
+                        <div class="form-group">
+                            <label class="control-label">Receiver Name</label>
+                            <input type="text" name="inputUserName" placeholder="Receiver Name" ng-model="emailcliObj.userName" ng-required="true" class="form-control" />
+                            <span class="help-block" style="color:red" ng-show="manageEmailRequest.inputUserName.$error.required">
+                                Required Field *
+                            </span>
+                        </div>
+                    </div>
+                    <br />
+                    <div class="row">
+                        <div class="form-group">
+                            <label class="control-label">To (Email)</label>
+                            <input type="email" name="inputEmailAddress" placeholder="To" ng-model="emailcliObj.emailAddress" class="form-control" ng-required="true" />
+                            <span class="error" ng-show="manageEmailRequest.inputEmailAddress.$error.email" style="color:red">
+                                Invalid Email
+                            </span>
+                            <span class="help-block" style="color:red" ng-show="manageEmailRequest.inputEmailAddress.$error.required">
+                                Required Field *
+                            </span>
+                        </div>
+                    </div>
+                    <br />
+                    <div class="row">
+                        <label class="control-label">Subject</label>
+                        <input type="text" name="inputEmailHeader" placeholder="Subject" ng-model="emailcliObj.emailHeader" ng-required="true" class="form-control" />
+                        <span class="help-block" style="color:red" ng-show="manageEmailRequest.inputEmailHeader.$error.required">
+                            Required Field *
+                        </span>
+                    </div>
+                    <br />
+                    <div class="row">
+                        <label class="control-label">Message</label>
+                        <textarea ui-tinymce="tinymceOptions" ng-model="emailcliObj.emailMessage" class="form-control" ng-required="true"></textarea>
+                    </div>
+                    <br />
+                    <div class="row">
+                        <div class="col-md-12 modal-footer">
+                            <button class="btn btn-primary" ng-disabled="!manageEmailRequest.$valid" ng-click="sendEmail()">Send Email</button>
+                            <button class="btn btn-default" ng-click="cancel()">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </ng-form>
+        </div>
+        <div id="divLoading" ng-show="showLoader"></div>
+    </script>
+</div>

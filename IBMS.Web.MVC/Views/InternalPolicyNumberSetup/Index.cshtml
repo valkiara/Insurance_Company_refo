@@ -1,0 +1,163 @@
+﻿@{
+    ViewBag.Title = "Internal Policy Number Setup";
+}
+
+
+<style>
+    .form-control {
+        width: 100%;
+    }
+</style>
+
+
+<script src="~/Scripts/ng/Controllers/InternalPolicyNumberSetupController.js"></script>
+<script src="~/Scripts/ng/Services/InternalPolicyNumberSetupService.js"></script>
+
+<div class="breadcrumb-line">
+    <ul class="breadcrumb">
+        <li><a href="/Dashboard/Dashboard"><i class="icon-home2 position-left"></i>Home</a></li>
+        <li>Master Details</li><li>Claim</li>
+        <li class="active"><b>Internal Policy Number Setup</b></li>
+    </ul>
+</div>
+
+<div ng-app="IBMSAPP" ng-controller="InternalPolicyNumberSetupController" ng-init="init()" ng-cloak>
+
+
+            <div class="page-content-wrap">
+                <div class="panel panel-default tabs">
+
+                    <ul class="nav nav-tabs" role="tablist">
+                        <li class="active" id="tabView"><a href="#tab-first" role="tab" data-toggle="tab">View</a></li>
+                        <li id="tabEdit"><a href="#tab-second" role="tab" data-toggle="tab">New</a></li>
+                    </ul>
+
+
+                    <div class="panel-body tab-content">
+                        <div class="tab-pane active" id="tab-first">
+
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">
+                                        <strong>Internal Policy Number Setup</strong>
+                                    </h3>
+                                    <ul class="panel-controls">
+                                        <li><input type="text" style="font-size: 12px;width: 100%;border-radius: 0px;margin-right:2px;" class="form-control" placeholder="Search Internal Policy Number ..." ng-model="search_query" ng-change="searchTextChange(search_query)"></li>
+                                        <li><a href="#" class="panel-refresh" ng-click="refreshContent()"><span class="fa fa-refresh"></span></a></li>
+
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="panel-body">
+                                <div class="col-md-2">Show records per page </div>
+                                <div class="col=md-10">
+                                    <select class="form-control" style="width:100px;" ng-model="viewby" ng-change="setItemsPerPage(viewby)">
+                                        <option>5</option>
+                                        <option>10</option>
+                                        <option>20</option>
+                                        <option>30</option>
+                                        <option>40</option>
+                                        <option>50</option>
+                                    </select>
+                                </div>
+                                <div></div><br />
+                                <table class="table table-responsive" cellspacing="0">
+                                    <thead>
+                                        <tr>
+                                            <th hidden>Internal Policy Number Setup ID</th>
+                                            <th>Internal Policy Number</th>
+                                            <th>Business Unit Name</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody ng-repeat="Policy in filterdData = (data.slice(((currentPage-1)*itemsPerPage), ((currentPage)*itemsPerPage)))">
+                                        <tr id="view{{Policy.InternalPolicyNumSetupID}}">
+                                            <td hidden>
+                                                {{Policy.InternalPolicyNumSetupID}}
+                                            </td>
+                                            <td>
+                                                {{Policy.InternalPolicyNumber}}
+                                            </td>
+                                            <td>
+                                                {{Policy.BusinessUnitName}}
+                                            </td>
+                                            <td>
+                                                <div class="fa fa-edit btn btn-success" ng-click="edit(Policy)"> Edit</div>&nbsp;&nbsp;
+                                                <div class="fa fa-trash-o btn btn-danger" ng-click="Delete(Policy)"> Delete</div>
+                                            </td>
+
+                                            @*{{filterdData}}*@
+                                        </tr>
+                                        <tr id="edit{{Policy.InternalPolicyNumSetupID}}" hidden>
+                                            <td hidden>
+                                                <input type="text" hidden class="form-control"
+                                                       value="{{Policy.InternalPolicyNumSetupID}}"
+                                                       ng-model="Policy.InternalPolicyNumSetupID">
+                                            </td>
+                                            <td>
+                                                <input type="text" style="font-size: 12px;width: 100%;border-radius: 0px;margin-right:2px;" class="form-control"
+                                                       value="{{Policy.InternalPolicyNumber}}"
+                                                       ng-model="Policy.InternalPolicyNumber"
+                                                       ng-required="true">
+                                                <span class="help-block" style="color:red" ng-show="!Policy.InternalPolicyNumber">Required Field *</span>
+                                            </td>
+                                            <td>
+                                                <select name="selectCompany" id="timeZone" class="form-control" ng-model="Policy.BusinessUnitID" ng-options="BU.BusinessUnitID as BU.BusinessUnit for BU in filteredBusinessUnits" ng-required="true">
+                                                    <option value="{{Policy.BusinessUnit}}"></option>
+                                                </select></td>
+                                            <td>
+                                                <div class="fa fa-save btn btn-info" ng-disabled="!Policy.InternalPolicyNumber" ng-click="update(Policy)"> Update</div>&nbsp;
+                                                <div ng-click="cancel(Policy)" class="fa fa-times btn btn-default"> Cancel</div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <pagination class="pull-left pagination-sm" total-items="totalItems" ng-model="currentPage" max-size="maxSize" boundary-links="true" rotate="false" num-pages="numPages" items-per-page="itemsPerPage"></pagination>
+                            </div>
+                        </div>
+
+                        <div class="tab-pane" id="tab-second">
+
+                            
+                            <form class="form-horizontal col-md-10" role="form">
+                                <ng-form name="InternalPolicyNumberSetup">
+
+                                    <div class="form-group">
+                                        <label class="col-md-4 control-label">Internal Policy Number</label>
+                                        <div class="col-md-4">
+                                            <input type="text" name="InternalPolicyNumber" style="width:100%" ng-model="InternalPolicyNumber" class="form-control" value="" ng-required="true" />
+                                            <span class="help-block" style="color:red;" ng-show="InternalPolicyNumberSetup.InternalPolicyNumber.$error.required">Required Field *</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-md-4 control-label">Business Unit</label>
+                                        <div class="col-md-4">
+                                            <select name="selectCompany" id="timeZone" class="form-control" ng-model="BusinessUnitID" ng-options="BU.BusinessUnitID as BU.BusinessUnit for BU in filteredBusinessUnits" ng-required="true">
+                                                <option value="">--Select a Business Unit--</option>
+                                            </select>
+                                            <span class="help-block" style="color:red" ng-show="InternalPolicyNumberSetup.selectCompany.$error.required">Required Field *</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-4 control-label"></label>
+                                        <div class="col-md-8">
+                                            <div class="btn btn-primary"  ng-disabled="!InternalPolicyNumberSetup.$valid" ng-click="Save()">Save <span class="fa fa-floppy-o fa-right"></span></div>
+                                            <button type="button" class="btn btn-default" ng-click="ClearFields()">Clear<span class="glyphicon glyphicon-erase fa-right"></span></button>
+                                        </div>
+                                    </div>
+
+
+
+
+                                </ng-form>
+                            </form>
+
+                        </div>
+                        </div>
+                    </div>
+                <div id="divLoading" ng-show="showLoader"></div>
+                </div>
+
+                </div>

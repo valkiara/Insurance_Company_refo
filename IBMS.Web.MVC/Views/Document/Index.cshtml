@@ -1,0 +1,208 @@
+﻿
+@{
+    ViewBag.Title = "Document";
+}
+@{
+    Layout = "~/Views/Shared/_index.cshtml";
+}
+<script src="~/Scripts/ng/Services/DocumentService.js"></script>
+<script src="~/Scripts/ng/Controllers/DocumentController.js"></script>
+
+
+@*<h2>Agent</h2>*@
+
+<div class="breadcrumb-line">
+    <ul class="breadcrumb">
+        <li>
+            <a href="/Dashboard/Dashboard"><i class="icon-home2 position-left"></i>Home</a>
+        </li>
+        <li>Master Details</li><li>Document</li>
+        <li class="active">
+            <b>Document Upload</b>
+        </li>
+    </ul>
+</div>
+@*Developed by Rajin*@
+<div class="content" ng-app="IBMSAPP">
+    <div ng-controller="DocumentController" ng-init="init()" ng-cloak>
+
+        @*{{currentUser}}*@
+
+
+        <div class="page-content-wrap">
+
+            <div class="panel panel-default tabs">
+                <ul class="nav nav-tabs" role="tablist">
+                    <li class="active">
+                        <a href="#tab-first" role="tab" data-toggle="tab">View</a>
+                    </li>
+                    <li>
+                        <a href="#tab-second" role="tab" data-toggle="tab">New</a>
+                    </li>
+                    @*<li><a href="#tab-third" role="tab" data-toggle="tab">Edit</a></li>*@
+                </ul>
+                <div class="panel-body tab-content">
+                    <div class="tab-pane active" id="tab-first">
+
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">
+                                    <strong>Document</strong>
+                                </h3>
+                                <ul class="panel-controls">
+                                    <li><input type="text" style="font-size: 12px;width: 100%;border-radius: 0px;margin-right:2px;" class="form-control" placeholder="Search Document. . . . . ." ng-model="search_query" ng-change="searchTextChange(search_query)"></li>
+                                    <li><a href="#" ng-click="refreshContent()"><span class="fa fa-refresh"></span></a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="panel-body">
+                            <div class="col-md-2">Show records per page </div>
+                            <div class="col=md-10">
+                                <select class="form-control" style="width:100px;" ng-model="viewby" ng-change="setItemsPerPage(viewby)">
+                                    <option>5</option>
+                                    <option>10</option>
+                                    <option>20</option>
+                                    <option>30</option>
+                                    <option>40</option>
+                                    <option>50</option>
+                                </select>
+                            </div>
+                            <div></div><br />
+                            <table class="table table-responsive" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th hidden>Document ID</th>
+                                        <th>Insurance Sub Class</th>
+                                        <th>Description</th>
+                                        <th>File Name</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="Business" ng-repeat="Doc in data.slice(((currentPage-1)*itemsPerPage), ((currentPage)*itemsPerPage))">
+                                    <tr id="view{{Doc.DocumentID}}">
+                                        <td hidden>{{Doc.DocumentID}}</td>
+                                        <td>{{Doc.InsuranceSubClassName}}</td>
+                                        <td>{{Doc.Description}}</td>
+                                        <td>{{Doc.DocumentPath}}</td>
+                                        <td>
+                                            <div class="fa fa-edit btn btn-success" ng-click="editDoc(Doc)"> Edit</div>&nbsp;&nbsp;
+                                            <div class="fa fa-trash-o btn btn-danger" ng-click="deleteDoc(Doc.DocumentID)"> Delete</div>
+                                        </td>
+
+
+                                    </tr>
+                                    <tr id="edit{{Doc.DocumentID}}" hidden>
+                                        <td hidden>
+                                            <input type="text" hidden class="form-control"
+                                                   value="{{Doc.DocumentID}}"
+                                                   ng-model="Doc.DocumentID">
+                                        </td>
+                                        <td>
+                                           
+                                            @*<input type="text" hidden class="form-control"*@
+                                            <select name="selectCompany" id="timeZone" class="form-control" style="width:100%" ng-model="Doc.InsuranceSubClassID" ng-options="doc.InsuranceSubClassID as doc.Description for doc in availableInsSubClass" ng-required="true">
+                                                <option value={{Doc.InsuranceSubClassName}}></option>
+                                            </select>
+                                            @*<span class="help-block" style="color:red" ng-show="!Doc.InsuranceSubClassID">Required Field *</span>*@
+                                            @*<select name="selectCompany" id="timeZone" hidden class="form-control" ng-model="BusinessUnit.CompanyID" ng-options="company.CompanyID as company.CompanyName for company in availableCompany">
+                                                <option value="{{BusinessUnit.CompanyName}}"></option>*@
+                                                @*ng-model="BusinessUnit.CompanyName">*@
+                                            @*</select>*@
+                                        </td>
+                                        <td>
+                                            <input type="text"  hidden class="form-control"
+                                                   value="{{Doc.Description}}"
+                                                   ng-model="Doc.Description">
+                                            <span class="help-block" style="color:red" ng-show="!Doc.Description">Required Field *</span>
+                                        </td>
+                                         <td><a href="{{Doc.DocumentPath}}">{{Doc.DocumentPath}}</a><br /><input type="file" class="form-control" id="file" name="file" multiple onchange="angular.element(this).scope().getDocument(this)" /></td>
+                                       
+                                        <td>
+                                            <div class="fa fa-save btn btn-info" ng-click="update(Doc)"> Update</div>&nbsp;
+                                            <div ng-click="cancel(Doc)" class="fa fa-times btn btn-default"> Cancel</div>
+                                        </td>
+
+
+                                    </tr>
+                                </tbody>
+
+                            </table>
+
+                            <pagination class="pull-left" total-items="totalItems" ng-model="currentPage" max-size="maxSize" class="pagination-sm" boundary-links="true" rotate="false" num-pages="numPages" items-per-page="itemsPerPage"></pagination>
+                            @*<pre>Page: {{currentPage}} / {{numPages}}</pre>*@
+
+                        </div>
+
+
+                    </div>
+                    <div class="tab-pane" id="tab-second">
+                        <form id="jvalidates" class="form-horizontal col-md-10" role="form">
+                            <ng-form name="DocumentData" novalidate>
+
+
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label">Insurance Sub Class</label>
+                                    <div class="col-md-8">
+                                        <select name="selectCompany" id="timeZone" class="form-control" ng-model="docObj.InsuranceSubClassID" ng-options="doc.InsuranceSubClassID as doc.Description for doc in availableInsSubClass" ng-required="true">
+                                            <option value="">--Select a Insurance Sub Class--</option>
+                                        </select>
+                                        <span class="help-block" style="color:red" ng-show="DocumentData.selectCompany.$error.required">Required Field *</span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label">Document Name</label>
+                                    <span class="error" ng-show="businessData.inputDocumentName.$error.required" style="color:red">&nbsp;*</span>
+                                    <div class="col-md-8">
+                                        <input type="text" name="InputDocname" ng-model="docObj.DocumentName" class="form-control" ng-required="true" />
+                                        <span class="help-block" style="color:red" ng-show="DocumentData.InputDocname.$error.required">Required Field *</span>
+                                    </div>
+
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label">File Upload</label>
+                                    @*<span class="error" ng-show="businessData.inputIsActive.$error.required" style="color:red">&nbsp;*</span>*@
+                                    <div class="col-md-8">
+                                        @*style="margin-top:5px;">*@
+                                        <input type="file" class="form-control" id="file" name="file" multiple onchange="angular.element(this).scope().getDocument(this)" />
+                                        <div style="color:red" id="fileupload">Required File Attachment*</div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label">Description</label>
+                                    @*<span class="error" ng-show="businessData.inputDescription.$error.required" style="color:red">&nbsp;*</span>*@
+                                    <div class="col-md-8">
+                                        <input type="text" name="description" ng-model="docObj.Description" class="form-control" />
+                                        <span class="help-block" style="color:red" ng-show="DocumentData.inputAgentName.$error.required">Required Field *</span>
+                                    </div>
+
+                                </div>
+                                <br />
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label"></label>
+                                    <div class="col-md-8">
+                                        <div class="btn btn-primary" ng-disabled="!DocumentData.$valid" ng-click="addDocument()">Add Document Details <span class="fa fa-floppy-o fa-right"></span></div>
+                                        <button type="button" class="btn btn-default" ng-click="refreshContent()">Clear<span class="glyphicon glyphicon-erase fa-right"></span></button>
+                                    </div>
+                                </div>
+                                @*ng-disabled="!businessData.$valid"*@
+                                @*<div class="panel-footer">*@
+
+                                @*</div>*@
+                            </ng-form>
+                        </form>
+
+                       
+
+                    </div>
+                    @*<div class="tab-pane" id="tab-third">
+                            <p> 3rd</p>
+
+                        </div>*@
+                </div>
+
+            </div>
+
+        </div>
+        <div id="divLoading" ng-show="showLoader"></div>
+    </div>
+</div>

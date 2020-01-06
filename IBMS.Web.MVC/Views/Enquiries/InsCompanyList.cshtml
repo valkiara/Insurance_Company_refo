@@ -1,0 +1,144 @@
+﻿
+@{
+    Layout = "~/Views/Shared/_index.cshtml";
+}
+
+
+<script src="~/Scripts/ng/Excel/Excel.js"></script>
+<script src="~/Scripts/ng/Services/InsCompanyListService.js"></script>
+<script src="~/Scripts/ng/Controllers/InsCompanyListController.js"></script>
+
+
+<div class="breadcrumb-line">
+    <ul class="breadcrumb">
+        <li><a href="/Dashboard/Index"><i class="icon-home2 position-left"></i>Home</a></li>
+        <li>Enquiries</li>
+        <li class="active"><b>Insurance company List</b></li>
+    </ul>
+</div>
+
+
+<div ng-app="IBMSAPP" ng-controller="InsCompanyListController" ng-init="init()" ng-cloak>
+
+
+    <div class="page-content-wrap">
+        <div class="panel panel-default tabs">
+            <ul class="nav nav-tabs" role="tablist">
+                <li class="active" id="tabView"><a href="#tab-first" role="tab" data-toggle="tab">View</a></li>
+            </ul>
+            <div class="panel-body tab-content">
+                <div class="tab-pane active" id="tab-first">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+
+                            <h3 class="panel-title">
+                                <strong>Insurance company List</strong>
+                            </h3>
+                            <ul class="panel-controls">
+                                <li><input type="text" style="font-size: 12px;width: 100%;border-radius: 0px;margin-right:2px;" class="form-control" placeholder="Search Insurance Company...." ng-model="search_query" ng-change="searchTextChange(search_query)"></li>
+                               @* <li><a href="#" class="panel-refresh" ng-click="refreshContent()"><span class="fa fa-refresh"></span></a></li>*@
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="panel-body">
+                        <label class="col-md-2">Show records per page </label>
+                        <div class="col=md-10">
+                            <select class="form-control" style="width:100px;" ng-model="viewby" ng-change="setItemsPerPage(viewby)">
+                                <option>5</option>
+                                <option>10</option>
+                                <option>20</option>
+                                <option>30</option>
+                                <option>40</option>
+                                <option>50</option>
+                            </select>
+                        </div>
+                        <div></div><br />
+                        <table class="table table-responsive" cellspacing="0" id="list">
+                            <thead>
+                                <tr>
+                                    <th>Insurance Company Name</th>
+                                    <th hidden>Business Unit</th>
+                                    <th>Address</th>
+                                    <th>Contact Person</th>
+                                    <th>Contact No</th>
+                                    <th>Email</th>
+                                    <th>Fax</th>
+                                </tr>
+                            </thead>
+                            <tbody ng-repeat="InsComp in filterdData = (data.slice(((currentPage-1)*itemsPerPage), ((currentPage)*itemsPerPage)))">
+                                <tr id="view{{InsComp.InsCompanyID}}">
+                                    <td hidden>
+                                        {{InsComp.InsCompanyID}}
+                                    </td>
+                                    <td>
+                                        {{InsComp.InsuranceCompanyName}}
+                                    </td>
+                                    <td hidden>
+                                        {{InsComp.BuisnessUnitID}}
+                                    </td>
+                                    <td>
+                                        {{InsComp.Address1}},{{InsComp.Address2}},{{InsComp.Address3}}
+                                    </td>
+                                    <td>
+                                        {{InsComp.ContactPerson}}
+                                    </td>
+                                    <td>
+                                        {{InsComp.ContactNo}}
+                                    </td>
+                                    <td>
+                                        {{InsComp.Email}}
+                                    </td>
+                                    <td>
+                                        {{InsComp.Fax}}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <pagination class="pull-left pagination-sm" total-items="totalItems" ng-model="currentPage" max-size="maxSize" boundary-links="true" rotate="false" num-pages="numPages" items-per-page="itemsPerPage"></pagination>
+                       
+                        <table class="table table-striped dataTable" id="listHidden" hidden>
+                            <thead>
+                                <tr>
+                                    <th>Insurance Company Name</th>
+                                    <th>Address</th>
+                                    <th>Contact Person</th>
+                                    <th>Contact No</th>
+                                    <th>Email</th>
+                                    <th>Fax</th>
+                                </tr>
+                            </thead>
+                            <tbody ng-repeat="insComp in InsComp">
+                                <tr id="view{{insComp.InsCompanyID}}">
+                                    <td>
+                                        {{insComp.InsuranceCompanyName}}
+                                    </td>
+                                    <td>
+                                        {{insComp.Address1}},{{insComp.Address2}},{{insComp.Address3}}
+                                    </td>
+                                    <td>
+                                        {{insComp.ContactPerson}}
+                                    </td>
+                                    <td>
+                                        {{insComp.ContactNo}}
+                                    </td>
+                                    <td>
+                                        {{insComp.Email}}
+                                    </td>
+                                    <td>
+                                        {{insComp.Fax}}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        
+                        
+                         <button style="border-radius: 0px;width:19%;" class="btn btn-danger pull-right" ng-click="exportToExcel('#listHidden')">Export to Excel</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+       <div id="divLoading" ng-show="showLoader"></div>
+    </div>
+</div>

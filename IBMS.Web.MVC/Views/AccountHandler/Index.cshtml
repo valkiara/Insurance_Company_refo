@@ -1,0 +1,221 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_index.cshtml";
+}
+
+<script src="~/Scripts/ng/Services/AgentService.js"></script>
+<script src="~/Scripts/ng/Controllers/AgentControler.js"></script>
+
+<script>
+    function checkInputRate(rateVal) {
+        var regEx = /^[0-9]+\.?[0-9]*$/;
+        if (regEx.test(rateVal.value) == false) {
+            rateVal.value = rateVal.value.substring(0, rateVal.value.length - 1);
+        }
+    }
+</script>
+
+<div class="breadcrumb-line">
+    <ul class="breadcrumb">
+        <li><a href="/Dashboard/Dashboard"><i class="icon-home2 position-left"></i>Home</a></li>
+        <li>Master Details</li>
+        <li>Partner</li>
+        <li class="active"><b>Account Handler</b></li>
+    </ul>
+</div>
+<div ng-app="IBMSAPP" ng-controller="AgentController" ng-cloak>
+    <div class="page-content-wrap">
+        <div class="panel panel-default tabs">
+            <ul class="nav nav-tabs" role="tablist">
+                <li class="active"><a href="#tab-first" role="tab" data-toggle="tab">View</a></li>
+                <li><a href="#tab-second" role="tab" data-toggle="tab">New</a></li>
+            </ul>
+            <div class="panel-body tab-content">
+                <div class="tab-pane active" id="tab-first">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">
+                                <strong>Account Handler</strong>
+                            </h3>
+                            <ul class="panel-controls">
+                                <li><input type="text" style="font-size: 12px;width: 100%;border-radius: 0px;margin-right:2px;" class="form-control" placeholder="Search Agent ..." ng-model="search_query" ng-change="searchTextChange(search_query)"></li>
+                                <li><a href="#" ng-click="refreshContent()"><span class="fa fa-refresh"></span></a></li>
+                                @*<li><a href="#" class="panel-remove"><span class="fa fa-times"></span></a></li>*@
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="col-md-2">Show records per page </div>
+                        <div class="col=md-10">
+                            <select class="form-control" style="width:100px;" ng-model="viewby" ng-change="setItemsPerPage(viewby)">
+                                <option>5</option>
+                                <option>10</option>
+                                <option>20</option>
+                                <option>30</option>
+                                <option>40</option>
+                                <option>50</option>
+                            </select>
+                        </div>
+                        <div></div><br />
+                        <table class="table table-responsive" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th>Account Handler Name</th>
+                                    <th>Address</th>
+                                    <th>Rate Value</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            @*<tbody ng-repeat="Agent in filterdData = (data.slice(((currentPage-1)*itemsPerPage), ((currentPage)*itemsPerPage)) | filter: search_query)">*@
+                            <tbody ng-repeat="Agent in filterdData = (data.slice(((currentPage-1)*itemsPerPage), ((currentPage)*itemsPerPage)))">
+                                <tr id="view{{Agent.AgentID}}">
+                                    <td hidden>{{Agent.CompanyID}}</td>
+                                    <td hidden>{{Agent.AgentID}}</td>
+                                    <td>{{Agent.AgentName}}</td>
+                                    <td>{{Agent.Address1}},{{Agent.Address2}},{{Agent.Address3}}</td>
+                                    <td>{{Agent.RateValue}}</td>
+                                    <td>
+                                        <div class="fa fa-edit btn btn-success" style="width:90px;" ng-click="edit(Agent)">&nbsp;&nbsp;Edit </div>&nbsp;&nbsp;
+                                        <div class="fa fa-trash-o btn btn-danger" style="width:90px;" ng-click="Delete(Agent)">&nbsp;&nbsp;Delete </div>
+                                    </td>
+                                </tr>
+                                <tr id="edit{{Agent.AgentID}}" hidden>
+                                    <td hidden>
+                                        <input type="text" hidden class="form-control"
+                                               value="{{Agent.AgentID}}"
+                                               ng-model="Agent.AgentID">
+                                    </td>
+                                    <td hidden>
+                                        <input type="text" hidden class="form-control"
+                                               value="{{Agent.CompanyID}}"
+                                               ng-model="Agent.CompanyID">
+                                    </td>
+                                    <td>
+                                        <input type="text" style="font-size: 12px;width: 100%;border-radius: 0px;margin-right:2px;" class="form-control"
+                                               value="{{Agent.AgentName}}"
+                                               ng-model="Agent.AgentName"
+                                               ng-required="true">
+                                        <span class="help-block" style="color:red" ng-show="!Agent.AgentName">Required Field *</span>
+                                    </td>
+                                    <td>
+                                        <input type="text" style="font-size: 12px;width: 100%;border-radius: 0px;margin-right:2px;" class="form-control"
+                                               value="{{Agent.Address1}}"
+                                               ng-model="Agent.Address1">
+                                        <input type="text" style="font-size: 12px;width: 100%;border-radius: 0px;margin-right:2px;" class="form-control"
+                                               value="{{Agent.Address2}}"
+                                               ng-model="Agent.Address2">
+                                        <input type="text" style="font-size: 12px;width: 100%;border-radius: 0px;margin-right:2px;" class="form-control"
+                                               value="{{Agent.Address3}}"
+                                               ng-model="Agent.Address3">
+                                    </td>
+                                    <td>
+                                        <input type="number" style="font-size: 12px;width: 100%;border-radius: 0px;margin-right:2px;" class="form-control"
+                                               value="{{Agent.RateValue}}"
+                                               ng-model="Agent.RateValue"
+                                               ng-required="true"
+                                               ng-change="checkInputRate(Agent)"
+                                               ng-show="false" />
+                                        <span class="help-block" style="color:red" ng-show="!Agent.RateValue">Required Field *</span>
+                                    </td>
+                                    <td>
+                                        <div class="fa fa-save btn btn-info" ng-disabled="!(Agent.RateValue && Agent.AgentName)" ng-click="update(Agent)">&nbsp;&nbsp;Update</div>&nbsp;
+                                        <div ng-click="cancel(Agent)" class="fa fa-times btn btn-default">&nbsp;&nbsp;Cancel</div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <pagination total-items="totalItems" ng-model="currentPage" max-size="maxSize" class="pagination-sm pull-left" boundary-links="true" rotate="false" num-pages="numPages" items-per-page="itemsPerPage"></pagination>
+                    </div>
+                </div>
+                <div class="tab-pane" id="tab-second">
+                    <form @*id="jvalidate"*@ class="form-horizontal col-md-10" role="form">
+                        <ng-form name="agentData" novalidate>
+
+                            <div class="form-group">
+                                <label class="col-md-4 control-label">Account Handler Name</label>
+                                <div class="col-md-8">
+                                    <input type="text" name="inputAgentName" class="form-control" ng-model="AgentName" ng-required="true" />
+                                    <span class="help-block" style="color:red" ng-show="agentData.inputAgentName.$error.required">Required Field *</span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-4 control-label">Address Line 1</label>
+                                <div class="col-md-8">
+                                    <input type="text" class="form-control" ng-model="Address1" />
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-4 control-label">Address Line 2</label>
+                                <div class="col-md-8">
+                                    <input type="text" class="form-control" ng-model="Address2" />
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-4 control-label">Address Line 3</label>
+                                <div class="col-md-8">
+                                    <input type="text" class="form-control" ng-model="Address3" />
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-4 control-label">Account Handler Code</label>
+                                <div class="col-md-8">
+                                    <input type="text" class="form-control" ng-model="AgentCode" />
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-4 control-label">Account Handler Type</label>
+                                <div class="col-md-8">
+                                    <select id="select" class="col-md-12 form-control" name="inputAgent" ng-model="AgentType" ng-required="true">
+                                        <option value="">--Select a Agent Type--</option>
+                                        <option value="Individual">  Individual</option>
+                                        <option value="Organizational"> Organizational</option>
+                                    </select>
+                                    <span class="help-block" style="color:red" ng-show="agentData.inputAgent.$error.required">Required Field *</span>
+                                </div>
+                            </div>
+                            <div class="form-group" ng-show="AgentType == 'Individual' ">
+                                <label class="col-md-4 control-label">Account Handler NIC</label>
+                                <div class="col-md-8">
+                                    <input type="text" class="form-control" maxlength="12" name="inputNIC" ng-model="AgentNIC" ng-pattern="/^[0-9]{9}[vVxX]|[0-9]{12}$/" ng-required="true" ng-change="generateNICLength(AgentNIC)" />
+                                    <span class="help-block" style="color:red" ng-show="agentData.inputNIC.$error.required">Required Field *</span>
+                                    <span class="help-block" style="color:red" ng-show="agentData.inputNIC.$error.pattern">Incorrect NIC Number</span>
+                                </div>
+                            </div>
+                            <div class="form-group" ng-show="AgentType == 'Organizational' ">
+                                <label class="col-md-4 control-label">Account Handler BR No</label>
+                                <div class="col-md-8">
+                                    <input type="text" class="form-control" ng-model="AgentBR" name="inputBR" ng-required="true" />
+                                    <span class="help-block" style="color:red" ng-show="agentData.inputNIC.$error.required">Required Field *</span>
+                                </div>
+                            </div>
+
+                            @*<div class="form-group">
+                                    <label class="col-md-4 control-label">Default Rate Value</label>
+                                    <div class="col-md-8">
+                                        <input type="number"
+                                               class="form-control"
+                                               name="inputRateValue"
+                                               ng-model="RateValue"
+                                               ng-required="true"
+                                               ng-change="checkInputRateByValue()"
+                                               min="0" />
+                                        <span class="help-block" style="color:red" ng-show="agentData.inputRateValue.$error.required">Required Field *</span>
+                                    </div>
+                                </div>*@
+                            <br />
+                            <div class="form-group">
+                                <label class="col-md-4 control-label"></label>
+                                <div class="col-md-8">
+                                    <div class="btn btn-primary" ng-disabled="!agentData.$valid" ng-click="Save()">Save Account Handler <span class="fa fa-floppy-o fa-right"></span></div>
+                                    <button type="button" class="btn btn-default" ng-click="ClearFields()">Clear<span class="glyphicon glyphicon-erase fa-right"></span></button>
+                                </div>
+                            </div>
+                        </ng-form>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div id="divLoading" ng-show="showLoader"></div>
+    </div>
+</div>

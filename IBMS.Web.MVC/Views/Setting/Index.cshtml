@@ -1,0 +1,170 @@
+﻿
+@{
+    ViewBag.Title = "Setting";
+    Layout = "~/Views/Shared/_index.cshtml";
+}
+
+
+<script src="~/Scripts/ng/Services/SettingService.js"></script>
+<script src="~/Scripts/ng/Controllers/SettingController.js"></script>
+
+<div class="breadcrumb-line">
+    <ul class="breadcrumb">
+        <li>
+            <a href="/Dashboard/Dashboard"><i class="icon-home2 position-left"></i>Home</a>
+        </li>
+        <li>Master Details</li><li>Settings</li>
+        <li class="active">
+            <b>Configuration</b>
+        </li>
+    </ul>
+</div>
+@*Developed by Rajin*@
+<div ng-app="IBMSAPP" ng-controller="SettingController" ng-init="init()"ng-cloak>
+
+    <div class="page-content-wrap">
+
+        <div class="panel panel-default tabs">
+            <ul class="nav nav-tabs" role="tablist">
+                <li class="active"><a href="#tab-first" role="tab" data-toggle="tab">View</a></li>
+                <li><a href="#tab-second" role="tab" data-toggle="tab">New</a></li>
+            </ul>
+            <div class="panel-body tab-content">
+                <div class="tab-pane active" id="tab-first">
+
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">
+                                <strong>Configuration</strong>
+                            </h3>
+                            <ul class="panel-controls">
+                                <li><input type="text" style="font-size: 12px;width: 100%;border-radius: 0px;margin-right:2px;" class="form-control" placeholder="Search Setting. . . . . . ." ng-model="search_query" ng-change="searchTextChange(search_query)"></li>
+                                <li><a href="#" ng-click="refreshContent()"><span class="fa fa-refresh"></span></a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="col-md-2">Show records per page </div>
+                        <div class="col=md-10">
+                            <select class="form-control" style="width:100px;" ng-model="viewby" ng-change="setItemsPerPage(viewby)">
+                                <option>5</option>
+                                <option>10</option>
+                                <option>20</option>
+                                <option>30</option>
+                                <option>40</option>
+                                <option>50</option>
+                            </select>
+                        </div>
+                        <div></div><br />
+                        <table class="table table-responsive" cellspacing="0">
+                            <thead>
+                                <tr>    
+                                    <th>Designation</th>
+                                    <th>Settings Code</th>
+                                    <th>Settings Description</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            
+                            <tbody ng-repeat="Setting in data.slice(((currentPage-1)*itemsPerPage), ((currentPage)*itemsPerPage))">
+                                <!--<tr  >-->
+                                <tr id="view{{Setting.SettingID}}">
+                                    
+                                    <td>{{Setting.DesignationName}}</td>
+                                    <td>{{Setting.SettingCode}}</td>
+                                    <td>{{Setting.SettingDescription}}</td>
+                                    <td>
+                                        <div class="fa fa-edit btn btn-success" ng-click="edit(Setting)">&nbsp;&nbsp;Edit</div>&nbsp;&nbsp;
+                                        <div class="fa fa-trash-o btn btn-danger" ng-click="Delete(Setting.SettingID)">&nbsp;&nbsp;Delete</div>
+                                    </td>
+                                </tr>
+
+                                <tr id="edit{{Setting.SettingID}}" hidden>
+                                    <td hidden>
+                                        <input type="text" hidden class="form-control"
+                                               value="{{Setting.SettingID}}"
+                                               ng-model="Setting.SettingID">
+                                    </td>
+                                    <td>
+
+                                        <select name="selectDesignation" class="form-control"
+                                                ng-model="Setting.DesignationID"
+                                                ng-options="doc.DesignationID as doc.DesignationName for doc in gridOptionsDesignation" 
+                                                ng-required="true" style="width:100%">
+                                            <option value="">--Select a Designation--</option>
+                                        </select>
+                                        
+                                        @*<span class="help-block" style="color:red" ng-show="!Setting.SettingCode">Required Field *</span>{{doc.DesignationName}}*@
+                                    </td>
+                                    
+                                    <td>
+                                        <input type="text" style="font-size: 12px;width: 100%;border-radius: 0px;margin-right:2px;" class="form-control"
+                                               value="{{Setting.SettingCode}}"
+                                               ng-model="Setting.SettingCode">
+                                        <span class="help-block" style="color:red" ng-show="!Setting.SettingCode">Required Field *</span>
+                                    </td>
+                                    <td>
+                                        <input type="text" style="font-size: 12px;width: 100%;border-radius: 0px;margin-right:2px;" class="form-control"
+                                               value="{{Setting.SettingDescription}}"
+                                               ng-model="Setting.SettingDescription">
+                                    </td>
+                                    <td>
+                                        <div class="fa fa-save btn btn-info" ng-disabled="!(Setting.SettingCode)" ng-click="update(Setting)">&nbsp;&nbsp;Update</div>&nbsp;&nbsp;&nbsp;&nbsp;
+                                        <div ng-click="cancel(Setting)" class="fa fa-times btn btn-default">&nbsp;&nbsp;Cancel</div>
+                                    </td>
+                                </tr>
+                            </tbody>
+
+                        </table>
+                        <pagination class="pull-left" total-items="totalItems" ng-model="currentPage" max-size="maxSize" class="pagination-sm" boundary-links="true" rotate="false" num-pages="numPages" items-per-page="itemsPerPage"></pagination>
+
+                    </div>
+                </div>
+                <div class="tab-pane" id="tab-second">
+                    <form class="form-horizontal col-md-10" role="form">
+                        <ng-form name="settingData" novalidate>
+
+                            <div class="form-group">
+                                <label class="col-md-4 control-label">Designation</label>
+                                <div class="col-md-8">
+                                   
+                                    <select name="selectDesignation" class="form-control"
+                                            ng-model="Designation"
+                                            ng-options="doc.DesignationID as doc.DesignationName for doc in gridOptionsDesignation"
+                                            ng-required="true">
+                                        <option value="">--Select a Designation--</option>
+                                    </select>
+                                    <span class="help-block" style="color:red" ng-show="settingData.selectDesignation.$error.required">Required Field *</span>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-md-4 control-label">Settings Code</label>
+                                <div class="col-md-8">
+                                    <input name="inputCode" type="text" class="form-control" ng-model="SettingCode" ng-required="true" />
+                                    <span class="help-block" style="color:red" ng-show="settingData.inputCode.$error.required">Required Field *</span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-4 control-label">Settings Description</label>
+                                <div class="col-md-8">
+                                    <input type="text" name="inputDescription" class="form-control" ng-model="SettingDesc" />
+                                    @*<span class="help-block" style="color:red" ng-show="settingData.inputDescription.$error.required">Required Field *</span>*@
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-4 control-label"></label>
+                                <div class="col-md-8">
+                                    <div class="btn btn-primary" ng-disabled="!settingData.$valid" ng-click="Save()">Save Changes <span class="fa fa-floppy-o fa-right"></span></div>
+                                    <button type="button" class="btn btn-default" ng-click="ClearFields()">Clear<span class="glyphicon glyphicon-erase fa-right"></span></button>
+                                </div>
+                            </div>
+                        </ng-form>
+                    </form>
+                        
+</div>
+            </div>
+        </div>
+        <div id="divLoading" ng-show="showLoader"></div>
+    </div>
+</div>

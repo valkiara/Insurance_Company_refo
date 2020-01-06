@@ -1,0 +1,454 @@
+﻿
+@{
+    ViewBag.Title = "ManagePilotClaimRecording";
+    Layout = "~/Views/Shared/_index.cshtml";
+}
+
+<style>
+    .form-control[disabled], .form-control[readonly] {
+        color: #000000 !important;
+    }
+
+    .set-header {
+        background-color: #1caf9a;
+        height: 30px;
+        padding: 2px;
+        /*margin-bottom: 15px;*/
+    }
+
+    .set-panel {
+        background-color: #F7DC6F;
+        height: 40px;
+        padding: 2px;
+        /*margin-bottom: 15px;*/
+    }
+</style>
+<script src="~/Scripts/ng/Controllers/PilotClaimRecordingController.js"></script>
+<script src="~/Scripts/ng/Services/PilotClaimRecordingService.js"></script>
+
+<script type="text/javascript">
+    function IsNumber(evt) {
+        evt = (evt) ? evt : window.event;
+        var charCode = (evt.which) ? evt.which : evt.keyCode;
+        if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+            return false;
+        }
+        return true;
+    }
+
+    function checkInputRate(rateVal) {
+        var regEx = /^[0-9]+\.?[0-9]*$/;
+        if (regEx.test(rateVal.value) == false) {
+            rateVal.value = rateVal.value.substring(0, rateVal.value.length - 1);
+        }
+    }
+</script>
+
+<div class="breadcrumb-line">
+    <ul class="breadcrumb">
+        <li><a href="/Dashboard/Index"><i class="icon-home2 position-left"></i>Home</a></li>
+        <li>Transaction</li>
+        <li>Claim</li>
+        <li class="active"><b>Claim Recording</b></li>
+    </ul>
+</div>
+
+<div class="content" ng-app="IBMSAPP">
+    <div ng-controller="PilotClaimRecordingController" ng-init="init()" ng-cloak>
+        <div class="page-content-wrap">
+            <div class="panel panel-default tabs">
+                <ul class="nav nav-tabs" role="tablist">
+                    <li id="list-tab-1" class="active"><a href="#tab-1" role="tab" data-toggle="tab" ng-click="activatePolicyInfoRecListTab()">View</a></li>
+                    <li id="list-tab-2"><a href="#tab-2" role="tab" data-toggle="tab" ng-click="activatePolicyInfoRecTab()">New</a></li>
+                </ul>
+                <div class="panel-body tab-content">
+                    <div class="tab-pane active" id="tab-1">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">
+                                    <strong>Claim Recording Details</strong>
+                                </h3>
+                                <ul class="panel-controls">
+                                    <li><input type="text" style="font-size: 12px;width: 100%;border-radius: 0px;margin-right:2px;" class="form-control" placeholder="Search Claim Recording ..." ng-model="search_query" ng-change="searchTextChange(search_query)"></li>
+                                    <li><a href="#" ng-click="refreshContent()"><span class="fa fa-refresh"></span></a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="panel-body">
+                            <div class="col-md-2">Show records per page </div>
+                            <div class="col=md-10">
+                                <select class="form-control" style="width:100px;"
+                                        ng-model="viewby"
+                                        ng-change="setItemsPerPage(viewby)">
+                                    <option>10</option>
+                                    <option>20</option>
+                                    <option>30</option>
+                                    <option>40</option>
+                                    <option>50</option>
+                                </select>
+                            </div>
+                            <div><br></div>
+                            <table class="table table-responsive" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th>Patient Name</th>
+                                        <th>Reference No</th>
+                                        <th>Admission Date</th>
+                                        <th>Passport Number</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody ng-repeat="Admission in data.slice(((currentPage-1)*itemsPerPage), ((currentPage)*itemsPerPage))">
+                                    <tr id="view{{Admission.ReferenceNo}}">
+                                        <td>{{Admission.PatientName}}</td>
+                                        <td>{{Admission.ReferenceNo}}</td>
+                                        <td>{{Admission.AdmissionDate}}</td>
+                                        <td>{{Admission.PassportNumber}}</td>
+                                        @*<td>{{Admission.FinalAmount}}</td>*@
+                                        <td>
+                                            <button class="btn btn-success" @*ng-disabled="ClientRequest.IsQuotationCreated"*@ style="width:150px;padding:1px;" ng-click="editClaimRecording(Admission.PatientAdmissionId)">Edit Claim Recording</button>&nbsp;&nbsp;
+                                        </td>
+                                    </tr>
+
+                                </tbody>
+
+                            </table>
+
+                            <pagination total-items="totalItems"
+                                        ng-model="currentPage"
+                                        max-size="maxSize"
+                                        class="pagination-sm pull-left"
+                                        boundary-links="true"
+                                        rotate="false"
+                                        num-pages="numPages"
+                                        items-per-page="itemsPerPage"></pagination>
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="tab-2">
+                        <form name="manangePolicyInformationRecording" novalidate>
+
+                            <ng-form name="managePolicyInfoRecording" novalidate>
+                                <div class="panel panel-default" @*ng-if="isQuotationAvailable"*@>
+                                    <div class="panel-heading">
+                                        <h3 class="panel-title">
+                                            <strong>Manage Claim Recording</strong>
+                                        </h3>
+                                    </div>
+                                </div>
+                                <div class="panel-body" @*ng-if="isQuotationAvailable"*@>
+                                    <div class="row">
+                                        <label class="col-md-3 ">Claim Number</label>
+                                        <div class="col-md-6">
+                                            <input type="text" placeholder="Claim Number" name="inputClaimNumber" ng-model="Admission.ReferenceNo" class="form-control" ng-required="true" style="width:100%" />
+                                            <span class="help-block" style="color:red" ng-show="managePolicyInfoRecording.inputClaimNumber.$error.required">Required Field *</span>
+                                        </div>
+                                    </div>
+                                    <br />
+                                    <div class="row">
+                                        <label class="col-md-3 ">Name of the Patient</label>
+                                        <div class="col-md-6">
+                                            <input type="text" placeholder="Name of the Patient" name="inputCauseOfLoss" ng-model="Admission.PatientName" class="form-control" ng-required="true" style="width:100%" />
+                                            <span class="help-block" style="color:red" ng-show="managePolicyInfoRecording.inputCauseOfLoss.$error.required">Required Field *</span>
+                                        </div>
+                                    </div>
+                                    <br />
+                                    <div class="row">
+                                        <label class="col-md-3 ">Date Of Birth</label>
+                                        <div class="col-md-4">
+                                            <div class="input-group">
+                                                <input type="text"
+                                                       readonly
+                                                       name="DateOfLoss"
+                                                       class="form-control date"
+                                                       ng-click="coverFromDateView=true"
+                                                       datepicker-popup="MM/dd/yyyy"
+                                                       ng-model="Admission.DateOfBirth"
+                                                       is-open="coverFromDateView"
+                                                       datepicker-options="dateOptions"
+                                                       placeholder="Date Of Loss"
+                                                       @*max-date="Admission.DateOfLoss"*@
+                                                       ng-required="true"
+                                                       close-text="Close">
+                                                <span class="input-group-btn">
+                                                    <button class="btn btn-default glyphicon glyphicon-calendar" ng-click="coverFromDateView=true;$event.stopPropagation();"></button>
+                                                </span>
+                                            </div>
+                                            <span class="help-block" style="color:red" ng-show="managePolicyInfoRecording.DateOfLoss.$error.required">
+                                                Required Field *
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <br />
+                                    <div class="row">
+                                        <label class="col-md-3">BHT Number</label>
+                                        <div class="col-md-6">
+                                            <input type="text" placeholder="Claim Number" name="inputBHTNumber" ng-model="Admission.BHTNumber" class="form-control" ng-required="true" style="width:100%" />
+                                            <span class="help-block" style="color:red" ng-show="managePolicyInfoRecording.inputBHTNumber.$error.required">Required Field *</span>
+                                        </div>
+                                    </div>
+                                    <br />
+                                    <div class="row">
+                                        <label class="col-md-3">Admission Date</label>
+                                        <div class="col-md-4">
+                                            <div class="input-group">
+                                                <input type="text"
+                                                       readonly
+                                                       name="DateOfIntimation"
+                                                       class="form-control date"
+                                                       ng-click="coverToDateView=true"
+                                                       datepicker-popup="MM/dd/yyyy"
+                                                       ng-model="Admission.AdmissionDate"
+                                                       is-open="coverToDateView"
+                                                       datepicker-options="dateOptions"
+                                                       placeholder="Admission Date"
+                                                       @*min-date="Admission.PeriodOfCoverFromDate"*@
+                                                       ng-required="true"
+                                                       close-text="Close">
+                                                <span class="input-group-btn">
+                                                    <button class="btn btn-default glyphicon glyphicon-calendar" ng-click="coverToDateView=true;$event.stopPropagation();"></button>
+                                                </span>
+                                            </div>
+                                            <span class="help-block" style="color:red" ng-show="managePolicyInfoRecording.DateOfIntimation.$error.required">
+                                                Required Field *
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <br />
+                                    <div class="row">
+                                        <label class="col-md-3">Discharged Date</label>
+                                        <div class="col-md-4">
+                                            <div class="input-group">
+                                                <input type="text"
+                                                       readonly
+                                                       name="DischargedDate"
+                                                       class="form-control date"
+                                                       ng-click="DischargedDateView=true"
+                                                       datepicker-popup="MM/dd/yyyy"
+                                                       ng-model="Admission.DischargedDate"
+                                                       is-open="DischargedDateView"
+                                                       datepicker-options="dateOptions"
+                                                       placeholder="Discharged Date"
+                                                       @*min-date="Admission.PeriodOfCoverFromDate"*@
+                                                       ng-required="true"
+                                                       close-text="Close">
+                                                <span class="input-group-btn">
+                                                    <button class="btn btn-default glyphicon glyphicon-calendar" ng-click="DischargedDateView=true;$event.stopPropagation();"></button>
+                                                </span>
+                                            </div>
+                                            <span class="help-block" style="color:red" ng-show="managePolicyInfoRecording.DischargedDate.$error.required">
+                                                Required Field *
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <br />
+                                    <div class="row">
+                                        <label class="col-md-3">Name of the Hospital</label>
+                                        <div class="col-md-6">
+                                            <input type="text" placeholder="name of the Hospital" name="inputnameoftheHospital" ng-model="Admission.Hospital" class="form-control" ng-required="true" style="width:100%" />
+                                            <span class="help-block" style="color:red" ng-show="managePolicyInfoRecording.inputnameoftheHospital.$error.required">Required Field *</span>
+                                        </div>
+                                    </div>
+                                    <br />
+                                    <div class="row">
+                                        <label class="col-md-3 ">Illness</label>
+                                        <div class="col-md-6">
+                                            <textarea rows="3" class="form-control" placeholder="Illness" ng-model="Admission.Illness" style="width:100%"></textarea>
+                                        </div>
+                                    </div>
+                                    <br />
+                                    <div class="row">
+                                        <label class="col-md-3 ">Incurred Amount</label>
+                                        <div class="col-md-6">
+                                            <input type="number" name="inputIncurredAmount" placeholder="Incurred Amount" ng-model="Admission.FinalAmount" class="form-control" onkeyup="checkInputRate(this);" min="0" ng-required="true" style="width:100%">
+                                            <span class="help-block" style="color:red" ng-show="managePolicyInfoRecording.inputIncurredAmount.$error.required">
+                                                Required Field *
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <br />
+                                    <div class="row">
+                                        <label class="col-md-3 ">Claim Documents Received Date (from Customer)</label>
+                                        <div class="col-md-4">
+                                            <div class="input-group">
+                                                <input type="text"
+                                                       readonly
+                                                       name="ClaimDocumentsReceivedDate"
+                                                       class="form-control date"
+                                                       ng-click="ClaimDocumentsReceivedDateView=true"
+                                                       datepicker-popup="MM/dd/yyyy"
+                                                       ng-model="Admission.ClaimDocumentReceivedDate"
+                                                       is-open="ClaimDocumentsReceivedDateView"
+                                                       datepicker-options="dateOptions"
+                                                       placeholder="Claim Documents Received Date"
+                                                       @*min-date="Admission.PeriodOfCoverFromDate"*@
+                                                       ng-required="true"
+                                                       close-text="Close">
+                                                <span class="input-group-btn">
+                                                    <button class="btn btn-default glyphicon glyphicon-calendar" ng-click="ClaimDocumentsReceivedDateView=true;$event.stopPropagation();"></button>
+                                                </span>
+                                            </div>
+                                            <span class="help-block" style="color:red" ng-show="managePolicyInfoRecording.ClaimDocumentsReceivedDate.$error.required">
+                                                Required Field *
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <br />
+                                    <div class="row">
+                                        <label class="col-md-3 ">Claim Documents Emailed Date (To Aviva)</label>
+                                        <div class="col-md-4">
+                                            <div class="input-group">
+                                                <input type="text"
+                                                       readonly
+                                                       name="ClaimDocumentsEmailedDate"
+                                                       class="form-control date"
+                                                       ng-click="ClaimDocumentsEmailedDateView=true"
+                                                       datepicker-popup="MM/dd/yyyy"
+                                                       ng-model="Admission.ClaimDocumentsEmailedDate"
+                                                       is-open="ClaimDocumentsEmailedDateView"
+                                                       datepicker-options="dateOptions"
+                                                       placeholder="Claim Documents Emailed Date"
+                                                       @*min-date="Admission.PeriodOfCoverFromDate"*@
+                                                       ng-required="true"
+                                                       close-text="Close">
+                                                <span class="input-group-btn">
+                                                    <button class="btn btn-default glyphicon glyphicon-calendar" ng-click="ClaimDocumentsEmailedDateView=true;$event.stopPropagation();"></button>
+                                                </span>
+                                            </div>
+                                            <span class="help-block" style="color:red" ng-show="managePolicyInfoRecording.ClaimDocumentsEmailedDate.$error.required">
+                                                Required Field *
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <br />
+                                    <div class="row">
+                                        <label class="col-md-3 ">Payment Advice Recevied Date (From Aviva)</label>
+                                        <div class="col-md-4">
+                                            <div class="input-group">
+                                                <input type="text"
+                                                       readonly
+                                                       name="PaymentAdviceReceviedDate"
+                                                       class="form-control date"
+                                                       ng-click="PaymentAdviceReceviedDateView=true"
+                                                       datepicker-popup="MM/dd/yyyy"
+                                                       ng-model="Admission.PaymentAdviceReceviedDate"
+                                                       is-open="PaymentAdviceReceviedDateView"
+                                                       datepicker-options="dateOptions"
+                                                       placeholder="Payment Advice Recevied Date"
+                                                       @*min-date="Admission.PeriodOfCoverFromDate"*@
+                                                       ng-required="true"
+                                                       close-text="Close">
+                                                <span class="input-group-btn">
+                                                    <button class="btn btn-default glyphicon glyphicon-calendar" ng-click="PaymentAdviceReceviedDateView=true;$event.stopPropagation();"></button>
+                                                </span>
+                                            </div>
+                                            <span class="help-block" style="color:red" ng-show="managePolicyInfoRecording.PaymentAdviceReceviedDate.$error.required">
+                                                Required Field *
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <br />
+
+                                    <div class="row">
+                                        <label class="col-md-3 ">Payment Advice Emailed Date (To Aviva)</label>
+                                        <div class="col-md-4">
+                                            <div class="input-group">
+                                                <input type="text"
+                                                       readonly
+                                                       name="PaymentAdviceEmailedDate"
+                                                       class="form-control date"
+                                                       ng-click="PaymentAdviceEmailedDateView=true"
+                                                       datepicker-popup="MM/dd/yyyy"
+                                                       ng-model="Admission.PaymentAdviceEmailedDate"
+                                                       is-open="PaymentAdviceEmailedDateView"
+                                                       datepicker-options="dateOptions"
+                                                       placeholder="Payment Advice Emailed Date"
+                                                       @*min-date="Admission.PeriodOfCoverFromDate"*@
+                                                       ng-required="true"
+                                                       close-text="Close">
+                                                <span class="input-group-btn">
+                                                    <button class="btn btn-default glyphicon glyphicon-calendar" ng-click="PaymentAdviceEmailedDateView=true;$event.stopPropagation();"></button>
+                                                </span>
+                                            </div>
+                                            <span class="help-block" style="color:red" ng-show="managePolicyInfoRecording.PaymentAdviceEmailedDate.$error.required">
+                                                Required Field *
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <br />
+                                    <div class="row">
+                                        <label class="col-md-3 ">Total Amount Paid USD (Claim)</label>
+                                        <div class="col-md-6">
+                                            <input type="text" placeholder="Amount Paid" name="inputAmountPaid" ng-model="Admission.TotalAmountPaid" class="form-control" ng-required="true" style="width:100%" />
+                                            <span class="help-block" style="color:red" ng-show="managePolicyInfoRecording.inputAmountPaid.$error.required">Required Field *</span>
+                                        </div>
+                                    </div>
+                                    <br />
+                                    <div class="row">
+                                        <label class="col-md-3 ">Original Documents couriered Date (To Aviva)</label>
+                                        <div class="col-md-4">
+                                            <div class="input-group">
+                                                <input type="text"
+                                                       readonly
+                                                       name="OriginalDocumentscourieredDate"
+                                                       class="form-control date"
+                                                       ng-click="OriginalDocumentscourieredDateView=true"
+                                                       datepicker-popup="MM/dd/yyyy"
+                                                       ng-model="Admission.OriginalDocumentscourieredDate"
+                                                       is-open="OriginalDocumentscourieredDateView"
+                                                       datepicker-options="dateOptions"
+                                                       placeholder="Original Documents couriered Date"
+                                                       @*min-date="Admission.PeriodOfCoverFromDate"*@
+                                                       ng-required="true"
+                                                       close-text="Close">
+                                                <span class="input-group-btn">
+                                                    <button class="btn btn-default glyphicon glyphicon-calendar" ng-click="OriginalDocumentscourieredDateView=true;$event.stopPropagation();"></button>
+                                                </span>
+                                            </div>
+                                            <span class="help-block" style="color:red" ng-show="managePolicyInfoRecording.OriginalDocumentscourieredDate.$error.required">
+                                                Required Field *
+                                            </span>
+                                        </div>
+                                    </div><br />
+                                    <div class="row">
+                                        <label class="col-md-3 ">Airway Bill No</label>
+                                        <div class="col-md-6">
+                                            <input type="text" placeholder="File Reference No" name="inputFileReferenceNo" ng-model="Admission.AirwayBillNo" class="form-control" ng-required="true" style="width:100%" />
+                                            <span class="help-block" style="color:red" ng-show="managePolicyInfoRecording.inputFileReferenceNo.$error.required">Required Field *</span>
+                                        </div>
+                                    </div>
+                                    <br />
+                                    @*<div class="row">
+                                            <label class="col-md-2 ">File Path</label>
+                                            <div class="col-md-6">
+                                                <input type="text" placeholder="File Path" name="inputFilePath" ng-model="Admission.FilePath" class="form-control" ng-required="true" style="width:100%" />
+                                                <span class="help-block" style="color:red" ng-show="managePolicyInfoRecording.inputFilePath.$error.required">Required Field *</span>
+                                            </div>
+                                        </div>*@
+                                    <div class="row">
+                                        <label class="col-md-3 ">Remark</label>
+                                        <div class="col-md-6">
+                                            <textarea rows="3" class="form-control" placeholder="Payment Pending Reason" ng-model="Admission.Remark" style="width:100%"></textarea>
+                                        </div>
+                                    </div>
+                                    <br />
+
+                                    @*{{Admission}}*@
+                                    <div class="row">
+                                        <div class="col-md-12 modal-footer">
+                                            <button class="btn btn-primary" ng-show="isClientReqAddMode && !isViewMode" ng-click="savePolicyInfoRecording()">Save Claim Recording<span class="fa fa-floppy-o fa-right"></span></button>
+                                            <button class="btn btn-primary" ng-show="!isClientReqAddMode && !isViewMode" ng-click="updatePolicyInfoRecording()">Update Claim Recording<span class="fa fa-floppy-o fa-right"></span></button>
+                                            <button class="btn btn-default" ng-click="cancelCustomerRequest()">Cancel</button>
+                                        </div>
+                                    </div>
+                                    <br />
+                                </div>
+                            </ng-form>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="divLoading" ng-show="showLoader"></div>
+    </div>
+</div>
+

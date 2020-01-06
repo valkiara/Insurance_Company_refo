@@ -1,0 +1,322 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="1e5fee24fcd24623ba92a96fe6429228" Name="Diagram1" ZoomLevel="80" ShowGrid="true">
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblAccessLevelType" Width="1.5" PointX="0.75" PointY="100.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblAgent" Width="1.5" PointX="10.5" PointY="99.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblBankDetail" Width="1.5" PointX="15.75" PointY="100.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblBankTransactionDetail" Width="1.5" PointX="21" PointY="88.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblBussinessUnit" Width="1.5" PointX="13.5" PointY="99" IsExpanded="true" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblCauseOfLoss" Width="1.5" PointX="32.25" PointY="101.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblClaimPayment" Width="1.5" PointX="45" PointY="99.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblClaimPaymentMethod" Width="1.5" PointX="47.25" PointY="107.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblClaimRecHistory" Width="1.5" PointX="45" PointY="94.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblClaimRecPendingDoc" Width="1.5" PointX="45" PointY="105" IsExpanded="true" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblClaimRejectReason" Width="1.5" PointX="8.25" PointY="87.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblClaimReOpenReason" Width="1.5" PointX="8.25" PointY="91.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblClientProperty" Width="1.5" PointX="34.5" PointY="99.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblClientRequestInsSubClassScope" Width="1.5" PointX="34.5" PointY="96" IsExpanded="true" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblClientRequestLine" Width="1.5" PointX="29.25" PointY="99.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblCommisionStructureHeader" Width="1.5" PointX="15.75" PointY="104.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblCommisionStructureLine" Width="1.5" PointX="18" PointY="110.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblCommisionType" Width="1.5" PointX="8.25" PointY="94.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblCommonInsScope" Width="1.5" PointX="27" PointY="94.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblCompany" Width="1.5" PointX="8.25" PointY="98" IsExpanded="true" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblCountry" Width="1.5" PointX="16.5" PointY="92.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblCoverNote" Width="1.5" PointX="34.5" PointY="104.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblCurrency" Width="1.5" PointX="35.25" PointY="110.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblDebitNote" Width="1.5" PointX="8.25" PointY="101.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblDesignation" Width="1.5" PointX="15.75" PointY="95.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblDocCategory" Width="1.5" PointX="8.25" PointY="105.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblDocument" Width="1.5" PointX="32.25" PointY="96.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblEmployee" Width="1.5" PointX="24" PointY="98.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblFunction" Width="1.5" PointX="0.75" PointY="96.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblFunctionAccess" Width="1.5" PointX="3" PointY="100.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblFunctionType" Width="1.5" PointX="1.5" PointY="93.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblInsClass" Width="1.5" PointX="21.75" PointY="99.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblInsCompany" Width="1.5" PointX="21.75" PointY="93.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblInsSubClass" Width="1.5" PointX="27" PointY="104.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblInternalPolicyNumSetup" Width="1.5" PointX="18.75" PointY="94.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblIntroducer" Width="1.5" PointX="8.25" PointY="109.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblIntroducerBusinessUnit" Width="1.5" PointX="18.75" PointY="105.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblLoadingType" Width="1.5" PointX="8.25" PointY="113.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblParentCompany" Width="1.5" PointX="8.25" PointY="116.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblPartnerMapping" Width="1.5" PointX="8.25" PointY="123.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblPayment" Width="1.5" PointX="27" PointY="100" IsExpanded="true" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblPaymentType" Width="1.5" PointX="8.25" PointY="127" IsExpanded="true" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblPolicy" Width="1.5" PointX="15.75" PointY="110.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblPolicyCategory" Width="1.5" PointX="8.25" PointY="130.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblPolicyDebitNote" Width="1.5" PointX="48" PointY="102.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblPolicyInfoPayment" Width="1.5" PointX="42.75" PointY="104.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblPolicyInformationBUPA" Width="1.5" PointX="21" PointY="116.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblPolicyInformationRecording" Width="1.5" PointX="37.5" PointY="98.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblPolicyMemberDetail" Width="1.5" PointX="21" PointY="119.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblPolicyRenewalHistory" Width="1.5" PointX="42.75" PointY="94.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblPremium" Width="1.5" PointX="2.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblQuotationDetailsInsCompanyHeader" Width="1.5" PointX="39" PointY="93.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblQuotationDetailsInsCompanyLine" Width="1.5" PointX="47.25" PointY="97.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblQuotationDetailsInsCompanyScope" Width="1.5" PointX="50.5" PointY="99.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblQuotationLine" Width="2.625" PointX="31" PointY="105.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblQuotationRequestedInsCompany" Width="1.5" PointX="36.75" PointY="93.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblQuotationStatu" Width="1.5" PointX="2.75" PointY="3.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblRateCategory" Width="1.5" PointX="8.25" PointY="134.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblRequiredDocument" Width="1.5" PointX="29.25" PointY="94.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblSetting" Width="1.5" PointX="24" PointY="94" IsExpanded="true" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblTaxType" Width="1.5" PointX="8.25" PointY="137.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblTransactionType" Width="1.5" PointX="21.75" PointY="105.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblUser" Width="1.5" PointX="6" PointY="88.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblFamilyDiscount" Width="1.5" PointX="4.75" PointY="0.75" IsExpanded="true" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblFunctionAccess_tblAccessLevelType" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblUser_tblAccessLevelType" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblAgent_tblCompany" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblAgent_tblUser" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblAgent_tblUser1" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblBankDetails_tblBussinessUnit" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblBussinessUnit_tblCompany" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblBussinessUnit_tblUser" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblBussinessUnit_tblUser1" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblCommisionStructureHeader_tblBussinessUnit" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblDesignation_tblBussinessUnit" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblInsClass_tblBussinessUnit" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblInsCompany_tblBussinessUnit" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblInternalPolicyNumSetup_tblBussinessUnit" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblIntroducerBusinessUnit_tblBussinessUnit" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblPolicy_tblBussinessUnit" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblTransactionType_tblBussinessUnit" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblCauseOfLoss_tblInsSubClass" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblCauseOfLoss_tblUser" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblCauseOfLoss_tblUser1" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblClaimPayment_tblUser" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblClaimPayment_tblUser1" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblClaimPaymentMethod_tblClaimPayment" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblClaimPaymentMethod_tblPaymentType" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblClaimPaymentMethod_tblUser" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblClaimPaymentMethod_tblUser1" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblClaimRecHistory_tblUser" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblClaimRecHistory_tblUser1" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblClaimRecPendingDoc_tblDocument" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblClaimRecPendingDoc_tblUser" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblClaimRecPendingDoc_tblUser1" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblClaimRejectReason_tblUser" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblClaimRejectReason_tblUser1" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblClaimReOpenReason_tblUser" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblClaimReOpenReason_tblUser1" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblClientProperty_tblClientRequestLine" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblClientProperty_tblUser" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblClientProperty_tblUser1" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblClientRequestInsSubClassScope_tblClientRequestLine" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblClientRequestInsSubClassScope_tblCommonInsScope" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblClientRequestInsSubClassScope_tblUser" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblClientRequestInsSubClassScope_tblUser1" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblClientRequestLine_tblInsSubClass" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblClientRequestLine_tblUser" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblClientRequestLine_tblUser1" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblCommisionStructureHeader_tblInsClass" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblCommisionStructureHeader_tblInsCompany" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblCommisionStructureHeader_tblInsSubClass" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblCommisionStructureHeader_tblUser" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblCommisionStructureHeader_tblUser1" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblCommisionStructureLine_tblCommisionStructureHeader" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblCommisionStructureLine_tblRateCategory" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblCommisionStructureLine_tblUser" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblCommisionStructureLine_tblUser1" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblCommisionType_tblUser" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblCommisionType_tblUser1" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblCommonInsScope_tblInsClass" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblCommonInsScope_tblInsSubClass" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblCommonInsScope_tblUser" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblCommonInsScope_tblUser1" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblCompany_tblUser" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblCompany_tblUser1" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblCurrency_tblCountry" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblCoverNote_tblInsSubClass" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblCoverNote_tblUser" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblCoverNote_tblUser1" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblPolicyInformationRecording_tblCurrency" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblPolicyInformationRecording_tblCurrency1" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblDebitNote_tblUser" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblDebitNote_tblUser1" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblPolicyDebitNote_tblDebitNote" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblDesignation_tblUser" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblDesignation_tblUser1" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblEmployee_tblDesignation" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblSetting_tblDesignation" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblUser_tblDesignation" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblDocCategory_tblUser" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblDocCategory_tblUser1" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblRequiredDocument_tblDocCategory" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblDocument_tblInsSubClass" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblDocument_tblUser" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblDocument_tblUser1" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblEmployee_tblUser" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblEmployee_tblUser1" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblFunction_tblFunctionType" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblFunctionAccess_tblFunction" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblInsClass_tblUser" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblInsClass_tblUser1" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblInsSubClass_tblInsClass" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblQuotationLine_tblInsClass" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblRequiredDocument_tblInsClass" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblInsCompany_tblUser" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblInsCompany_tblUser1" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblQuotationRequestedInsCompany_tblInsCompany" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblInsSubClass_tblUser" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblInsSubClass_tblUser1" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblQuotationDetailsInsCompanyLine_tblInsSubClass" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblQuotationLine_tblInsSubClass" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblRequiredDocument_tblInsSubClass" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblInternalPolicyNumSetup_tblUser" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblInternalPolicyNumSetup_tblUser1" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblIntroducer_tblUser" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblIntroducer_tblUser1" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblIntroducerBusinessUnit_tblIntroducer" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblLoadingType_tblUser" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblLoadingType_tblUser1" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblParentCompany_tblUser" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblParentCompany_tblUser1" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblPartnerMapping_tblUser" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblPartnerMapping_tblUser1" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblPayment_tblUser" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblPayment_tblUser1" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblPolicyDebitNote_tblPayment" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblPaymentType_tblUser" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblPaymentType_tblUser1" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblPolicy_tblPolicyCategory" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblPolicy_tblUser" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblPolicy_tblUser1" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblPolicyCategory_tblUser" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblPolicyCategory_tblUser1" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblPolicyDebitNote_tblPolicyInfoPayment" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblPolicyInfoPayment_tblPolicyInformationRecording" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblPolicyInfoPayment_tblUser" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblPolicyInfoPayment_tblUser1" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblPolicyInformationRecording_tblQuotationDetailsInsCompanyLine" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblPolicyInformationRecording_tblUser" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblPolicyInformationRecording_tblUser1" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblPolicyRenewalHistory_tblPolicyInformationRecording" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblPolicyRenewalHistory_tblUser" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblPolicyRenewalHistory_tblUser1" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblQuotationDetailsInsCompanyHeader_tblQuotationRequestedInsCompany" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblQuotationDetailsInsCompanyHeader_tblUser" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblQuotationDetailsInsCompanyHeader_tblUser1" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblQuotationDetailsInsCompanyLine_tblQuotationDetailsInsCompanyHeader" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblQuotationDetailsInsCompanyLine_tblUser" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblQuotationDetailsInsCompanyLine_tblUser1" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblQuotationDetailsInsCompanyScope_tblQuotationDetailsInsCompanyLine" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblQuotationDetailsInsCompanyScope_tblUser" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblQuotationDetailsInsCompanyScope_tblUser1" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblQuotationLine_tblUser" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblQuotationLine_tblUser1" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblQuotationRequestedInsCompany_tblQuotationLine" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblQuotationRequestedInsCompany_tblUser" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblQuotationRequestedInsCompany_tblUser1" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblRateCategory_tblUser" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblRateCategory_tblUser1" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblRequiredDocument_tblUser" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblRequiredDocument_tblUser1" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblSetting_tblUser" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblSetting_tblUser1" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblTaxType_tblUser" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblTaxType_tblUser1" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblTransactionType_tblUser" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblTransactionType_tblUser1" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblUser_tblUser_C" ManuallyRouted="false" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblUser_tblUser_M" ManuallyRouted="false" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblAccountHandler" Width="1.5" PointX="5.375" PointY="3.75" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblComCommisionStructureLine" Width="2" PointX="0.75" PointY="6.75" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblInsComCommisionStructureHeader" Width="2.25" PointX="2.75" PointY="6.75" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblDistrict" Width="1.5" PointX="7.375" PointY="0.75" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblClaimStatu" Width="1.5" PointX="7.375" PointY="3.75" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblInsClassType" Width="1.5" PointX="7.375" PointY="6.75" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblYear" Width="1.5" PointX="9.375" PointY="0.75" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblClaimRecording" Width="1.5" PointX="39.75" PointY="98.5" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblClaimPayment_tblClaimRecording" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblClaimRecHistory_tblClaimRecording" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblClaimRecording_tblPolicyInformationRecording" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblClaimRecording_tblUser" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblClaimRecording_tblUser1" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblClaimRecPendingDoc_tblClaimRecording" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.UploadedFile" Width="1.5" PointX="9.375" PointY="3.75" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.Status" Width="1.5" PointX="6.375" PointY="9.75" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.SingaporeAdmission" Width="2.75" PointX="11.375" PointY="0.75" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblEndorsementCharge" Width="1.5" PointX="0.75" PointY="11.75" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblEndorsementInfo" Width="1.5" PointX="2.75" PointY="11.75" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.SingaporeInvoice" Width="1.5" PointX="11.375" PointY="8.75" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblPolicyCommisionPayment" PointX="42.75" PointY="99.875" Width="1.5" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblPolicyCommisionPayment_tblCommisionStructureLine" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblPolicyCommisionPayment_tblCommisionType" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblPolicyCommisionPayment_tblPolicyInformationRecording" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblPolicyCommisionPayment_tblUser" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblPolicyCommisionPayment_tblUser1" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblPolicyCommisionPayment_New" Width="1.5" PointX="13.375" PointY="8.75" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblPolicyInforCharge_New" Width="1.5" PointX="13.375" PointY="12.75" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblJLT" Width="1.5" PointX="15.375" PointY="8.75" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblWBN" Width="1.5" PointX="15.375" PointY="14.75" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblTitle" Width="1.5" PointX="5.375" PointY="12.75" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblHospitals" Width="1.5" PointX="15.375" PointY="11.75" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblScheme" Width="1.5" PointX="0.75" PointY="16.75" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblCommissionFormat" Width="1.5" PointX="15.375" PointY="0.75" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblGender" Width="1.5" PointX="7.375" PointY="16.75" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblRelationship" Width="1.5" PointX="17.375" PointY="0.75" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblDeductionsLine" Width="3" PointX="17.375" PointY="3.75" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblCommissionFormatNew" Width="1.5" PointX="17.375" PointY="7.75" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblCustomerQuotation" Width="1.5" PointX="17.375" PointY="12.75" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblChargeType" Width="1.5" PointX="8.25" PointY="83.75" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblChargeType_tblUser" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblChargeType_tblUser1" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblClient" Width="1.5" PointX="24.75" PointY="103.75" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblBankTransactionDetails_tblClient" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblClient_tblBussinessUnit" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblClient_tblCountryH" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblClient_tblCountryR" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblClient_tblUser" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblClient_tblUser1" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblPayment_tblClient" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblPolicyInformationBUPA_tblClient" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblPolicyMemberDetails_tblClient" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblPolicyInfoCharge" Width="1.5" PointX="15.75" PointY="16.5" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblAgeWisePremium" Width="1.5" PointX="11.375" PointY="16.75" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblPartner" Width="1.5" PointX="8.25" PointY="120" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblCommisionStructureHeader_tblPartner" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblPartner_tblUser" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblPartner_tblUser1" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblDeductionType" Width="1.5" PointX="3.375" PointY="16.75" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblPilotPremium" Width="1.5" PointX="19.375" PointY="7.75" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblPremiumHolderType" Width="1.5" PointX="7.375" PointY="19.75" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblGrpFamilyDetail" Width="1.5" PointX="9.375" PointY="19.75" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.PatientAdmission" Width="1.5" PointX="0.75" PointY="19.75" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblFamilyMember" Width="1.5" PointX="27" PointY="109.875" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblFamilyMembers_tblClient" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblReceivedQuotation" Width="1.5" PointX="8.375" PointY="9.75" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblClientRequestHeader" Width="1.5" PointX="32" PointY="89.25" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblClientRequestHeader_tblClient" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblClientRequestHeader_tblUser" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblDeduction" Width="1.5" PointX="27" PointY="116.375" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblDeductions_tblClient" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblQuotationHeader" Width="2.5" PointX="34.25" PointY="90.25" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblQuotationHeader_tblClientRequestHeader" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblCoverNote_tblQuotationHeader" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblPolicyInformationRecording_tblQuotationHeader" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblQuotationHeader_tblUser" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblQuotationHeader_tblUser1" />
+        <AssociationConnector Association="PERFECTIBSModel.FK_tblQuotationLine_tblQuotationHeader" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.Admission_Singapore" Width="1.5" PointX="18.375" PointY="18.75" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.MemberStatu" Width="1.5" PointX="7.375" PointY="13.75" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.Trf_Bupa" Width="1.5" PointX="3.375" PointY="19.75" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblPilotPRM" Width="1.5" PointX="9.375" PointY="13.75" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblClientRHistory" Width="5.5" PointX="19.375" PointY="10.75" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblClientRenewelRequestHeader" Width="1.5" PointX="11.375" PointY="19.75" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblClientRewenelHistory" Width="1.5" PointX="13.375" PointY="20.75" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblClientRnlRequestHeader" Width="1.5" PointX="15.375" PointY="20.75" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblFrequncyDetail" Width="1.5" PointX="19.375" PointY="0.75" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblTransactionDetail" Width="1.5" PointX="20.375" PointY="18.75" />
+        
+
+
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

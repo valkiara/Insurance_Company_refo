@@ -1,0 +1,77 @@
+﻿
+@{
+    ViewBag.Title = "CommissionExcelUpload";
+    Layout = "~/Views/Shared/_index.cshtml";
+}
+
+<script src="~/Scripts/ng/Controllers/CommissionFormatController.js"></script>
+<script src="~/Scripts/ng/Services/CommissionFormatService.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.8.1/xlsx.full.min.js"></script>
+<script src="http://oss.sheetjs.com/js-xlsx/jszip.js"></script>
+
+
+
+<style>
+    .form-control[disabled], .form-control[readonly] {
+        color: #000000 !important;
+    }
+
+    .set-header {
+        background-color: #1caf9a;
+        height: 30px;
+        padding: 2px;
+        /*margin-bottom: 15px;*/
+    }
+
+    .set-panel {
+        background-color: #F7DC6F;
+        height: 40px;
+        padding: 2px;
+        /*margin-bottom: 15px;*/
+    }
+</style>
+
+<script type="text/javascript">
+    function IsNumber(evt) {
+        evt = (evt) ? evt : window.event;
+        var charCode = (evt.which) ? evt.which : evt.keyCode;
+        if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+            return false;
+        }
+        return true;
+    }
+
+    function checkInputRate(rateVal) {
+        var regEx = /^[0-9]+\.?[0-9]*$/;
+        if (regEx.test(rateVal.value) == false) {
+            rateVal.value = rateVal.value.substring(0, rateVal.value.length - 1);
+        }
+    }
+</script>
+
+
+<script src="~/Scripts/ng/Controllers/CommissionFormatController.js"></script>
+
+<div class="breadcrumb-line">
+    <ul class="breadcrumb">
+        <li><a href="/Dashboard/Index"><i class="icon-home2 position-left"></i>Home</a></li>
+        <li>Transaction</li>
+        <li>Commission Excel Upload</li>
+    </ul>
+</div>
+
+<div class="content" ng-app="IBMSAPP">
+    <div ng-controller="CommissionFormatController" ng-init="init()" ng-cloak>
+        
+            <input type="file" class="form-control" id="file" name="file"
+                   onchange="angular.element(this).scope().getDocument(this)" />
+            <input type="button" value="Import" class="btn btn-success" @*ng-disabled="!SelectedFileForUpload"*@
+                   ng-click="ParseExcelDataAndSave()" />
+            <br />
+            <span style="color:red">
+                {{Message}}
+            </span>
+        
+       
+    </div>
+</div>

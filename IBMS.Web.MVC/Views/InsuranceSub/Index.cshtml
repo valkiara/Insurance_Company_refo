@@ -1,0 +1,179 @@
+﻿
+@{
+    ViewBag.Title = "Insurance Sub Class";
+}
+@{
+    Layout = "~/Views/Shared/_index.cshtml";
+}
+
+
+<script src="~/Scripts/ng/Controllers/InsSubClassController.js"></script>
+<script src="~/Scripts/ng/Services/InsSubClassService.js"></script>
+
+<div class="breadcrumb-line">
+    <ul class="breadcrumb">
+        <li><a href="/Dashboard/Dashboard"><i class="icon-home2 position-left"></i>Home</a></li>
+        <li>Master Details</li><li>Insurance</li>
+        <li class="active"><b>Insurance Sub Class</b></li>
+    </ul>
+</div>
+@*Developed by Rajin*@
+<div class="content" ng-app="IBMSAPP">
+    <div ng-controller="InsSubClassController" ng-init="init()" ng-cloak>
+        <div class="page-content-wrap">
+
+            <div class="panel panel-default tabs">
+                <ul class="nav nav-tabs" role="tablist">
+                    <li class="active"><a href="#tab-first" role="tab" data-toggle="tab">View</a></li>
+                    <li><a href="#tab-second" role="tab" data-toggle="tab">New</a></li>
+                    @*<li><a href="#tab-third" role="tab" data-toggle="tab">Edit</a></li>*@
+                </ul>
+                <div class="panel-body tab-content">
+                    <div class="tab-pane active" id="tab-first">
+
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">
+                                    <strong>Insurance Sub Class</strong>
+                                </h3>
+                                <ul class="panel-controls">
+                                    <li><input type="text" style="font-size: 12px;width: 100%;border-radius: 0px;margin-right:2px;" class="form-control" placeholder="Search Insurance Sub Class ..." ng-model="search_query" ng-change="searchTextChange(search_query)"></li>
+                                    <li><a href="#" ng-click="refreshContent()"><span class="fa fa-refresh"></span></a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="panel-body">
+                            <div class="col-md-2">Show records per page </div>
+                            <div class="col=md-10">
+                                <select class="form-control" style="width:100px;" ng-model="viewby" ng-change="setItemsPerPage(viewby)">
+                                    <option>5</option>
+                                    <option>10</option>
+                                    <option>20</option>
+                                    <option>30</option>
+                                    <option>40</option>
+                                    <option>50</option>
+                                </select>
+                            </div>
+                            <div></div><br />
+                            <table class="table table-responsive" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th hidden>Insurance Sub Class ID</th>
+                                        <th>Insurance Class Code</th>
+                                        <th>Insurance Sub Class Name</th>
+                                        <th>Is Active</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody ng-repeat="INS in data.slice(((currentPage-1)*itemsPerPage), ((currentPage)*itemsPerPage))| filter:search_query">
+                                    <!--<tr  >-->
+                                    <tr id="view{{INS.InsuranceSubClassID}}">
+                                        <td hidden>{{INS.InsuranceSubClassID}}</td>
+                                        <td>{{INS.InsuranceClassCode}}</td>
+                                        <td>{{INS.Description}}</td>
+                                        <td><input type="checkbox" value="{{INS.IsActive}}" ng-model="INS.IsActive" disabled></td>
+                                        
+                                        <td>
+                                            <div class="fa fa-edit btn btn-success" ng-click="editINS(INS)"> Edit</div>&nbsp;&nbsp;
+                                            <div class="fa fa-trash-o btn btn-danger" ng-click="deleteINS(INS.InsuranceSubClassID)"> Delete</div>
+                                        </td>
+
+
+                                    </tr>
+
+                                    <tr id="edit{{INS.InsuranceSubClassID}}" hidden>
+                                        <td hidden>
+                                            <input type="text" hidden class="form-control"
+                                                   value="{{INS.InsuranceSubClassID}}"
+                                                   ng-model="INS.InsuranceSubClassID">
+                                        </td>
+                                        <td>
+                                            <select name="selectCompany" id="timeZone" style="width:100%" class="form-control" ng-model="INS.InsuranceClassID" ng-options="ins.InsuranceClassID as ins.InsuranceCode for ins in availableInsClass" ng-required="true">
+                                                <option value="{{INS.InsuranceSubClassID}}"></option>
+                                            </select>
+                                            <span class="help-block" style="color:red" ng-show="!INS.InsuranceSubClassID">Required Field *</span>
+                                        </td>
+                                        <td>
+                                            <input type="text" hidden style="width:100%" class="form-control"
+                                                   value="{{INS.Description}}"
+                                                   ng-model="INS.Description">
+                                            <span class="help-block" style="color:red" ng-show="!INS.Description">Required Field *</span>
+                                        </td>
+                                        <td>
+                                            <input type="checkbox" value="{{INS.IsActive}}" ng-model="INS.IsActive">
+                                            @*<input type="text" style="font-size: 12px;width: 100%;border-radius: 0px;margin-right:2px;" class="form-control"
+                                                   value="{{INS.IsActive}}"
+                                                   ng-model="INS.IsActive">*@
+                                        </td>
+                                        <td>
+                                            <div class="fa fa-save btn btn-info" ng-disabled="!(INS.InsuranceSubClassID && INS.Description)" ng-click="update(INS)"> Update</div>&nbsp;
+                                            <div ng-click="cancel(INS)" class="fa fa-times btn btn-default"> Cancel</div>
+                                        </td>
+
+
+                                    </tr>
+
+
+                                </tbody>
+
+                            </table>
+                            <pagination class="pull-left" total-items="totalItems" ng-model="currentPage" max-size="maxSize" class="pagination-sm" boundary-links="true" rotate="false" num-pages="numPages" items-per-page="itemsPerPage"></pagination>
+
+                        </div>
+
+                    </div>
+                    <div class="tab-pane" id="tab-second">
+                        <form class="form-horizontal col-md-10" role="form">
+                            <ng-form name="insSubData" novalidate>
+
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label">Insurance Sub Class Name</label>
+                                    <div class="col-md-8">
+                                        <input type="text" name="InsSubName"ng-model="insObj.InsSubClass" class="form-control" value="Some text value..." ng-required="true" /><span class="help-block" style="color:red" ng-show="insSubData.InsSubName.$error.required">Required Field *</span>
+                                    </div>
+
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label">Description</label>
+                                    <div class="col-md-8">
+                                        <input type="text" name="Description"ng-model="insObj.Description" class="form-control" value="Some text value..." ng-required="true" /><span class="help-block" style="color:red" ng-show="insSubData.Description.$error.required">Required Field *</span>
+                                    </div>
+
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label">Is Active</label>
+                                    @*<span class="error" ng-show="businessData.inputIsActive.$error.required" style="color:red">&nbsp;*</span>*@
+                                    <div class="col-md-8">
+                                        @*style="margin-top:5px;">*@
+                                        <input type="checkbox" ng-model="insObj.IsActive" id="isTaxable">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label">Insurance Class</label>
+                                    <div class="col-md-8">
+                                        <select name="selectCompany" id="timeZone" class="form-control" ng-model="insObj.InsuranceClassID" ng-options="ins.InsuranceClassID as ins.InsuranceCode for ins in availableInsClass" ng-required="true">
+                                            <option value="">--Select Insurance Class--</option>
+                                        </select><span class="help-block" style="color:red" ng-show="insSubData.selectCompany.$error.required">Required Field *</span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label"></label>
+                                    <div class="col-md-8">
+                                        <div class="btn btn-primary" ng-disabled="!insSubData.$valid" ng-click="addInsuarance()">Add Insurance Sub Class <span class="fa fa-floppy-o fa-right"></span></div>
+                                        <button type="button" class="btn btn-default" ng-click="ClearFields()">Clear<span class="glyphicon glyphicon-erase fa-right"></span></button>
+                                    </div>
+                                </div>
+                            </ng-form>
+                        </form>
+
+                            
+
+                    </div>
+                    
+                </div>
+            </div>
+
+        </div>
+        <div id="divLoading" ng-show="showLoader"></div>
+    </div>
+</div>

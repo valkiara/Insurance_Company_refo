@@ -1,0 +1,169 @@
+﻿@{
+    Layout = "~/Views/Shared/_index.cshtml";
+}
+
+<style>
+    .form-control {
+        width: 100%;
+    }
+</style>
+
+<script src="~/Scripts/ng/Excel/Excel.js"></script>
+<script src="~/Scripts/ng/Services/CommissionPercentagesService.js"></script>
+<script src="~/Scripts/ng/Controllers/CommissionPercentagesController.js"></script>
+
+<div class="breadcrumb-line">
+    <ul class="breadcrumb">
+        <li><a href="/Dashboard/Index"><i class="icon-home2 position-left"></i>Home</a></li>
+        <li>Enquiries</li>
+        <li class="active"><b>Commission Percentages</b></li>
+    </ul>
+</div>
+
+<div ng-app="IBMSAPP" ng-controller="CommissionPercentagesController" ng-init="init()" ng-cloak>
+
+    <div class="page-content-wrap">
+        <div class="panel panel-default tabs">
+
+            <ul class="nav nav-tabs" role="tablist">
+                <li class="active" id="tabView"><a href="#tab-first" role="tab" data-toggle="tab">View</a></li>
+            </ul>
+
+            <div class="panel-body tab-content">
+                <div class="tab-pane active" id="tab-first">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+
+                            <h3 class="panel-title">
+                                <strong>Commission Percentages</strong>
+                            </h3>
+
+                            <ul class="panel-controls">
+                                <li><input type="text" style="font-size: 12px;width: 100%;border-radius: 0px;margin-right:2px;" class="form-control" placeholder="Search Commission...." ng-model="search_query" ng-change="searchTextChange(search_query)"></li>
+                                @*<li><a href="#" class="panel-refresh" ng-click="refreshContent()"><span class="fa fa-refresh"></span></a></li>*@
+                            </ul>
+
+                        </div>
+                        </div>
+
+                    <div class="panel-body">
+
+                        <form class="form-horizontal col-md-12" role="form">
+                            <ng-form name="CommissionPercentagesData">
+
+                                <div class="form-group">
+                                    <label class="col-md-3 control-label">Commission Structure Header</label>
+                                    <div class="col-md-3">
+                                        <select name="selectCommissionHeader" id="Commission"
+                                                class="form-control" ng-model="CommissionStructureID" style="width:100%"
+                                                ng-options="Commissions.CommisionStructureID as Commissions.CommisionStructureName for Commissions in availableCommissionHeader"
+                                                ng-required="true"
+                                                ng-change="LoadCommission(CommissionStructureID)">
+                                            <option value="">--Select Commission Header--</option>
+                                        </select>
+                                        @*<span class="help-block" style="color:red" ng-show="CommissionPercentagesData.selectCommissionHeader.$error.required">Required Field *</span>*@
+                                    </div>
+                                </div>
+
+                                <label class="col-md-3 control-label">Show records per page </label>
+                                <div class="col=md-10">
+                                    <select class="form-control" style="width:100px;" ng-model="viewby" 
+                                            ng-change="setItemsPerPage(viewby)">
+                                        <option>5</option>
+                                        <option>10</option>
+                                        <option>20</option>
+                                        <option>30</option>
+                                        <option>40</option>
+                                        <option>50</option>
+                                    </select>
+                                </div>
+                                <div></div><br />
+
+                                <table class="table table-responsive" cellspacing="0" id="list">
+                                    <thead>
+                                        <tr>
+                                            <th>Commission Structure Name</th>
+                                            <th>Rate Category</th>
+                                            <th>Is Age Consider</th>
+                                            <th>Age From</th>
+                                            <th>Age To</th>
+                                            <th>Is Fixed</th>
+                                            <th>Rate Value</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody ng-repeat="COM in filterdData = (data.slice(((currentPage-1)*itemsPerPage), ((currentPage)*itemsPerPage)))">
+                                            <tr>
+                                            <td>
+                                                {{COM.CommisionStructureName}}
+                                            </td>
+                                            <td>
+                                                {{COM.RateCategoryName}}
+                                            </td>
+                                            <td>
+                                                {{COM.IsAgeConsider}}
+                                            </td>
+                                            <td>
+                                                {{COM.AgeFrom}}
+                                            </td>
+                                            <td>
+                                                {{COM.AgeTo}}
+                                            </td>
+                                            <td>
+                                                {{COM.IsFixed}}
+                                            </td>
+                                            <td>
+                                                {{COM.RateValue}}
+                                            </td>
+                                                </tbody>
+                                </table>
+
+                                <pagination total-items="totalItems" ng-model="currentPage" max-size="maxSize" class="pagination-sm pull-left" boundary-links="true" rotate="false" num-pages="numPages" items-per-page="itemsPerPage"></pagination>
+
+                               <table class="table table-striped dataTable" id="listHidden" hidden>
+                                    <thead>
+                                        <tr>
+                                            <th>Commission Structure Name</th>
+                                            <th>Rate Category</th>
+                                            <th>Is AgeConsider</th>
+                                            <th>Age From</th>
+                                            <th>Age To</th>
+                                            <th>Is Fixed</th>
+                                            <th>Rate Value</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody ng-repeat="COM in ComStructLine">
+                                        <tr>
+                                            <td>
+                                                {{COM.CommisionStructureName}}
+                                            </td>
+                                            <td>
+                                                {{COM.RateCategoryName}}
+                                            </td>
+                                            <td>
+                                                {{COM.IsAgeConsider}}
+                                            </td>
+                                            <td>
+                                                {{COM.AgeFrom}}
+                                            </td>
+                                            <td>
+                                                {{COM.AgeTo}}
+                                            </td>
+                                            <td>
+                                                {{COM.IsFixed}}
+                                            </td>
+                                            <td>
+                                                {{COM.RateValue}}
+                                            </td>
+                                    </tbody>
+                                </table>
+
+                                <button style="border-radius: 0px;width:19%;" class="btn btn-danger pull-right" ng-click="exportToExcel('#listHidden')">Export to Excel</button>
+                            </ng-form>
+                        </form>
+                    </div>
+                    </div>
+                </div>
+                        </div>
+       <div id="divLoading" ng-show="showLoader"></div>
+                    </div>
+                </div>

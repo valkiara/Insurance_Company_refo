@@ -1,0 +1,104 @@
+﻿@{
+
+    Layout = "~/Views/Shared/_index.cshtml";
+    ViewBag.Title = "Claim Reopen Reason";
+}
+
+
+<script src="//code.jquery.com/jquery-1.10.2.js"></script>
+<script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+<script src="~/Scripts/ng/IBMSApp.js"></script>
+<script src="~/Scripts/ng/Controllers/ClaimReopenReasonController.js"></script>
+
+
+
+<div class="breadcrumb-line">
+    <ul class="breadcrumb">
+        <li><a href="/Dashboard/Dashboard"><i class="icon-home2 position-left"></i>Home</a></li>
+        <li>Master Details</li>
+        <li class="active"><b>Claim Reopen Reason</b></li>
+    </ul>
+</div>
+
+<div ng-app="IBMSApp">
+    <div ng-controller="ClaimReopenReasonController" ng-cloak>
+
+
+<div class="page-content-wrap">
+    <div class="panel panel-default tabs">
+
+        <ul class="nav nav-tabs" role="tablist">
+            <li class="active" id="tabView"><a href="#tab-first" role="tab" data-toggle="tab">View</a></li>
+            <li id="tabEdit"><a href="#tab-second" role="tab" data-toggle="tab">New</a></li>
+        </ul>
+
+        <div class="panel-body tab-content">
+
+            <div class="tab-pane active" id="tab-first">
+
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">
+                            <strong>Claim Reopen Reason</strong>
+                        </h3>
+                        <ul class="panel-controls">
+                            <li><a href="#" class="panel-refresh" ng-click="refresh()"><span class="fa fa-refresh"></span></a></li>
+                            <li><a href="#" class="panel-remove"><span class="fa fa-times"></span></a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="panel-body">
+                    <table class="table table-bordered table-striped dataTable">
+                        <thead>
+                            <tr>
+                                <th>Reopen Reasons</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="RR in ReopenReason">
+                                <td>
+                                    {{RR.Reason}}
+                                </td>
+                                <td>
+                                    <button class="fa fa-edit btn-sm btn-success"></button>&nbsp;&nbsp;
+                                    <button class="fa fa-trash-o btn-sm btn-danger"></button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="tab-pane" id="tab-second">
+
+                <ng-form name="ClaimReopenReason">
+                    <form class="form-horizontal col-md-12" role="form">
+
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">Claim Reopen Reason</label>
+                            <div class="col-md-3">
+                                <input type="text" placeholder="Enter Reason" ng-model="reason" class="form-control" style="width:100%" />
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-md-2 control-label"></label>
+                            <div class="col-md-1">
+                                <button type="submit" class="btn btn-primary" ng-click="add()">Add</button>
+                            </div>
+                        </div>
+
+
+
+                    </form>
+                </ng-form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+</div>
+    </div>

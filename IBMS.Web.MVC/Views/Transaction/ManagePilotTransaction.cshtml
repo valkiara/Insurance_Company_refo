@@ -1,0 +1,1633 @@
+﻿
+@{
+    ViewBag.Title = "ManagePilotTransaction";
+    Layout = "~/Views/Shared/_index.cshtml";
+}
+
+@*<h2>ManagePilotTransaction</h2>*@
+
+<style>
+    .form-control {
+        width: 100%;
+    }
+
+    .set-header {
+        background-color: #1caf9a;
+        height: 30px;
+        padding: 2px;
+        /*margin-bottom: 15px;*/
+    }
+
+    .set-header-property {
+        background-color: #e47080;
+        height: 30px;
+        padding: 2px;
+        /*margin-bottom: 15px;*/
+    }
+
+    .set-header-scope {
+        background-color: #e4a670;
+        height: 30px;
+        padding: 2px;
+        /*margin-bottom: 15px;*/
+    }
+    /*------------------Popup---------------------*/
+    @@media screen and (min-width: 1024px) {
+        .app-modal-window-pir .modal-dialog {
+            width: 95%;
+        }
+
+        .app-modal-window-pic .modal-dialog {
+            width: 95%;
+        }
+    }
+
+    @@media screen and (max-width: 1024px) {
+        .app-modal-window-pir .modal-dialog {
+            width: 100%;
+        }
+
+        .app-modal-window-pic .modal-dialog {
+            width: 95%;
+        }
+    }
+    /*------------------Popup---------------------*/
+</style>
+
+<script src="~/Scripts/ng/Services/ManagePilotTransactionService.js"></script>
+<script src="~/Scripts/ng/Controllers/ManagePilotTransactionController.js"></script>
+<script type="text/javascript">
+    function IsNumber(evt) {
+        evt = (evt) ? evt : window.event;
+        var charCode = (evt.which) ? evt.which : evt.keyCode;
+        if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+            return false;
+        }
+        return true;
+    }
+
+    function checkInputRate(rateVal) {
+        var regEx = /^[0-9]+\.?[0-9]*$/;
+        if (regEx.test(rateVal.value) == false) {
+            rateVal.value = rateVal.value.substring(0, rateVal.value.length - 1);
+        }
+    }
+
+</script>
+<div class="breadcrumb-line">
+    <ul class="breadcrumb">
+        <li><a href="/Dashboard/Index"><i class="icon-home2 position-left"></i>Home</a></li>
+        <li>Transaction</li>
+        <li class="active"><b>Transaction</b></li>
+    </ul>
+</div>
+
+<div class="content" ng-app="IBMSAPP">
+    <div ng-controller="ManagePilotTransactionController" ng-init="init()" ng-cloak>
+        <div class="page-content-wrap">
+            <div class="panel panel-default tabs">
+                <ul class="nav nav-tabs" role="tablist">
+                    <li id="list-tab-1" class="active"><a href="#tab-1" role="tab" data-toggle="tab" ng-click="activateClientRequestListTab()">View</a></li>
+                    <li id="list-tab-2"><a href="#tab-2" role="tab" data-toggle="tab" ng-click="activateNewClientRequestTab()">New</a></li>
+                </ul>
+                <div class="panel-body tab-content">
+                    <div class="tab-pane active" id="tab-1">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">
+                                    <strong>Customer Requests</strong>
+                                </h3>
+                                <ul class="panel-controls">
+                                    <li><input type="text" style="font-size: 12px;width: 100%;border-radius: 0px;margin-right:2px;" class="form-control" placeholder="Search Client Request ..." ng-model="search_query" ng-change="searchTextChange(search_query)"></li>
+                                    <li><a href="#" ng-click="refreshContent()"><span class="fa fa-refresh"></span></a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="panel-body">
+                            <div class="col-md-2">Show records per page </div>
+                            <div class="col=md-10">
+                                <select class="form-control" style="width:100px;"
+                                        ng-model="viewby"
+                                        ng-change="setItemsPerPage(viewby)">
+                                    <option>10</option>
+                                    <option>20</option>
+                                    <option>30</option>
+                                    <option>40</option>
+                                    <option>50</option>
+                                </select>
+                            </div>
+                            <div><br></div>
+
+                            <table class="table table-responsive" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th>Client Name</th>
+                                        <th>Scheme</th>
+                                        <th>Requested Date</th>
+                                        @*<th>Is Quotation Created</th>*@
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody ng-repeat="ClientRequest in data.slice(((currentPage-1)*itemsPerPage), ((currentPage)*itemsPerPage))">
+                                    <tr id="view{{ClientRequest.ClientRequestHeaderID}}">
+                                        <td>{{ClientRequest.ClientName}}</td>
+                                        <td>{{ClientRequest.PremiumName}}</td>
+                                        <td>{{ClientRequest.RequestedDate}}</td>
+                                        @*<td><center><span style="font-size:medium" ng-bind-html='ClientRequest.IsQuotationCreated | return_status'></span></center></td>*@
+                                        <td>
+                                            <button class="btn btn-info" @*ng-disabled="ClientRequest.IsQuotationCreated"*@ style="width:70px;padding:1px;" ng-click="editClientRequest(ClientRequest.ClientRequestHeaderID,ClientRequest.ClientID)">Edit</button>&nbsp;&nbsp;
+                                            <button class="btn btn-info" @*ng-disabled="!ClientRequest.IsQuotationCreated"*@ style="width:70px;padding:1px;background-color:#1caf9a;border:0px;" ng-click="viewClientRequest(ClientRequest.ClientRequestHeaderID,ClientRequest.ClientID)">View</button>&nbsp;&nbsp;
+                                            <button class="btn btn-success" ng-disabled="ClientRequest.isManagePayment" style="width:140px;padding:1px;background-color:##58D68D ;border:0px;" ng-click="manageBankDetails(ClientRequest.BusinessUnitID, ClientRequest.ClientID,ClientRequest.ClientRequestHeaderID)">Manage Payments</button>
+                                            @*<button ng-disabled="ClientRequest.IsQuotationCreated" class="btn btn-success" ng-click="initializeQuotation(ClientRequest.ClientRequestHeaderID)">Make Quotation</button>&nbsp;&nbsp;*@
+                                            @*<button class="btn btn-danger " hidden ng-click="Delete(myReqList)">Delete</button>*@
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <pagination total-items="totalItems"
+                                        ng-model="currentPage"
+                                        max-size="maxSize"
+                                        class="pagination-sm pull-left"
+                                        boundary-links="true"
+                                        rotate="false"
+                                        num-pages="numPages"
+                                        items-per-page="itemsPerPage"></pagination>
+                        </div>
+
+                    </div>
+                    <div class="tab-pane" id="tab-2">
+                        <form name="manangeClientRequest" novalidate>
+                            <ng-form name="manageClient" novalidate>
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <h3 class="panel-title">
+                                            <strong>Customer Details</strong>
+                                        </h3>
+                                    </div>
+                                </div>
+                                <div class="panel-body">
+                                    @*<div class="col-md-4" ng-if="!isCustomerAvailable">
+                                            <div class="form-group">
+                                                <label class="control-label">Select Customer</label>
+                                                <selectize placeholder="Select Customer" options="availableClients" config="{maxItems: 1}" ng-model="cusObj.ClientID" ng-change="loadClientByID(cusObj.ClientID)"></selectize>
+                                            </div>
+                                        </div>*@
+                                    <div class="col-md-4" ng-if="!isCustomerAvailable" style="margin-top:25px;">
+                                        <input type="button" class="btn btn-danger" value="Add New Customer" ng-click="manageCustomer(false,'')" />
+                                    </div>
+                                    <div class="row" ng-if="isCustomerAvailable">
+                                        <div class="col-md-6">
+                                            <h3 style="margin-top: 5px;">{{cusObj.ClientName }}</h3>
+                                            <h5 style="color:red">{{cusObj.Email}}</h5>
+                                            <h4>{{cusObj.ClientAddress}}</h4>
+                                            <h6>Phone:&nbsp;{{cusObj.ContactNo}}/{{cusObj.FixedLine}}</h6>
+                                            <h6>NIC:&nbsp;{{cusObj.NIC}}</h6>
+                                            <h6>DOB:&nbsp;{{cusObj.DOB}}</h6>
+                                        </div>
+                                    </div>
+                                    <br />
+                                    <div class="row" ng-if="isCustomerAvailable && !isViewMode">
+                                        <div class="col-md-12">
+                                            <button class="btn btn-primary" ng-click="changeCustomer()">Change Customer</button>
+                                            <button class="btn btn-default" ng-click="manageCustomer(true,cusObj,cusReqObj)">Edit Customer</button>
+                                        </div>
+                                    </div>
+
+
+                                    <div class="row" ng-if="isViewMode">
+                                        <div class="col-md-12">
+
+                                            <button class="btn btn-default" ng-click="manageViewCustomer(true,cusObj,cusReqObj)">View Customer</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </ng-form>
+                            <ng-form name="manageClientRequest" novalidate>
+                                <div class="panel panel-default" ng-if="isCustomerAvailable">
+                                    <div class="panel-heading">
+                                        <h3 class="panel-title">
+                                            <strong>Customer Request Details</strong>
+                                        </h3>
+                                    </div>
+                                </div>
+                                <div class="panel-body" ng-if="isCustomerAvailable">
+                                    <div class="row">
+                                        <label class="col-md-2 control-label">Business Unit</label>
+                                        <div class="col-md-5">
+                                            <div class="form-group">
+                                                <h3><strong><b>{{currentUser.BusinessUnitName}}</b></strong></h3>
+                                            </div>
+                                        </div>
+                                        <h3 >
+                                            <strong>3021041</strong>
+                                        </h3>
+                                    </div>
+                                    <br />
+                                    <div class="row">
+                                        <label class="col-md-2 control-label">Agent</label>
+                                        <div class="col-md-5">
+                                            <div class="form-group">
+                                                <selectize placeholder="Select Agent" id="Agent" name="inputAgent"  options="availableAgents" config="{maxItems: 1}" ng-model="cusReqObj.AgentID" ng-required="true"></selectize>
+                                                <span class="help-block" style="color:red" ng-show="manageClientRequest.inputAgent.$error.required">
+                                                    Required Field *
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <br />
+                                    <div class="row">
+                                        <label class="col-md-2 control-label">Scheme</label>
+                                        <div class="col-md-5">
+                                            <div class="form-group">
+                                                <selectize placeholder="Select Scheme" id="Scheme" name="inputPartner"  options="availablePartners" config="{maxItems: 1}" ng-model="cusReqObj.PartnerID" ng-required="true"></selectize>
+                                                <span class="help-block" style="color:red" ng-show="manageClientRequest.inputPartner.$error.required">
+                                                    Required Field *
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <br />
+                                    <div class="row">
+                                        <label class="col-md-2 control-label">Premium</label>
+                                        <div class="col-md-5">
+                                            <div class="form-group">
+                                                <selectize placeholder="Select Premium" id="premium" name="inputpremium"  options="availablePilotPremum" config="{maxItems: 1}" ng-model="cusReqObj.PilotPremiumID" ng-required="true"></selectize>
+                                                <span class="help-block" style="color:red" ng-show="manageClientRequest.inputpremium.$error.required">
+                                                    Required Field *
+                                                </span>
+                                                @*<select placeholder="Select Value" name="inputValue"  config="{maxItems: 1}" ng-model="cusReqObj.PilotPremiumID" ng-required="true" class="form-control">
+                                                    <option value="">--Select a Premium Type--</option>
+                                                    <option value="1">Person</option>
+                                                    <option value="2">Couple</option>
+                                                    <option value="3">Family</option>
+                                                </select>
+                                                <span class="help-block" style="color:red" ng-show="manageClientRequest.inputValue.$error.required">
+                                                    Required Field *
+                                                </span>*@
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <br />
+
+
+                                    <div class="row">
+                                        <label class="col-md-2 control-label">Requested Date</label>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <div class="input-group">
+                                                    <input type="text"
+                                                           name="selectRequestedDate"
+                                                           class="form-control date"
+                                                           ng-click="reqPolicyReqtDate=true"
+                                                           datepicker-popup="dd/MM/yyyy"
+                                                           ng-model="cusReqObj.RequestedDate"
+                                                           is-open="reqPolicyReqtDate"
+                                                           datepicker-options="dateOptions"
+                                                           placeholder="Requested Date"
+                                                           ng-disabled="!isClientReqAddMode"
+                                                           @*min-date="currentDate"
+                                                           max-date="purchaseOrderObj.DatePaid"*@
+                                                           ng-required="true"
+                                                           close-text="Close"
+                                                           @*ng-disabled="purchaseOrderObj.PurchaseOrderStatus=='Closed'"*@>
+                                                    <span class="input-group-btn">
+                                                        <button class="btn btn-default glyphicon glyphicon-calendar" ng-click="reqPolicyReqtDate=true;$event.stopPropagation();"></button>
+                                                    </span>
+                                                </div>
+                                                <span class="help-block" style="color:red" ng-show="manageClientRequest.selectRequestedDate.$error.required">
+                                                    Required Field *
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <br />
+                                    <div class="row">
+                                        <label class="col-md-2 control-label">Inception Date</label>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <div class="input-group">
+                                                    <input type="text"
+                                                           name="selectInspectionDate"
+                                                           class="form-control date"
+                                                           ng-click="InspectionDate=true"
+                                                           datepicker-popup="dd/MM/yyyy"
+                                                           ng-model="cusReqObj.JoinDate"
+                                                           is-open="InspectionDate"
+                                                           datepicker-options="dateOptions"
+                                                           placeholder="Inspection Date"
+                                                           ng-disabled="!isClientReqAddMode"
+                                                           @*min-date="currentDate"*@
+                                                           @*max-date="purchaseOrderObj.DatePaid"*@
+                                                           ng-required="true"
+                                                           close-text="Close"
+                                                           @*ng-disabled="purchaseOrderObj.PurchaseOrderStatus=='Closed'"*@>
+                                                    <span class="input-group-btn">
+                                                        <button class="btn btn-default glyphicon glyphicon-calendar" ng-click="InspectionDate=true;$event.stopPropagation();"></button>
+                                                    </span>
+                                                </div>
+                                                @*<span class="help-block" style="color:red" ng-show="manageClientRequest.selectRequestedDate.$error.required">
+                                                        Required Field *
+                                                    </span>*@
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <br />
+                                    <div class="row">
+                                        <label class="col-md-2 control-label">File No</label>
+                                        <div class="col-md-5">
+                                            <div class="form-group">
+                                                <input type="text" placeholder="File No" name="inputFileNo" ng-model="cusReqObj.FileNo" class="form-control" ng-required="true" />
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <br />
+                                    <div class="row">
+                                        <label class="col-md-2 control-label">Policy Period</label>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <div class="input-group">
+                                                    <input type="text"
+                                                           name="selectPolicyStartDate"
+                                                           class="form-control date"
+                                                           ng-click="PolicyStartDate=true"
+                                                           datepicker-popup="dd/MM/yyyy"
+                                                           ng-model="cusReqObj.PolicyStartDate"
+                                                           is-open="PolicyStartDate"
+                                                           datepicker-options="dateOptions"
+                                                           placeholder="Policy Start Date"
+                                                           ng-disabled="!isClientReqAddMode"
+                                                           min-date=""
+                                                           max-date=""
+                                                           ng-required="true"
+                                                           close-text="Close"
+                                                           @*ng-disabled="purchaseOrderObj.PurchaseOrderStatus=='Closed'"*@>
+                                                    <span class="input-group-btn">
+                                                        <button class="btn btn-default glyphicon glyphicon-calendar" ng-click="PolicyStartDate=true;$event.stopPropagation();"></button>
+                                                    </span>
+                                                </div>
+                                                @*<span class="help-block" style="color:red" ng-show="manageClientRequest.selectRequestedDate.$error.required">
+                        Required Field *
+                    </span>*@
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <div class="input-group">
+                                                    <input type="text"
+                                                           name="selectPolicyEndDate"
+                                                           class="form-control date"
+                                                           ng-click="PolicyEndDate=true"
+                                                           datepicker-popup="dd/MM/yyyy"
+                                                           ng-model="cusReqObj.PolicyEndDate"
+                                                           is-open="PolicyEndDate"
+                                                           datepicker-options="dateOptions"
+                                                           placeholder="Policy End Date"
+                                                           ng-disabled="!isClientReqAddMode"
+                                                           @*min-date="currentDate"*@
+                                                           @*max-date="purchaseOrderObj.DatePaid"*@
+                                                           ng-required="true"
+                                                           close-text="Close"
+                                                           @*ng-disabled="purchaseOrderObj.PurchaseOrderStatus=='Closed'"*@>
+                                                    <span class="input-group-btn">
+                                                        <button class="btn btn-default glyphicon glyphicon-calendar" ng-click="PolicyEndDate=true;$event.stopPropagation();"></button>
+                                                    </span>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <br />
+
+                                    <div class="row">
+                                        <label class="col-md-2 control-label">Deductile Type</label>
+                                        <div class="col-md-5">
+                                            <div class="form-group">
+                                                <selectize placeholder="Select Deductible" id="deductible" name="inputdeductible"  options="availableDeduction" config="{maxItems: 1}" ng-model="cusReqObj.DeductibleID" ng-required="true"></selectize>
+                                                <span class="help-block" style="color:red" ng-show="manageClientRequest.inputdeductible.$error.required">
+                                                    Required Field *
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <br />
+
+                                    <div class="row">
+                                        <label class="col-md-2 control-label"></label>
+                                        <div class="col-md-5">
+                                            <div class="form-group">
+                                                @*<div class="panel-body no-padding">*@
+                                                <button type="button" class="btn btn-danger" ng-click="sendEmailRequest(insCompany)">Send Email</button>
+                                                @*</div>*@
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <br />
+                                    @*<div class="row">
+                                            <div class="col-md-12 set-header">
+                                                <div class="row">
+                                                    <div class="col-md-1" align="center"><h5><b>#</b></h5></div>
+                                                    <div class="col-md-4" align="center"><h5><b>Insuarnce Sub Class</b></h5></div>
+                                                    <div class="col-md-3" align="center"><h5><b>Properties</b></h5></div>
+                                                    <div class="col-md-3" align="center"><h5><b>Scopes</b></h5></div>
+                                                    <div class="col-md-1" align="center"></div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12" ng-repeat="cusReq in cusReqObj.ClientRequestLineDetails" style="background-color:#d9f7f7">
+                                                <ng-form name="manageClientReqLine" novalidate>
+                                                    <div class="row">
+                                                        <div class="col-md-1">
+                                                            <div class="panel-body no-padding" align="center">
+                                                                <h6 label>{{$index+1}}</h6>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <div class="panel-body no-padding" style="align-content:center">
+                                                                <selectize placeholder="Select Ins Sub Class" name="inputInsSubClass" options="availableInsSubClasses" config="{maxItems: 1}" ng-model="cusReq.InsSubClassID" ng-required="true" ng-change="insSubClassChange($index)"></selectize>
+                                                                <span class="help-block" style="color:red" ng-show="manageClientReqLine.inputInsSubClass.$error.required">
+                                                                    Required Field *
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-3">
+                                                            <div class="panel-body no-padding" align="center">
+                                                                <button type="button" class="btn btn-danger" ng-click="manageProperties($index)">Manage Properties</button>
+                                                                <input type="text" ng-model="propertyValidateTemp" ng-required="cusReq.ClientPropertyDetails.length==0" ng-show="false" />
+                                                                <span ng-if="cusReq.ClientPropertyDetails.length>0"><i style="color:green" class="glyphicon glyphicon-ok"></i></span>
+                                                                <span ng-if="cusReq.ClientPropertyDetails.length==0"><i style="color:red" class="glyphicon glyphicon-remove"></i></span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-3">
+                                                            <div class="panel-body no-padding" align="center">
+                                                                <button type="button" class="btn btn-warning" ng-click="manageScopes($index,cusReq.InsSubClassID)">Manage Scopes</button>
+                                                                <input type="text" ng-model="scopeValidateTemp" ng-required="cusReq.ClientRequestInsSubClassScopeDetails.length==0" ng-show="false" />
+                                                                <span ng-if="cusReq.ClientRequestInsSubClassScopeDetails.length>0"><i style="color:green" class="glyphicon glyphicon-ok"></i></span>
+                                                                <span ng-if="cusReq.ClientRequestInsSubClassScopeDetails.length==0"><i style="color:red" class="glyphicon glyphicon-remove"></i></span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-1">
+                                                            <div class="panel-body no-padding" ng-if="$index>0">
+                                                                <button type="button" class="btn btn-default" ng-click="deleteItem($index)">
+                                                                    <span class="glyphicon glyphicon-remove-circle"></span>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </ng-form>
+                                            </div>
+                                            <div class="col-md-12">
+                                                <br />
+                                                <div class="row">
+                                                    <div class="col-md-1">
+                                                        <div class="panel-body no-padding" align="center">
+                                                            <button type="button" class="btn btn-default" ng-click="addItem()">
+                                                                <span class="glyphicon glyphicon-plus"></span>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>*@
+                                    <br />
+                                    @*<ng-form name="manageDebitNote" novalidate>*@
+                                    <div class="panel panel-default" ng-show="!isClientReqAddMode">
+                                        <div class="panel-heading">
+                                            <h3 class="panel-title">
+                                                <strong>Manage Premium</strong>
+                                            </h3>
+                                        </div>
+                                        <br />
+                                        <br /> <br /><br />
+                                        <div class="row">
+                                            <div class="col-md-12 set-header">
+                                                <div class="row">
+                                                    <div class="col-md-1" align="center"><h5><b>#</b></h5></div>
+                                                    <div class="col-md-2" align="center"><h5><b>Premium Holder</b></h5></div>
+                                                    @*<div class="col-md-2" align="center"><h5><b>Deductibles(%)</b></h5></div>*@
+                                                    @*<div class="col-md-2" align="center"><h5><b>Loadings(%)</b></h5></div>*@
+                                                    @*<div class="col-md-2" align="center"><h5><b>Premium</b></h5></div>*@
+                                                    <div class="col-md-2" align="center"><h5><b>Net Premium</b></h5></div>
+                                                    <div class="col-md-1" align="center"></div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12" ng-repeat="policyCommissionPayment in cusObj.DeductionDetails" style="background-color:#d9f7f7">
+                                                <ng-form name="managePolicyCommissionPayment" novalidate>
+                                                    <div class="row">
+                                                        <div class="col-md-1">
+                                                            <div class="panel-body no-padding" align="center">
+                                                                <h6 label>{{$index+1}}</h6>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <div class="panel-body no-padding" style="align-content:center">
+                                                                <input type="text" placeholder="Premium Holder" name="inputValue" ng-model="policyCommissionPayment.PremiumHolder" class="form-control" ng-required="true" @*onkeyup="checkInputRate(this);" min="0"*@ style="width:100%" />
+                                                                <span class="help-block" style="color:red" ng-show="managePolicyCommissionPayment.inputCommissionType.$error.required">
+                                                                    Required Field *
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                        @*<div class="col-md-2">
+                                                            <div class="panel-body no-padding" align="left">
+                                                                <select placeholder="Deductions" name="inputPrecentage" options="availableDeductions" config="{maxItems: 1}" ng-model="policyCommissionPayment.DeductionRate" ng-required="true" class="form-control">
+                                                                    <option value="">--Select a Deduction Type--</option>
+                                                                    <option value="1">Nill</option>
+                                                                    <option value="2">USD 2,000 </option>
+                                                                    <option value="3">USD 3,000 </option>
+                                                                </select>
+                                                                <span class="help-block" style="color:red" ng-show="managePolicyCommissionPayment.inputPrecentage.$error.required">
+                                                                    Required Field *
+                                                                </span>
+                                                            </div>
+                                                        </div>*@
+
+                                                        @*<div class="col-md-2">
+                                                            <div class="panel-body no-padding" align="left">
+                                                                <select placeholder="Select Value" name="inputValue" options="availablePremium" config="{maxItems: 1}" ng-model="policyCommissionPayment.PremiumAmount" ng-required="true" class="form-control">
+                                                                    <option value="">--Select a Premium Type--</option>
+                                                                    <option value="1">Person</option>
+                                                                    <option value="2">Couple </option>
+                                                                    <option value="3">Family </option>
+                                                                </select>
+                                                                <span class="help-block" style="color:red" ng-show="managePolicyCommissionPayment.inputValue.$error.required">
+                                                                    Required Field *
+                                                                </span>
+                                                                </div>
+                                                            </div>*@
+
+                                                       
+                                                        
+
+                                                        <div class="col-md-2">
+                                                            <div class="panel-body no-padding" align="left">
+                                                                <input type="text" placeholder="Net Premium" ng-disabled="true" name="inputCommissionValue" ng-model="policyCommissionPayment.NetPremium | number : 2" class="form-control" ng-required="true" onkeyup="checkInputRate(this);" min="0" style="width:100%" />
+                                                                <span class="help-block" style="color:red" ng-show="managePolicyCommissionPayment.inputCommissionValue.$error.required">
+                                                                    Required Field *
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-sm-1" hidden>
+                                                            <div class="panel-body no-padding" align="left">
+                                                                <input type="text" placeholder="Loadings" name="inputLoadings" ng-model="policyCommissionPayment.LoadingRate" class="form-control" ng-required="true" onkeyup="checkInputRate(this);" min="0" style="width:100%" />
+                                                                <span class="help-block" style="color:red" ng-show="managePolicyCommissionPayment.inputLoadings.$error.required">
+                                                                    Required Field *
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-1">
+                                                            <div class="panel-body no-padding" ng-if="$index>0">
+                                                                <button type="button" class="btn btn-default" ng-click="deleteItem($index,cusObj.PolicyCommissionPaymentDetails)">
+                                                                    <span class="glyphicon glyphicon-remove-circle"></span>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </ng-form>
+                                            </div>
+                                            <div class="col-md-12">
+                                                <br />
+                                                <div class="row">
+                                                    <div class="col-md-1">
+                                                        <div class="panel-body no-padding" align="center">
+                                                            <button type="button" class="btn btn-default" ng-click="addItem()">
+                                                                <span class="glyphicon glyphicon-plus"></span>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        @*<div class="row">
+                                            <label class="col-md-2 ">Loading</label>
+                                            <div class="col-md-6">
+                                                <input type="text" placeholder="Loading Precentage" name="inputLoading" ng-model="cusObj.LoadnigRate" class="form-control" ng-change="checkInputRateByValue()"
+                                                       min="0" style="width:80%" />
+                                                @*<span class="help-block" style="color:red" ng-show="managePolicyInfoRecording.inputCauseOfLoss.$error.required">Required Field *</span>*@
+                                        @*</div>
+                                            </div>
+                                            <br />
+                                            <div class="row">
+                                                <label class="col-md-2 ">Deduction</label>
+                                                <div class="col-md-6">
+                                                    <input type="text" placeholder="Deduction Precentage" name="inputDeduction" ng-model="cusObj.DeductionRate" class="form-control" ng-change="checkInputDeduction()" style="width:80%" />
+
+                                                </div>
+                                            </div>
+                                            <br />*@
+                                        <br />
+                                        <div class="row" ng-show="isFamilyDiscountApply" hidden>
+                                            <label class="col-md-2 ">Family Discount</label>
+                                            <div class="col-md-6">
+                                                <h5 label style="color:green"><b>{{cusReqObj.NewFamilyDiscount}} % {{cusReqObj.FamilyDiscountStatus}}</b></h5>
+                                                @*<span class="help-block" style="color:red" ng-show="managePolicyInfoRecording.inputCauseOfLoss.$error.required">Required Field *</span>*@
+                                            </div>
+                                        </div>
+                                        <br />
+                                        <div class="row" ng-show="!isFamilyDiscountApply" hidden>
+                                            <label class="col-md-2 ">Family Discount</label>
+                                            <div class="col-md-6">
+                                                <h5 label style="color:red"><b>{{cusReqObj.NewFamilyDiscount}} % {{cusReqObj.FamilyDiscountStatus}}</b></h5>
+                                                @*<span class="help-block" style="color:red" ng-show="managePolicyInfoRecording.inputCauseOfLoss.$error.required">Required Field *</span>*@
+                                            </div>
+                                        </div>
+                                        <br />
+
+                                        <div class="row">
+                                            <label class="col-md-2">Additional Note</label>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <textarea rows="3" class="form-control" placeholder="Additional Note" ng-model="cusReqObj.AdditionalNote"></textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <br />
+
+                                        <div class="row">
+                                            <label class="col-md-2 "></label>
+                                            <div class="col-md-6">
+                                                <button class="btn btn-success" ng-click="calculateNetPremium(cusObj.DeductionDetails)">Calculate Net Premium</button>
+                                                @*<span class="help-block" style="color:red" ng-show="managePolicyInfoRecording.inputCauseOfLoss.$error.required">Required Field *</span>*@
+                                            </div>
+                                        </div>
+                                        <br />
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="panel-body no-padding" align="center">
+                                                    <h3 label style="color:red"><b>Net Premium : US$ {{cusReqObj.PaymentAmount | number : 2}}</b></h3>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <br />
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-12 modal-footer">
+                                            <button class="btn btn-primary" @*ng-disabled="!manageClientRequest.$valid"*@ ng-show="isClientReqAddMode && !isViewMode" ng-click="saveCustomerRequest()">Save Customer Request<span class="fa fa-floppy-o fa-right"></span></button>
+                                            <button class="btn btn-primary" @*ng-disabled="!manageClientRequest.$valid"*@ ng-show="!isClientReqAddMode && !isViewMode" ng-click="updateCustomerRequest()">Update Customer Request<span class="fa fa-floppy-o fa-right"></span></button>
+                                            <button class="btn btn-default" ng-click="cancelCustomerRequest()">Cancel</button>
+                                        </div>
+                                    </div>
+                                    <br />
+                                </div>
+                            </ng-form>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div id="divLoading" ng-show="showLoader"></div>
+        <script type="text/ng-template" id="ngTemplateCustomer">
+            <div class="modal-header bg-primary" style="background-color:#1caf9a !important">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true" ng-click="cancel()">x</button>
+                <h4>{{mode}} Customer</h4>
+            </div>
+            <div class="modal-body">
+                <ng-form name="manageCustomer" novalidate>
+                    <div class="content">
+                        <div class="row">
+                            <label class="col-md-3 control-label">Customer Name</label>
+                            @*<div class="row">*@
+                            <div class="col-md-3">
+
+
+                                <selectize placeholder="" name="inputTitle" options="availableTitle" config="{maxItems: 1}" ng-model="customerObj.TitleID">
+                                </selectize>
+
+                            </div>
+                            <div class="col-md-6">
+                                <input type="text" placeholder="Surname" name="inputCustomerName" ng-model="customerObj.ClientName" class="form-control" ng-required="true" />
+                                <span class="help-block" style="color:red" ng-show="manageCustomer.inputCustomerName.$error.required">Required Field *</span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <label class="col-md-3 control-label">&nbsp;&nbsp;</label>
+                            <div class="row">
+                                <div class="col-md-9">
+                                    <div class="form-group">
+                                        <input type="text" placeholder="Other Name" name="inputCustomerOtherName" ng-model="customerObj.ClientOtherName" class="form-control" ng-required="true" />
+                                        <span class="help-block" style="color:red" ng-show="manageCustomer.inputCustomerName.$error.required">Required Field *</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <br />
+                        <div class="row">
+                            <label class="col-md-3 control-label">Address</label>
+                            <div class="col-md-9">
+                                <div class="form-group">
+                                    <input type="text" placeholder="Address" name="inputAddress" ng-model="customerObj.ClientAddress" class="form-control" ng-required="true" />
+                                    <span class="help-block" style="color:red" ng-show="manageCustomer.inputAddress.$error.required">Required Field *</span>
+                                </div>
+                            </div>
+                        </div>
+                        <br />
+                        <div class="row">
+                            <label class="col-md-3 control-label">NIC</label>
+                            <div class="col-md-9">
+                                <div class="form-group">
+                                    <input type="text" placeholder="NIC" name="inputNIC" maxlength="12" ng-model="customerObj.NIC" class="form-control" @*ng-required="true"*@ ng-pattern="/^[0-9]{9}[vVxX]|[0-9]{12}$/" ng-change="generateNICLength(customerObj.NIC)" />
+                                    <span class="help-block" style="color:red" ng-show="manageCustomer.inputNIC.$error.pattern">Incorrect NIC Number</span>
+                                    <span class="help-block" style="color:red" ng-show="manageCustomer.inputNIC.$error.required">Required Field *</span>
+                                </div>
+                            </div>
+                        </div>
+                        <br />
+                        <div class="row">
+                            <label class="col-md-3 control-label">Passport ID</label>
+                            <div class="col-md-9">
+                                <div class="form-group">
+                                    <input type="text" placeholder="PPID" name="inputPPID" ng-model="customerObj.PPID" class="form-control" />
+                                </div>
+                            </div>
+                        </div>
+                        <br />
+                        <div class="row">
+                            <label class="col-md-3 control-label">Mobile No</label>
+                            <div class="col-md-9">
+                                <div class="form-group">
+                                    <input type="text" placeholder="Contact No" name="inputContactNo" maxlength="10" ng-model="customerObj.ContactNo" class="form-control" @*ng-required="true"*@ onkeypress="return IsNumber(event)" ng-pattern="/^\d{10}$/" />
+                                    <span class="help-block" style="color:red" ng-show="manageCustomer.inputContactNo.$error.pattern">Incorrect Contact Number</span>
+                                    @*<span class="help-block" style="color:red" ng-show="manageCustomer.inputContactNo.$error.required">Required Field *</span>*@
+                                </div>
+                            </div>
+                        </div>
+                        <br />
+                        <div class="row">
+                            <label class="col-md-3 control-label">Fixed Line</label>
+                            <div class="col-md-9">
+                                <div class="form-group">
+                                    <input type="text" placeholder="Fixed Line" name="inputFixedLine" maxlength="10" ng-model="customerObj.FixedLine" class="form-control" @*ng-required="true"*@ onkeypress="return IsNumber(event)" ng-pattern="/^\d{10}$/" />
+                                    <span class="help-block" style="color:red" ng-show="manageCustomer.inputFixedLine.$error.pattern">Incorrect Fixed Line</span>
+                                    @*<span class="help-block" style="color:red" ng-show="manageCustomer.inputFixedLine.$error.required">Required Field *</span>*@
+                                </div>
+                            </div>
+                        </div>
+                        <br />
+                        <div class="row">
+                            <label class="col-md-3 control-label">Email</label>
+                            <div class="col-md-9">
+                                <div class="form-group">
+                                    <input type="email" name="inputEmail" placeholder="Email" ng-model="customerObj.Email" class="form-control" ng-required="true" />
+                                    <span class="error" ng-show="manageCustomer.inputEmail.$error.email" style="color:red">
+                                        Invalid Email
+                                    </span>
+                                    <span class="help-block" style="color:red" ng-show="manageCustomer.inputEmail.$error.required">
+                                        Required Field *
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <br />
+                        <div class="row">
+                            <label class="col-md-3 control-label">Date of Birth</label>
+                            <div class="col-md-9">
+                                <div class="form-group">
+                                    <div class="input-group">
+                                        <input type="text"
+                                               @*readonly*@
+                                               name="selectDOB"
+                                               class="form-control date"
+                                               ng-click="dob=true"
+                                               datepicker-popup="dd/MM/yyyy"
+                                               ng-model="customerObj.DOB"
+                                               is-open="dob"
+                                               datepicker-options="dateOptions"
+                                               placeholder="Date of birth"
+                                               @*min-date="currentDate"*@
+                                               @*max-date="purchaseOrderObj.DatePaid"*@
+                                               ng-required="true"
+                                               close-text="Close"
+                                               @*ng-disabled="purchaseOrderObj.PurchaseOrderStatus=='Closed'"*@>
+                                        <span class="input-group-btn">
+                                            <button class="btn btn-default glyphicon glyphicon-calendar" ng-click="dob=true;$event.stopPropagation();"></button>
+                                        </span>
+                                    </div>
+                                    <span class="help-block" style="color:red" ng-show="manageCustomer.selectDOB.$error.required">
+                                        Required Field *
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <br />
+
+
+
+                        <br />
+                        @*<div class="row">
+                                <label class="col-md-3 control-label">Family Discount</label>
+                                <div class="col-md-9">
+                                    <div class="form-group">
+                                        <input type="number" placeholder="Family Discount" ng-model="customerObj.FamilyDiscount" class="form-control" onkeyup="checkInputRate(this);" min="0">
+                                    </div>
+                                </div>
+                            </div>*@
+                        <br />
+                        
+                        @*<div class="row">
+                                <label class="col-md-3 control-label">Additional Note</label>
+                                <div class="col-md-9">
+                                    <div class="form-group">
+                                        <textarea rows="3" class="form-control" placeholder="Additional Note" ng-model="customerObj.AdditionalNote"></textarea>
+                                    </div>
+                                </div>
+                            </div>*@
+                        <br />
+                        <div class="row">
+                            <label class="col-md-3 control-label">Home Country</label>
+                            <div class="col-md-9">
+                                <div class="form-group">
+                                    <selectize placeholder="Select Home Country" name="inputHomeCountry" options="availableHomeCountries" config="{maxItems: 1}" ng-model="customerObj.HomeCountryID" ng-required="true"></selectize>
+                                    <span class="help-block" style="color:red" ng-show="manageCustomer.inputHomeCountry.$error.required">
+                                        Required Field *
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <br />
+                        <div class="row">
+                            <label class="col-md-3 control-label">Resident Country</label>
+                            <div class="col-md-9">
+                                <div class="form-group">
+                                    <selectize placeholder="Select Resident Country" name="inputResidentCountry" options="availableResidentCountries" config="{maxItems: 1}" ng-model="customerObj.ResidentCountryID" ng-required="true"></selectize>
+                                    <span class="help-block" style="color:red" ng-show="manageCustomer.inputResidentCountry.$error.required">
+                                        Required Field *
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <br />
+
+                        <div class="row">
+                            <label class="col-md-3 control-label">Add Family Details</label>
+                            <div class="col-md-9">
+                                <div class="form-group">
+                                    <button type="button" class="btn btn-danger" ng-click="manageInsCompanyScopeDetails($index)">Add Family Members</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <br />
+                        <div class="row">
+                            <div class="col-md-12 modal-footer">
+                                <button class="btn btn-primary" ng-disabled="!manageCustomer.$valid || isViewMode" ng-show="!isEditMode " ng-click="saveCustomerDetails()">Add Customer</button>
+                                <button class="btn btn-primary" ng-disabled="!manageCustomer.$valid || isViewMode" ng-show="isEditMode " ng-click="updateCustomerDetails()">Edit Customer</button>
+                                <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+                </ng-form>
+            </div>
+            <div id="divLoading" ng-show="showLoader"></div>
+        </script>
+        <script type="text/ng-template" id="ngTemplateBank">
+            <div class="modal-header bg-primary" style="background-color:#1caf9a !important">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true" ng-click="cancel()">x</button>
+                <h4> Payment Details</h4>
+            </div>
+            <div class="modal-body">
+                <ng-form name="managePayment" novalidate>
+                    <div class="content">
+                        @*<div id="printable" name="printableArea" >*@
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="panel-body no-padding" align="center">
+                                    <h3 label style="color:red"><b>Net Premium : US$ {{bankObj.PaymentAmount | number : 2}}</b></h3>
+                                </div>
+                            </div>
+                        </div>
+
+                        <br />
+                        <div class="row">
+                            <label class="col-md-3 ">Client Name</label>
+                            <div class="col-md-9">
+                                <h5 label style="color:black"><b>{{bankObj.ClientName}}</b></h5>
+                                @*<span class="help-block" style="color:red" ng-show="managePolicyInfoRecording.inputCauseOfLoss.$error.required">Required Field *</span>*@
+                            </div>
+                        </div>
+                        <div class="row">
+                            <label class="col-md-3 ">Email</label>
+                            <div class="col-md-9">
+                                <h5 label style="color:red"><b>{{bankObj.Email}}</b></h5>
+                                @*<span class="help-block" style="color:red" ng-show="managePolicyInfoRecording.inputCauseOfLoss.$error.required">Required Field *</span>*@
+                            </div>
+                        </div>
+                        <div class="row">
+                            <label class="col-md-3 ">Address</label>
+                            <div class="col-md-9">
+                                <h5 label style="color:black"><b>{{bankObj.ClientAddress}}</b></h5>
+                                @*<span class="help-block" style="color:red" ng-show="managePolicyInfoRecording.inputCauseOfLoss.$error.required">Required Field *</span>*@
+                            </div>
+                        </div>
+                        <div class="row">
+                            <label class="col-md-3 ">Contact Infomation</label>
+                            <div class="col-md-9">
+                                <h5 label style="color:black"><b>{{bankObj.ContactNo}}/{{bankObj.FixedLine}}</b></h5>
+                                @*<span class="help-block" style="color:red" ng-show="managePolicyInfoRecording.inputCauseOfLoss.$error.required">Required Field *</span>*@
+                            </div>
+                        </div>
+                        <br />
+                        <div class="row">
+                            <label class="col-md-3">Select Bank</label>
+                            <div class="col-md-9">
+                                @*<div class="form-group">*@
+                                <selectize placeholder="Select Bank" style="width:200px" name="inputBank" options="availableBanks" config="{maxItems: 1}" ng-model="bankObj.BankID" ng-change="loadBankByID(bankObj.BankID)" ng-required="true"></selectize>
+                                <span class="help-block" style="color:red" ng-show="managePayment.inputBank.$error.required">
+                                    Required Field *
+                                </span>
+                                @*</div>*@
+                            </div>
+                        </div>
+                        <br />
+                        <div class="row">
+                            <label class="col-md-3">Draft No</label>
+                            <div class="col-md-9">
+                                @*<div class="form-group">*@
+                                <input type="text" placeholder="DraftNo" style="width:200px" name="inputDraftNo" ng-model="bankObj.DraftNo" class="form-control" ng-required="true" />
+                                <span class="help-block" style="color:red" ng-show="managePayment.inputDraftNo.$error.required">Required Field *</span>
+                                @*</div>*@
+                            </div>
+                        </div>
+                        <br />
+                        @*{{bankObj}}*@
+                        <div class="row">
+                            <label class="col-md-3 ">Bank Rate</label>
+                            <div class="col-md-9">
+                                <h5 label style="color:red"><b>{{bankObj.BankRate}}%</b></h5>
+                                @*<span class="help-block" style="color:red" ng-show="managePolicyInfoRecording.inputCauseOfLoss.$error.required">Required Field *</span>*@
+                            </div>
+                        </div>
+                        <br />
+                        <div class="row">
+                            <label class="col-md-3 ">Bank Commision</label>
+                            <div class="col-md-9">
+                                <h5 label style="color:red"><b>{{bankObj.BankAmount | number : 2}}</b></h5>
+                                @*<span class="help-block" style="color:red" ng-show="managePolicyInfoRecording.inputCauseOfLoss.$error.required">Required Field *</span>*@
+                            </div>
+                        </div>
+                        <br />
+                        <div class="row">
+                            <label class="col-md-3 ">Agent Rate</label>
+                            <div class="col-md-9">
+                                <h5 label style="color:red"><b>{{bankObj.AgentRate}}%</b></h5>
+                                @*<span class="help-block" style="color:red" ng-show="managePolicyInfoRecording.inputCauseOfLoss.$error.required">Required Field *</span>*@
+                            </div>
+                        </div>
+                        <br />
+                        <div class="row">
+                            <label class="col-md-3 ">Agent Commision</label>
+                            <div class="col-md-9">
+                                <h5 label style="color:red"><b>{{bankObj.AgentAmount | number : 2}}</b></h5>
+                                @*<span class="help-block" style="color:red" ng-show="managePolicyInfoRecording.inputCauseOfLoss.$error.required">Required Field *</span>*@
+                            </div>
+                        </div>
+                        <br />
+                        <div class="row">
+                            <label class="col-md-3 ">SIB Commision</label>
+                            <div class="col-md-9">
+                                <h5 label style="color:red"><b>{{bankObj.IBSAmount | number : 2}}</b></h5>
+                                @*<span class="help-block" style="color:red" ng-show="managePolicyInfoRecording.inputCauseOfLoss.$error.required">Required Field *</span>*@
+                            </div>
+                        </div>
+                        <br />
+                        <div class="row">
+                            <label class="col-md-3 ">SGS Commision</label>
+                            <div class="col-md-9">
+                                <h5 label style="color:red"><b>{{bankObj.SGSAmount | number : 2}}</b></h5>
+                                @*<span class="help-block" style="color:red" ng-show="managePolicyInfoRecording.inputCauseOfLoss.$error.required">Required Field *</span>*@
+                            </div>
+                        </div>
+
+                        @*<div class="row">
+                                <label class="col-md-3 control-label"></label>
+                                <div class="col-md-9">
+                                    <div class="form-group">
+                                        <button type="button" class="btn btn-success" ng-click="managePolicyInfoChargeDetails(ClientRequest.BusinessUnitID)">Bank Details </button>
+                                    </div>
+                                </div>
+                            </div>*@
+                        <br />
+                        @*</div>*@
+                        <div id="printable" name="printableArea" ng-hide="true">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="panel-body no-padding" align="center">
+                                        <h3 label style="color:red"><b>Net Premium : US$ {{bankObj.PaymentAmount | number : 2}}</b></h3>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <br />
+                            <div class="row">
+                                <label class="col-md-3 ">Client Name</label>
+                                <div class="col-md-9">
+                                    <h5 label style="color:black"><b>{{bankObj.ClientName}}</b></h5>
+                                    @*<span class="help-block" style="color:red" ng-show="managePolicyInfoRecording.inputCauseOfLoss.$error.required">Required Field *</span>*@
+                                </div>
+                            </div>
+                            <div class="row">
+                                <label class="col-md-3 ">Email</label>
+                                <div class="col-md-9">
+                                    <h5 label style="color:red"><b>{{bankObj.Email}}</b></h5>
+                                    @*<span class="help-block" style="color:red" ng-show="managePolicyInfoRecording.inputCauseOfLoss.$error.required">Required Field *</span>*@
+                                </div>
+                            </div>
+                            <div class="row">
+                                <label class="col-md-3 ">Address</label>
+                                <div class="col-md-9">
+                                    <h5 label style="color:black"><b>{{bankObj.ClientAddress}}</b></h5>
+                                    @*<span class="help-block" style="color:red" ng-show="managePolicyInfoRecording.inputCauseOfLoss.$error.required">Required Field *</span>*@
+                                </div>
+                            </div>
+                            <div class="row">
+                                <label class="col-md-3 ">Contact Infomation</label>
+                                <div class="col-md-9">
+                                    <h5 label style="color:black"><b>{{bankObj.ContactNo}}/{{bankObj.FixedLine}}</b></h5>
+                                    @*<span class="help-block" style="color:red" ng-show="managePolicyInfoRecording.inputCauseOfLoss.$error.required">Required Field *</span>*@
+                                </div>
+                            </div>
+                            <br />
+                            <div class="row">
+                                <label class="col-md-3">Select Bank</label>
+                                <div class="col-md-3">
+                                    @*<div class="form-group">*@
+                                    <selectize placeholder="Select Bank" style="width:200px" name="inputResidentCountry" options="availableBanks" config="{maxItems: 1}" ng-model="bankObj.BankID" ng-change="loadBankByID(bankObj.BankID)" ng-required="true"></selectize>
+
+                                    @*</div>*@
+                                </div><br />
+                                <label class="col-md-3">Draft No</label>
+                                <div class="col-md-3">
+                                    @*<div class="form-group">*@
+                                    <h5 label style="color:black"><b>{{bankObj.DraftNo}}</b></h5>
+                                </div>
+                            </div>
+                            <br />
+                            <div class="row">
+                                <label class="col-md-3">Draft No</label>
+                                <div class="col-md-9">
+                                    @*<div class="form-group">*@
+                                    <h5 label style="color:black"><b>{{bankObj.DraftNo}}</b></h5>
+                                </div>
+                            </div>
+                            <br />
+                            @*{{bankObj}}*@
+                            <div class="row">
+                                <label class="col-md-3 ">Bank Rate</label>
+                                <div class="col-md-9">
+                                    <h5 label style="color:red"><b>{{bankObj.BankRate}}%</b></h5>
+                                    @*<span class="help-block" style="color:red" ng-show="managePolicyInfoRecording.inputCauseOfLoss.$error.required">Required Field *</span>*@
+                                </div>
+                            </div>
+                            <br />
+                            <div class="row">
+                                <label class="col-md-3 ">Bank Commision</label>
+                                <div class="col-md-9">
+                                    <h5 label style="color:red"><b>{{bankObj.BankAmount | number : 2}}</b></h5>
+                                    @*<span class="help-block" style="color:red" ng-show="managePolicyInfoRecording.inputCauseOfLoss.$error.required">Required Field *</span>*@
+                                </div>
+                            </div>
+                            <br />
+                            <div class="row">
+                                <label class="col-md-3 ">Agent Rate</label>
+                                <div class="col-md-9">
+                                    <h5 label style="color:red"><b>{{bankObj.AgentRate}}%</b></h5>
+                                    @*<span class="help-block" style="color:red" ng-show="managePolicyInfoRecording.inputCauseOfLoss.$error.required">Required Field *</span>*@
+                                </div>
+                            </div>
+                            <br />
+                            <div class="row">
+                                <label class="col-md-3 ">Agent Commision</label>
+                                <div class="col-md-9">
+                                    <h5 label style="color:red"><b>{{bankObj.AgentAmount | number : 2}}</b></h5>
+                                    @*<span class="help-block" style="color:red" ng-show="managePolicyInfoRecording.inputCauseOfLoss.$error.required">Required Field *</span>*@
+                                </div>
+                            </div>
+                            <br />
+                            <div class="row">
+                                <label class="col-md-3 ">IBS Commision</label>
+                                <div class="col-md-9">
+                                    <h5 label style="color:red"><b>{{bankObj.IBSAmount | number : 2}}</b></h5>
+                                    @*<span class="help-block" style="color:red" ng-show="managePolicyInfoRecording.inputCauseOfLoss.$error.required">Required Field *</span>*@
+                                </div>
+                            </div>
+                            <br />
+                            <div class="row">
+                                <label class="col-md-3 ">SGS Commision</label>
+                                <div class="col-md-9">
+                                    <h5 label style="color:red"><b>{{bankObj.SGSAmount | number : 2}}</b></h5>
+                                    @*<span class="help-block" style="color:red" ng-show="managePolicyInfoRecording.inputCauseOfLoss.$error.required">Required Field *</span>*@
+                                </div>
+                            </div>
+
+                            @*<div class="row">
+                                    <label class="col-md-3 control-label"></label>
+                                    <div class="col-md-9">
+                                        <div class="form-group">
+                                            <button type="button" class="btn btn-success" ng-click="managePolicyInfoChargeDetails(ClientRequest.BusinessUnitID)">Bank Details </button>
+                                        </div>
+                                    </div>
+                                </div>*@
+                            <br />
+                        </div>
+                        <button ng-click="printDiv('printable');">Print Div</button>
+                        <div class="row">
+                            <div class="col-md-12 modal-footer">
+                                <button class="btn btn-primary" ng-disabled="!managePayment.$valid" ng-show="!IsPayment" ng-click="saveBankDetails()">Add Payment Details</button>
+                                <button class="btn btn-primary" @*ng-disabled="!managePayment.$valid"*@ style="visibility:hidden" ng-show="IsPayment" ng-click="updateBankDetails()">Update Payment Details</button>
+                                <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+                </ng-form>
+            </div>
+            <div id="divLoading" ng-show="showLoader"></div>
+        </script>
+        <script type="text/ng-template" id="ngTemplateAgentDetails">
+            <div class="modal-header bg-primary" style="background-color:#1caf9a !important">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true" ng-click="cancel()">x</button>
+                <h4> Bank Details</h4>
+            </div>
+            <div class="modal-body">
+                <ng-form name="manageCustomer" novalidate>
+                    <div class="content">
+                        <div class="row">
+                            <label class="col-md-3 control-label">Select Bank</label>
+                            <div class="col-md-9">
+                                <div class="form-group">
+                                    <selectize placeholder="Select Bank" name="inputResidentCountry" options="availableBanks" config="{maxItems: 1}" ng-model="customerObj.BankID" ng-required="true"></selectize>
+                                    <span class="help-block" style="color:red" ng-show="manageCustomer.inputResidentCountry.$error.required">
+                                        Required Field *
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <br />
+                        <div class="row">
+                            <label class="col-md-3 control-label">Draft No</label>
+                            <div class="col-md-9">
+                                <div class="form-group">
+                                    <input type="text" placeholder="Draft No" name="inputCustomerName" ng-model="customerObj.ClientName" class="form-control" ng-required="true" />
+                                    <span class="help-block" style="color:red" ng-show="manageCustomer.inputCustomerName.$error.required">Required Field *</span>
+                                </div>
+                            </div>
+                        </div>
+                        <br />
+                        <div class="row">
+                            <div class="col-md-12 modal-footer">
+                                <button class="btn btn-primary" ng-disabled="!manageCustomer.$valid" ng-show="!isEditMode" ng-click="saveBankDetails()">Add Bank Details</button>
+                                <button class="btn btn-primary" ng-disabled="!manageCustomer.$valid" ng-show="isEditMode" ng-click="updateBankDetails()">Edit Bank Details</button>
+                                <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+                </ng-form>
+            </div>
+            <div id="divLoading" ng-show="showLoader"></div>
+        </script>
+        <script type="text/ng-template" id="ngTemplateInsCompanyScope">
+            <div class="modal-header bg-primary" style="background-color:#1caf9a !important">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true" ng-click="cancel()">x</button>
+                <h4>Family Members Details</h4>
+            </div>
+            <div class="modal-body">
+                <ng-form name="manageInsuranceCompanyScope" novalidate>
+                    <div class="content">
+                        <div class="row">
+                            <div class="col-md-12 set-header-scope" style="height: 45px;">
+                                @*<div class="row">
+                            <table style="width:100%">
+                                <tr>
+                                    <td style="width:1%">
+                                       <div class="panel-body no-padding" align="center">
+                                            <h5>
+                                                <b>#</b>
+                                            </h5>
+                                        </div>
+
+                                    </td>
+
+                                    <td style="width:7%">
+                                        <div class="panel-body no-padding" align="center">
+                                            <h5>
+                                                <b>Name</b>
+                                            </h5>
+                                        </div>
+                                    </td>
+                                    <td style="width:15%">
+                                        <div class="panel-body no-padding" align="center">
+                                            <h5>
+                                                <b>DOB</b>
+                                            </h5>
+                                        </div>
+                                    </td>
+                                    <td style="width:15%">
+                                        <div class="panel-body no-padding" align="center">
+                                            <h5>
+                                                <b>NIC/PPNo</b>
+                                            </h5>
+                                        </div>
+                                    </td>
+                                    <td hidden>
+
+                                        <h5>
+                                            <b>Membership ID</b>
+                                        </h5>
+                                    </td>
+                                    <td style="width:15%">
+                                        <div class="panel-body no-padding" align="center">
+                                            <h5>
+                                                <b>Contact No</b>
+                                            </h5>
+                                        </div>
+                                    </td>
+                                    <td style="width:15%">
+                                        <div class="panel-body no-padding" align="center">
+                                            <h5>
+                                                <b>Resident Country</b>
+                                            </h5>
+                                        </div>
+                                    </td>
+                                    <td style="width:15%">
+                                        <div class="panel-heading">
+                                            <h5>
+                                                <b>Home Country</b>
+                                            </h5>
+                                        </div>
+
+                                    </td>
+                                    <td></td>
+                                </tr>
+                            </table>
+                        </div>*@
+                            </div>
+                            <div class="col-md-12" ng-repeat="insCompanyScope in quotationDetailsInsCompanyScopeTemp" style="background-color:#ffeed0">
+                                <ng-form name="manageInsCompanyScope" novalidate>
+                                    <div class="row">
+                                        <table style="width:100%">
+                                            <tr>
+                                                <td style="width:1%">
+                                                    <div class="no-padding" align="center">
+                                                        <h6 label>{{$index+1}}</h6>
+                                                    </div>
+                                                </td>
+                                                @*<div style="width:5%">
+                                            <div class="panel-body no-padding" align="center">
+                                                <h6 label>{{$index+1}}</h6>
+                                            </div>
+                                        </div>*@
+                                                <td class="col-md-3">
+                                                    <div class="no-padding" style="align-content:center">
+                                                        <selectize placeholder="Title" name="inputTitle" options="availableTitle" config="{maxItems: 1}" ng-model="insCompanyScope.TitleID">
+                                                        </selectize>
+
+                                                        <input type="text" placeholder="SurName" name="inputName" ng-model="insCompanyScope.MemberName" class="form-control" ng-required="true" />
+                                                        <span class="help-block" style="color:red" ng-show="manageInsCompanyScope.inputName.$error.required">
+                                                            Required Field *
+                                                        </span>
+                                                    </div>
+
+                                                    <div class="no-padding" style="align-content:center">
+                                                        <input type="text" placeholder="Other Name" name="inputOther" ng-model="insCompanyScope.MemberOtherName" class="form-control" ng-required="true" />
+                                                        <span class="help-block" style="color:red" ng-show="manageInsCompanyScope.inputOther.$error.required">
+                                                            Required Field *
+                                                        </span>
+                                                    </div>
+                                                </td>
+
+                                                <td class="col-md-3">
+                                                    <div class="no-padding" style="align-content:center">
+                                                        <input type="text" placeholder="NIC/PPNo" name="inputNIC" ng-model="insCompanyScope.NIC" class="form-control" />
+
+                                                    </div>
+
+                                                    <div class="no-padding" style="align-content:center">
+                                                        <input type="text" placeholder="Contact No" name="inputContactNo" ng-model="insCompanyScope.ContactNo" onkeyup="checkInputRate(this);" min="0" class="form-control" />
+
+                                                    </div>
+                                                </td>
+
+
+
+
+                                                <td class="col-md-3">
+                                                    <div class="no-padding" style="align-content:center">
+                                                        <input type="text"
+                                                               id="dob"
+                                                               @*readonly*@
+                                                               name="selectDOB"
+                                                               class="form-control date"
+                                                               ng-change="textChange()"
+                                                               ng-click="dob=true"
+                                                               datepicker-popup="dd/MM/yyyy"
+                                                               ng-model="insCompanyScope.MemberDOB"
+                                                               is-open="dob"
+                                                               datepicker-options="dateOptions"
+                                                               placeholder="Date of birth"
+                                                               @*min-date="currentDate"*@
+                                                               @*max-date="purchaseOrderObj.DatePaid"*@
+                                                               close-text="Close" />
+                                                        @*<span class="help-block" style="color:red" ng-show="manageInsCompanyScope.selectDOB.$error.required">
+                                                    Required Field *
+                                                </span>*@
+                                                    </div>
+                                                    <div class="no-padding" style="align-content:center">
+                                                        <input type="text"
+                                                               id="dob"
+                                                               @*readonly*@
+                                                               name="selectJoinDate"
+                                                               class="form-control date"
+                                                               ng-change="textChange()"
+                                                               ng-click="joinDate=true"
+                                                               datepicker-popup="dd/MM/yyyy"
+                                                               ng-model="insCompanyScope.JoinDate"
+                                                               is-open="joinDate"
+                                                               datepicker-options="dateOptions"
+                                                               placeholder="Join Date"
+                                                               @*min-date="currentDate"*@
+                                                               @*max-date="purchaseOrderObj.DatePaid"*@
+                                                               close-text="Close" />
+                                                        
+                                                    </div>
+                                                </td>
+                                                <td class="col-md-3">
+                                                    <div class="no-padding" style="align-content:center">
+                                                        <div class="form-group">
+                                                            <selectize placeholder="Relationship" name="inputRelationship" options="RelationshipDetails" config="{maxItems: 1}" ng-model="insCompanyScope.RelationShipID"></selectize>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="no-padding" style="align-content:center">
+                                                        <div class="form-group">
+                                                            <selectize placeholder="Gender" name="inputGender" options="GenderDetails" config="{maxItems: 1}" ng-model="insCompanyScope.GenderID"></selectize>
+                                                        </div>
+                                                    </div>
+                                                </td>
+
+
+                                                <td class="col-md-3">
+
+                                                    <div class="no-padding" style="align-content:flex-start">
+
+                                                        <selectize placeholder="Home Country" name="inputHomeCountry" options="availableHomeCountries" config="{maxItems: 1}" ng-model="insCompanyScope.MemberCountryID"></selectize>
+
+                                                    </div>
+
+                                                    <div class="no-padding" style="align-content:flex-start">
+
+                                                        <selectize placeholder="Resident Country" name="inputResidentCountry" options="availableResidentCountries" config="{maxItems: 1}" ng-model="insCompanyScope.MemberResCountryID"></selectize>
+
+                                                    </div>
+                                                </td>
+
+
+                                                <td class="form-group" ng-if="$index>0">
+                                                    <div class="no-padding">
+                                                        <button type="button" class="btn btn-default" ng-click="deleteInsCompanyScopeDetails($index)">
+                                                            <span class="glyphicon glyphicon-remove"></span>
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </ng-form>
+                            </div>
+                            <div class="col-md-12">
+                                <br />
+                                <div class="row">
+                                    <div class="col-md-1">
+                                        <div class="panel-body no-padding" align="center">
+                                            <button type="button" class="btn btn-default" ng-click="AddNewRow()">
+                                                <span class="glyphicon glyphicon-plus"></span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <br />
+                        <div class="row">
+                            <div class="col-md-12 modal-footer">
+                                <button class="btn btn-primary" ng-disabled="!manageInsuranceCompanyScope.$valid || isViewMode" ng-click="saveInsCompanyScopeDetails()">Add</button>
+                                <button class="btn btn-default" ng-click="cancel()">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </ng-form>
+            </div>
+            <div id="divLoading" ng-show="showLoader"></div>
+        </script>
+
+        <script type="text/ng-template" id="ngTemplateProperty">
+            <div class="modal-header bg-primary" style="background-color:#1caf9a !important">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true" ng-click="cancel()">x</button>
+                <h4>Manage Properties</h4>
+            </div>
+            <div class="modal-body">
+                <ng-form name="manageProperty" novalidate>
+                    <div class="content">
+                        <div class="row">
+                            <div class="col-md-11 set-header-property">
+                                <div class="row">
+                                    <div class="col-md-1" align="center"><h5><b>#</b></h5></div>
+                                    <div class="col-md-3" align="center"><h5><b>Property Name</b></h5></div>
+                                    <div class="col-md-3" align="center"><h5><b>BR No</b></h5></div>
+                                    <div class="col-md-3" align="center"><h5><b>VAT No</b></h5></div>
+                                    <div class="col-md-1" align="center"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-11" ng-repeat="property in clientPropertyDetailsTemp" style="background-color:#f5eaec">
+                                <ng-form name="manageClientProperty" novalidate>
+                                    <div class="row">
+                                        <div class="col-md-1">
+                                            <div class="panel-body no-padding" align="center">
+                                                <h6 label>{{$index+1}}</h6>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="panel-body no-padding" style="align-content:center">
+                                                <input type="text" placeholder="Propert Name" name="inputPropertyName" ng-model="property.ClientPropertyName" class="form-control" ng-required="true" />
+                                                <span class="help-block" style="color:red" ng-show="manageClientProperty.inputPropertyName.$error.required">
+                                                    Required Field *
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="panel-body no-padding" align="center">
+                                                <input type="text" placeholder="BR No" name="inputBRNo" ng-model="property.BRNo" class="form-control" ng-required="true" />
+                                                <span class="help-block" style="color:red" ng-show="manageClientProperty.inputBRNo.$error.required">
+                                                    Required Field *
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="panel-body no-padding" align="center">
+                                                <input type="text" placeholder="VAT No" name="inputVATNo" ng-model="property.VATNo" class="form-control" ng-required="true" />
+                                                <span class="help-block" style="color:red" ng-show="manageClientProperty.inputVATNo.$error.required">
+                                                    Required Field *
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-1">
+                                            <div class="panel-body no-padding" ng-if="$index>0">
+                                                <button type="button" class="btn btn-default" ng-click="deleteProperty($index)">
+                                                    <span class="glyphicon glyphicon-remove-circle"></span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </ng-form>
+                            </div>
+                            <div class="col-md-11">
+                                <br />
+                                <div class="row">
+                                    <div class="col-md-1">
+                                        <div class="panel-body no-padding" align="center">
+                                            <button type="button" class="btn btn-default" ng-click="addProperty()">
+                                                <span class="glyphicon glyphicon-plus"></span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12 modal-footer">
+                                <button class="btn btn-primary" ng-disabled="!manageProperty.$valid" ng-click="savePropertyDetails()">Done</button>
+                                <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+                </ng-form>
+            </div>
+            <div id="divLoading" ng-show="showLoader"></div>
+        </script>
+        <script type="text/ng-template" id="ngTemplateScopes">
+            <div class="modal-header bg-primary" style="background-color:#1caf9a !important">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true" ng-click="cancel()">x</button>
+                <h4>Manage Scopes</h4>
+            </div>
+            <div class="modal-body">
+                <ng-form name="manageScopes" novalidate>
+                    <div class="content">
+                        <div class="row">
+                            <div class="col-md-10 set-header-scope">
+                                <div class="row">
+                                    <div class="col-md-1" align="center"><h5><b>#</b></h5></div>
+                                    <div class="col-md-8" align="center"><h5><b>Insurance Sub Class Scope</b></h5></div>
+                                    <div class="col-md-1" align="center"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-10" ng-repeat="scope in insSubClassScopeDetailsTemp" style="background-color:#ffeed0">
+                                <ng-form name="manageInsSubClassScope" novalidate>
+                                    <div class="row">
+                                        <div class="col-md-1">
+                                            <div class="panel-body no-padding" align="center">
+                                                <h6 label>{{$index+1}}</h6>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-8">
+                                            <div class="panel-body no-padding" style="align-content:center">
+                                                <selectize placeholder="Select Ins Sub Class Scope" name="inputInsSubClassScope" options="availableInsSubClassScopes" config="{maxItems: 1}" ng-model="scope.CommonInsScopeID" ng-required="true"></selectize>
+                                                <span class="help-block" style="color:red" ng-show="manageInsSubClassScope.inputInsSubClassScope.$error.required">
+                                                    Required Field *
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-1">
+                                            <div class="panel-body no-padding" ng-if="$index>0">
+                                                <button type="button" class="btn btn-default" ng-click="deleteScope($index)">
+                                                    <span class="glyphicon glyphicon-remove-circle"></span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </ng-form>
+                            </div>
+                            <div class="col-md-10">
+                                <br />
+                                <div class="row">
+                                    <div class="col-md-1">
+                                        <div class="panel-body no-padding" align="center">
+                                            <button type="button" class="btn btn-default" ng-click="addScope()">
+                                                <span class="glyphicon glyphicon-plus"></span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12 modal-footer">
+                                <button class="btn btn-primary" ng-disabled="!manageScopes.$valid" ng-click="saveScopeDetails()">Done</button>
+                                <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+                </ng-form>
+            </div>
+            <div id="divLoading" ng-show="showLoader"></div>
+        </script>
+        <script type="text/ng-template" id="ngTemplateSendEmail">
+            <div class="modal-header bg-primary" style="background-color:#1caf9a !important">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true" ng-click="cancel()">x</button>
+                <h4>Send Email Request</h4>
+            </div>
+            <div class="modal-body">
+                <ng-form name="manageEmailRequest" novalidate>
+                    <div class="content">
+                        <div class="row">
+                            <div class="form-group">
+                                <label class="control-label">Receiver Name</label>
+                                <input type="text" name="inputUserName" placeholder="Receiver Name" ng-model="emailObj.userName" ng-required="true" class="form-control" />
+                                <span class="help-block" style="color:red" ng-show="manageEmailRequest.inputUserName.$error.required">
+                                    Required Field *
+                                </span>
+                            </div>
+                        </div>
+                        <br />
+                        <div class="row">
+                            <div class="form-group">
+                                <label class="control-label">To (Email)</label>
+                                <input type="email" name="inputEmailAddress" placeholder="To" ng-model="emailObj.emailAddress" class="form-control" ng-required="true" />
+                                <span class="error" ng-show="manageEmailRequest.inputEmailAddress.$error.email" style="color:red">
+                                    Invalid Email
+                                </span>
+                                <span class="help-block" style="color:red" ng-show="manageEmailRequest.inputEmailAddress.$error.required">
+                                    Required Field *
+                                </span>
+                            </div>
+                        </div>
+                        <br />
+                        <div class="row">
+                            <label class="control-label">Subject</label>
+                            <input type="text" name="inputEmailHeader" placeholder="Subject" ng-model="emailObj.emailHeader" ng-required="true" class="form-control" />
+                            <span class="help-block" style="color:red" ng-show="manageEmailRequest.inputEmailHeader.$error.required">
+                                Required Field *
+                            </span>
+                        </div>
+                        <br />
+                        <div class="row">
+                            <label class="control-label">Message</label>
+                            <textarea ui-tinymce="tinymceOptions" ng-model="emailObj.emailMessage" class="form-control" ng-required="true"></textarea>
+                        </div>
+                        <br />
+
+                        <br />
+                        <div class="row">
+                            <div class="col-md-12 modal-footer">
+                                <button class="btn btn-primary" ng-disabled="!manageEmailRequest.$valid" ng-click="sendEmail()">Send Email</button>
+                                <button class="btn btn-default" ng-click="cancel()">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </ng-form>
+            </div>
+            <div id="divLoading" ng-show="showLoader"></div>
+        </script>
+    </div>
+</div>

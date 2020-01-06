@@ -1,0 +1,124 @@
+﻿
+@{
+    ViewBag.Title = "PartnerMapping";
+    Layout = "~/Views/Shared/_index.cshtml";
+}
+
+
+<script src="~/Scripts/ng/Services/PartnerMappingService.js"></script>
+<script src="~/Scripts/ng/Controllers/PartnerMappingController.js"></script>
+<div class="breadcrumb-line">
+    <ul class="breadcrumb">
+        <li><a href="/Dashboard/Dashboard"><i class="icon-home2 position-left"></i>Home</a></li>
+        <li>Master Details</li><li>Partner</li>
+        <li class="active"><b>PartnerMapping</b></li>
+    </ul>
+</div>
+<div ng-app="IBMSAPP" ng-controller="PartnerMappingController" ng-init="init()" ng-cloak>
+
+    <div class="page-content-wrap">
+
+        <div class="panel panel-default tabs">
+            <ul class="nav nav-tabs" role="tablist">
+                <li class="active"><a href="#tab-first" role="tab" data-toggle="tab">View</a></li>
+                <li><a href="#tab-second" role="tab" data-toggle="tab">New</a></li>
+            </ul>
+            <div class="panel-body tab-content">
+                <div class="tab-pane active" id="tab-first">
+
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">
+                                <strong>Partner</strong>
+                            </h3>
+                            <ul class="panel-controls">
+                                <li><input type="text" style="font-size: 12px;width: 100%;border-radius: 0px;margin-right:2px;" class="form-control" placeholder="Search Partner Mapping ..." ng-model="search_query" ng-change="searchTextChange(search_query)"></li>
+                                <li><a href="#" ng-click="refreshContent()"><span class="fa fa-refresh"></span></a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="col-md-2">Show records per page </div>
+                        <div class="col=md-10">
+                            <select class="form-control" ng-model="viewby" style="width:100px;" ng-change="setItemsPerPage(viewby)"><option>5</option><option>10</option><option>20</option><option>30</option><option>40</option><option>50</option></select></div><div></div><br />
+                            <table class="table table-responsive" cellspacing="0" width="100%">
+                                <thead>
+                                    <tr>
+                                        <th>Partner Name</th>
+                                        <th>Action</th>
+                                        @*<th>Setting Code</th>
+                        <th>Setting Description</th>*@
+                                    </tr>
+                                </thead>
+
+                                <tbody ng-repeat="PartnerMapping in data.slice(((currentPage-1)*itemsPerPage), ((currentPage)*itemsPerPage))">
+                                    <!--<tr  >-->
+                                    <tr id="view{{PartnerMapping.PartnerID}}">
+
+                                        <td>{{PartnerMapping.PartnerName}}</td>
+                                        @*<td>{{Setting.SettingCode}}</td>
+                        <td>{{Setting.SettingDescription}}</td>*@
+                                        <td>
+                                            <div class="fa fa-edit btn btn-success" style="width:90px;" ng-click="edit(PartnerMapping)">&nbsp;&nbsp;Edit</div>&nbsp;&nbsp;
+                                            <div class="fa fa-trash-o btn btn-danger" style="width:90px;" ng-click="Delete(PartnerMapping.PartnerID)">&nbsp;&nbsp;Delete</div>
+                                        </td>
+                                    </tr>
+
+                                    <tr id="edit{{PartnerMapping.PartnerID}}" hidden>
+                                        <td hidden>
+                                            <input type="text" hidden class="form-control"
+                                                   value="{{PartnerMapping.PartnerID}}"
+                                                   ng-model="PartnerMapping.PartnerID">
+                                        </td>
+                                        <td>
+                                            <input type="text" style="font-size: 12px;width: 100%;border-radius: 0px;margin-right:2px;" class="form-control"
+                                                   value="{{PartnerMapping.PartnerName}}"
+                                                   ng-model="PartnerMapping.PartnerName">
+                                            <span class="help-block" style="color:red" ng-show="!PartnerMapping.PartnerName">Required Field *</span>
+                                        </td>
+
+
+                                        <td>
+                                            <div class="fa fa-save btn btn-info" ng-disabled="!(PartnerMapping.PartnerName)" ng-click="update(PartnerMapping)">&nbsp;&nbsp;Update</div>&nbsp;&nbsp;&nbsp;&nbsp;
+                                            <div ng-click="cancel(PartnerMapping)" class="fa fa-times btn btn-default">&nbsp;&nbsp;Cancel</div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <pagination class="pull-left" total-items="totalItems" ng-model="currentPage" max-size="maxSize" class="pagination-sm" boundary-links="true" rotate="false" num-pages="numPages" items-per-page="itemsPerPage"></pagination>
+
+                        </div>
+                </div>
+                <div class="tab-pane" id="tab-second">
+
+                    <form class="form-horizontal col-md-10" role="form">
+                        <ng-form name="partnerData" novalidate>
+                            <div class="form-group">
+                                <label class="col-md-4 control-label">Partner Name</label>
+                                <div class="col-md-8">
+                                    <input name="inputPartnerName"type="text" class="form-control" ng-model="PartnerName" ng-required="true"/>
+                                    <span class="help-block" style="color:red" ng-show="partnerData.inputPartnerName.$error.required">Required Field *</span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-4 control-label"></label>
+                                <div class="col-md-8">
+                                    <button class="btn btn-primary" ng-disabled="!partnerData.$valid" ng-click="Save()">Save Changes <span class="fa fa-floppy-o fa-right"></span></button>
+                                    <button type="button" class="btn btn-default" ng-click="ClearFields()">Clear<span class="glyphicon glyphicon-erase fa-right"></span></button>
+
+                                </div>
+                            </div>
+                            @*<div class="form-group">
+                <label class="col-md-4 control-label">Setting Description</label>
+                <div class="col-md-8">
+                    <input type="text" class="form-control" ng-model="SettingDesc" />
+                </div>
+            </div>*@
+</ng-form>
+</form>
+                </div>
+            </div>
+        </div>
+        <div id="divLoading" ng-show="showLoader"></div>
+    </div>
+</div>

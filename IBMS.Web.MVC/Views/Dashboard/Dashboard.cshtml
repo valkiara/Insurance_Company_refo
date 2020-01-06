@@ -1,0 +1,276 @@
+﻿
+@{
+    ViewBag.Title = "Dashboard";
+    Layout = "~/Views/Shared/_index.cshtml";
+}
+
+<script src="~/Scripts/angular.min.js"></script>
+
+<div class="breadcrumb-line">
+    <ul class="breadcrumb">
+        <li><a href="/Dashboard/Dashboard"><i class="icon-home2 position-left"></i>Home</a></li>
+        <li>Master Details</li>
+        <li class="active"><b>Dashboard</b></li>
+    </ul>
+</div>
+
+<link href="~/Content/css/bootstrap/bootstrap.min.css" rel="stylesheet" />
+
+
+<script src="~/Scripts/ng/Services/DashboardService.js"></script>
+<script src="~/Scripts/ng/Controllers/DashboardController.js"></script>
+
+<style>
+    h3.panel-title, .h3.panel-title {
+        color: #5c6bc0 !important;
+    }
+</style>
+<style>
+    .main-section {
+        width: 100%;
+        margin: 0 auto;
+        text-align: center;
+        padding: 0px 5px;
+    }
+
+    .dashbord {
+        width: 24%;
+        display: inline-block;
+        background-color: #f5f5f5;
+        color: #fff;
+        margin-top: 25px;
+    }
+
+    .icon-sectionn i {
+        font-size: 30px;
+        padding: 10px;
+        border: 1px solid #fff;
+        border-radius: 50%;
+        margin-top: -25px;
+        /*margin-bottom: 10px;*/
+        background-color: #34495E;
+    }
+
+    .icon-sectionn p {
+        margin: 0px;
+        font-size: 20px;
+        padding-bottom: 10px;
+    }
+
+    .icon-sectionn:before {
+        content: "" !important;
+    }
+
+    .detail-section {
+        background-color: #2F4254;
+        padding: 5px 0px;
+    }
+
+    .dashbord .detail-section:hover {
+        background-color: #5a5a5a;
+        cursor: pointer;
+    }
+
+    .detail-section a {
+        color: #fff;
+        text-decoration: none;
+    }
+
+    .dashbord-green .icon-sectionn, .dashbord-green .icon-sectionn i {
+        background-color: #16A085;
+    }
+
+    .dashbord-green .detail-section {
+        background-color: #149077;
+    }
+
+    .dashbord-orange .icon-sectionn, .dashbord-orange .icon-sectionn i {
+        background-color: #F39C12;
+    }
+
+    .dashbord-orange .detail-section {
+        background-color: #DA8C10;
+    }
+
+    .dashbord-blue .icon-sectionn, .dashbord-blue .icon-sectionn i {
+        background-color: #2980B9;
+    }
+
+    .dashbord-blue .detail-section {
+        background-color: #2573A6;
+    }
+
+    .dashbord-red .icon-sectionn, .dashbord-red .icon-sectionn i {
+        background-color: #E74C3C;
+    }
+
+    .dashbord-red .detail-section {
+        background-color: #CF4436;
+    }
+
+    .dashbord-skyblue .icon-sectionn, .dashbord-skyblue .icon-sectionn i {
+        background-color: #8E44AD;
+    }
+
+    .dashbord-skyblue .detail-section {
+        background-color: #803D9B;
+    }
+</style>
+
+
+<!-- Page container -->
+<div class="content" ng-app="IBMSAPP">
+    <div ng-controller="DashboardController" ng-init="init()" ng-cloak>
+        <div class="col-md-12">
+            <div class="panel-body">
+                <div class="main-section">
+                    <div class="dashbord dashbord-skyblue">
+                        <div class="icon-sectionn" style="width:100%">
+                            <i class="fa fa-user" aria-hidden="true"></i>
+                            <h1 style="margin-bottom:2px">{{deliveryCountDay | number:0}}</h1>
+                        </div>
+                        <div class="detail-section">
+                            <a href="#"><h4 style="font-family:Fira Sans, Helvetica Neue, Arial, sans-serif;color:white">Pending Quotation</h4></a>
+                        </div>
+                    </div>
+                    <div class="dashbord dashbord-green">
+                        <div class="icon-sectionn" style="width:100%">
+                            <i class="fa fa-user" aria-hidden="true"></i><br>
+                            <h1 style="margin-bottom:2px">{{deliveryCountMonth  | number:0}}</h1>
+                        </div>
+                        <div class="detail-section">
+                            <a href="#"><h4 style="font-style:normal;color:white">Approved Quotation</h4></a>
+                        </div>
+                    </div>
+                    <div class="dashbord dashbord-orange">
+                        <div class="icon-sectionn" style="width:100%">
+                            <i class="fa fa-user" aria-hidden="true"></i><br>
+                            <h1 style="margin-bottom:2px">{{deliveryCountYear  | number:0}}</h1>
+                        </div>
+                        <div class="detail-section">
+                            <a href="#"><h4 style="font-style:normal;color:white">Total Client Requests</h4></a>
+                        </div>
+                    </div>
+                    <div class="dashbord dashbord-blue">
+                        <div class="icon-sectionn" style="width:100%">
+                            <i class="fa fa-user" aria-hidden="true"></i><br>
+                            <h1 style="margin-bottom:2px">{{totalDeliveryCount  | number:0}}</h1>
+                        </div>
+                        <div class="detail-section">
+                            <a href="#"><h4 style="font-style:normal;color:white">Total Quotation</h4></a>
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-12">
+            <div class="panel-body">
+                <div class="col-md-8">
+                    <div class="panel panel-flat" style="height:413px;">
+                        <div class="panel-heading">
+                            <h3 class="panel-title"><b>HOW ENGAGED QUOTATION AND CLIENT REQUEST MONTHLY</b></h3>
+                        </div>
+                        <div class="panel-body">
+                            @*<div><h5 style="font-family:Fira Sans, Helvetica Neue, Arial, sans-serif">HOW ENGAGED OUR USERS DAILY</h5></div>*@
+
+                            @*<canvas id="base" class="chart-horizontal-bar"
+                                chart-data="dataBar" chart-labels="labelsBar" chart-color="red"></canvas>*@
+
+                            @*{{labelsLine}}{{seriesLine}}{{dataLine}}*@
+                            <canvas id="line" class="chart chart-line" chart-data="dataLine" chart-colors="colors"
+                                    chart-labels="labelsLine" chart-series="seriesLine" chart-options="optionsLine"
+                                    chart-dataset-override="datasetOverride" chart-click="onClick"></canvas>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="col-md-4">
+                    <div class="panel panel-flat" style="height:413px;">
+                        <div class="panel-heading">
+                            <center><h3 class="panel-title"><b>CLIENT PERCENTAGE BY BUSINESS UNIT</b></h3></center>
+                        </div>
+                        <div class="panel-body">
+
+                            <canvas id="pie" class="chart chart-doughnut"
+                                    chart-data="datas" chart-labels="labels" chart-options="optionspie" chart-colors="colorspie"></canvas>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+
+        <div class="col-md-12">
+            <div class="panel panel-flat">
+                <div class="panel-body">
+                    <div class="table-responsive">
+                        <table class="table text-nowrap" style="background-color:beige">
+                            <thead style="background-color:#cca3ea">
+                                <tr>
+                                    <th style="color:darkgreen"><b>Client Name</b></th>
+                                    <th style="color:darkgreen"><b>No Client Request</b></th>
+                                    <th style="color:darkgreen"><b>No Of Quotation</b></th>
+                                    <th style="color:darkgreen"><b>Total Payment</b></th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="Business" ng-repeat="client in data.slice(((currentPage-1)*itemsPerPage), ((currentPage)*itemsPerPage))">
+                                <tr>
+                                    <td>
+
+                                        <h6 class="text-semibold no-margin">{{client.ClientName}}</h6>
+
+                                    </td>
+
+                                    <td>
+                                        <h6 class="text-semibold no-margin">{{client.NoOfClientRequest | number:0.00}}</h6>
+                                    </td>
+                                    <td>
+                                        <h6 class="text-semibold no-margin">{{client.NoOfQuitation | number:0.00}}</h6>
+                                    </td>
+                                    <td>
+                                        <h6 class="text-semibold no-margin">{{client.PaymentAmount | number:0.00}}</h6>
+                                    </td>
+
+                                </tr>
+                            </tbody>
+
+                        </table>
+
+                        <div>
+                            <center><pagination total-items="totalItems" ng-model="currentPage" max-size="maxSize" class="pagination-sm pull-left" boundary-links="true" rotate="false" num-pages="numPages" items-per-page="itemsPerPage"></pagination></center>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+
+        <div class="col-md-12">
+            <div class="panel panel-flat">
+                <div class="panel-heading">
+                    <h5 style="font-family:Fira Sans, Helvetica Neue, Arial, sans-serif;color:black"></h5>
+                </div>
+                <div class="panel-body">
+                    <h3 class="panel-title"><b> TOP CLIENT PAYMENT</b></h3>
+
+                    <canvas id="line" class="chart chart-bar" chart-data="dataBar" chart-colors="colorsBar"
+                            chart-labels="labelsBar" chart-series="seriesBar" chart-options="optionsBar"></canvas>
+                </div>
+            </div>
+        </div>
+
+
+        </div></div>
+
+
+
+

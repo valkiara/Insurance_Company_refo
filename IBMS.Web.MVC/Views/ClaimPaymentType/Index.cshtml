@@ -1,0 +1,161 @@
+﻿@{
+    ViewBag.Title = "Claim Payment Type";
+}
+
+<style>
+    .form-control {
+        width: 100%;
+    }
+</style>
+
+<script src="~/Scripts/ng/Controllers/ClaimPaymentTypeController.js"></script>
+<script src="~/Scripts/ng/Services/ClaimPaymentTypeService.js"></script>
+
+
+<div class="breadcrumb-line">
+    <ul class="breadcrumb">
+        <li><a href="/Dashboard/Dashboard"><i class="icon-home2 position-left"></i>Home</a></li>
+        <li>Master Details</li><li>Claim</li>
+        <li class="active"><b>Claim Payment Type</b></li>
+    </ul>
+</div>
+
+<div ng-app="IBMSAPP"ng-controller="ClaimPaymentTypeController" ng-init="init()" ng-cloak>
+  
+
+            <div class="page-content-wrap">
+                <div class="panel panel-default tabs">
+
+                    <ul class="nav nav-tabs" role="tablist">
+                        <li class="active" id="tabView"><a href="#tab-first" role="tab" data-toggle="tab">View</a></li>
+                        <li id="tabEdit"><a href="#tab-second" role="tab" data-toggle="tab">New</a></li>
+                    </ul>
+
+                    <div class="panel-body tab-content">
+
+                        <div class="tab-pane active" id="tab-first">
+
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">
+                                        <strong>Claim Payment Type</strong>
+                                    </h3>
+                                    <ul class="panel-controls">
+                                        <li><input type="text" style="font-size: 12px;width: 100%;border-radius: 0px;margin-right:2px;" class="form-control"
+                                                    placeholder="Search Claim Payment Type......" ng-model="search_query" ng-change="searchTextChange(search_query)"></li>
+                                        <li><a href="#" ng-click="refreshContent()"><span class="fa fa-refresh"></span></a></li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="panel-body">
+                                <div class="col-md-2">Show records per page </div>
+                                <div class="col=md-10">
+                                    <select class="form-control" style="width:100px;" ng-model="viewby" ng-change="setItemsPerPage(viewby)">
+                                        <option>5</option>
+                                        <option>10</option>
+                                        <option>20</option>
+                                        <option>30</option>
+                                        <option>40</option>
+                                        <option>50</option>
+                                    </select>
+                                </div>
+                                <div></div><br />
+                                <table class="table table-responsive" cellspacing="0">
+                                    <thead>
+                                        <tr>
+                                            <th>Payment Type Name</th>
+                                            <th>Description</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody ng-repeat="Paymenttype in filterdData = (data.slice(((currentPage-1)*itemsPerPage), ((currentPage)*itemsPerPage)))">
+                                        <tr id="view{{Paymenttype.PaymentTypeID}}">
+                                            <td hidden>
+                                                {{Paymenttype.PaymentTypeID}}
+                                            </td>
+                                            <td>
+                                                {{Paymenttype.PaymentTypeName}}
+                                            </td>
+                                            <td>
+                                                {{Paymenttype.Description}}
+                                            </td>
+                                            <td>
+                                                <div class="fa fa-edit btn btn-success"  ng-click="edit(Paymenttype)"> Edit</div>&nbsp;&nbsp;
+                                                <div class="fa fa-trash-o btn btn-danger"  ng-click="Delete(Paymenttype)"> Delete</div>
+                                            </td>
+                                        </tr>
+                                        <tr id="edit{{Paymenttype.PaymentTypeID}}" hidden>
+                                            <td hidden>
+                                                <input type="text" hidden class="form-control"
+                                                       value="{{Paymenttype.PaymentTypeID}}"
+                                                       ng-model="Paymenttype.PaymentTypeID">
+                                            </td>
+                                            <td>
+                                                <input type="text" style="font-size: 12px;width: 100%;border-radius: 0px;margin-right:2px;" class="form-control"
+                                                       value="{{Paymenttype.PaymentTypeName}}"
+                                                       ng-model="Paymenttype.PaymentTypeName"
+                                                       ng-required="true">
+                                                <span class="help-block" style="color:red" ng-show="!Paymenttype.PaymentTypeName">Required Field *</span>
+                                            </td>
+                                            <td>
+                                                <input type="text" style="font-size: 12px;width: 100%;border-radius: 0px;margin-right:2px;" class="form-control"
+                                                       value="{{Paymenttype.Description}}"
+                                                       ng-model="Paymenttype.Description"
+                                                       ng-required="true">
+                                                <span class="help-block" style="color:red" ng-show="!Paymenttype.Description">Required Field *</span>
+                                            </td>
+                                            <td>
+                                                <div class="fa fa-save btn btn-info" ng-disabled="!(Paymenttype.PaymentTypeName && Paymenttype.Description)" ng-click="update(Paymenttype)"> Update</div>&nbsp;
+                                                <div ng-click="cancel(Paymenttype)" class="fa fa-times btn btn-default"> Cancel</div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <pagination class="pull-left pagination-sm" total-items="totalItems" ng-model="currentPage" max-size="maxSize" boundary-links="true" rotate="false" num-pages="numPages" items-per-page="itemsPerPage"></pagination>
+                            </div>
+                        </div>
+
+                        <div class="tab-pane" id="tab-second">
+
+                           
+                            <form class="form-horizontal col-md-10" role="form">
+                                <ng-form name="ClaimPaymentType">
+
+                                    <div class="form-group">
+                                        <label class="col-md-4 control-label">Payment Type Name</label>
+                                        <div class="col-md-4">
+                                            <input type="text" name="inputPaymenttype" class="form-control" style="width:100%" ng-model="PaymentTypeName" ng-required="true" />
+                                            <span class="help-block" style="color:red" ng-show="ClaimPaymentType.inputPaymenttype.$error.required">Required Field *</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-md-4 control-label">Description</label>
+                                        <div class="col-md-4">
+                                            <input type="text" name="inputDescription" class="form-control" style="width:100%" ng-model="Description" ng-required="true" />
+                                            <span class="help-block" style="color:red" ng-show="ClaimPaymentType.inputDescription.$error.required">Required Field *</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-md-4 control-label"></label>
+                                        <div class="col-md-8">
+                                            <div class="btn btn-primary" ng-disabled="!ClaimPaymentType.$valid" ng-click="Save()">Save <span class="fa fa-floppy-o fa-right"></span></div>
+                                            <button type="button" class="btn btn-default" ng-click="ClearFields()">Clear<span class="glyphicon glyphicon-erase fa-right"></span></button>
+                                        </div>
+                                    </div>
+
+
+
+
+                                </ng-form>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div id="divLoading" ng-show="showLoader"></div>
+            </div>
+
+
+        </div>

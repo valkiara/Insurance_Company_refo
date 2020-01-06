@@ -1,0 +1,81 @@
+﻿
+@{
+    Layout = "~/Views/Shared/_index.cshtml";
+}
+
+
+
+
+@*<script src="~/Scripts/angular.min.js"></script>
+<script src="~/Content/lib/ui-grid.js"></script>
+<script src="~/Scripts/ng/IBMSApp.js"></script>*@
+
+<script src="~/Scripts/ng/Excel/Excel.js"></script>
+<script src="~/Scripts/ng/Services/AgentListService.js"></script>
+<script src="~/Scripts/ng/Controllers/AgentListController.js"></script>
+
+
+    <ul class="breadcrumb">
+        <li><a href="/Dashboard/Index"><i class="icon-home2 position-left"></i>Home</a></li>
+        <li>Enquries</li>
+        <li class="active"><b>Agent List</b></li>
+    </ul>
+
+
+<div ng-app="IBMSAPP" ng-controller="AgentListController" ng-init="init()" ng-cloak>
+
+    <div class="page-content-wrap">
+
+        <div class="panel panel-default tabs">
+            <ul class="nav nav-tabs" role="tablist">
+                <li class="active"><a href="#tab-first" role="tab" data-toggle="tab">View</a></li>
+                @*<li><a href="#tab-second" role="tab" data-toggle="tab">New</a></li>*@
+                @*<li><a href="#tab-third" role="tab" data-toggle="tab">Edit</a></li>*@
+            </ul>
+            <div class="panel-body tab-content">
+                <div class="tab-pane active" id="tab-first">
+
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">
+                                <strong>Agent List</strong>
+                            </h3>
+                            <ul class="panel-controls">
+                                <li><input type="text" style="font-size: 12px;width: 100%;border-radius: 0px;margin-right:2px;" class="form-control" placeholder="Search Agent ..." ng-model="search_query"></li>
+                                <li><a href="#" class="panel-collapse"><span class="fa fa-angle-down"></span></a></li>
+                                <li><a href="#" class="panel-refresh"><span class="fa fa-refresh"></span></a></li>
+                                <li><a href="#" class="panel-remove"><span class="fa fa-times"></span></a></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="panel-body">
+
+                        <table class="table .table-striped" id="list">
+                            <thead>
+                                <tr>
+                                    <th>Agent List</th>
+                                    <th>Address</th>
+                                    <th>Rate Value</th>
+                                </tr>
+                            </thead>
+                            <tbody ng-repeat="Agent in Agents| filter:search_query">
+
+                                <!--<tr  >-->
+                                <tr id="view{{Agent.AgentID}}">
+                                    <td hidden>{{Agent.CompanyID}} </td>
+                                    <td hidden>{{Agent.AgentID}}</td>
+                                    <td>{{Agent.AgentName}}</td>
+                                    <td>{{Agent.Address1}},{{Agent.Address2}},{{Agent.Address3}}</td>
+                                    <td>{{Agent.RateValue}}</td>
+                                </tr>
+
+                        </table>
+                        <button style="border-radius: 0px;width:19%;" class="btn btn-danger pull-right" ng-click="exportToExcel('#list')">Export to Excel</button>
+                    </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

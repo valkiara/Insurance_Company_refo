@@ -1,0 +1,141 @@
+﻿@{
+    ViewBag.Title = "Loading/ Excess Type";
+}
+
+<style>
+    .form-control {
+        width: 100%;
+    }
+</style>
+
+<script src="~/Scripts/ng/Controllers/LoadingExcessTypeController.js"></script>
+<script src="~/Scripts/ng/Services/LoadingExcessTypeService.js"></script>
+
+<div class="breadcrumb-line">
+    <ul class="breadcrumb">
+        <li><a href="/Dashboard/Dashboard"><i class="icon-home2 position-left"></i>Home</a></li>
+        <li>Master Details</li><li>Claim</li>
+        <li class="active"><b>Loading / Excess Type</b></li>
+    </ul>
+</div>
+
+<div ng-app="IBMSAPP" ng-controller="LoadingExcessTypeController" ng-init="init()" ng-cloak>
+
+
+
+            <div class="page-content-wrap">
+                <div class="panel panel-default tabs">
+
+                    <ul class="nav nav-tabs" role="tablist">
+                        <li class="active" id="tabView"><a href="#tab-first" role="tab" data-toggle="tab">View</a></li>
+                        <li id="tabEdit"><a href="#tab-second" role="tab" data-toggle="tab">New</a></li>
+                    </ul>
+
+                    <div class="panel-body tab-content">
+
+                        <div class="tab-pane active" id="tab-first">
+
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">
+                                        <strong>Loading / Excess Type</strong>
+                                    </h3>
+                                    <ul class="panel-controls">
+                                        <li><input type="text" style="font-size: 12px;width: 100%;border-radius: 0px;margin-right:2px;" class="form-control" placeholder="Search Loading Type ..." ng-model="search_query" ng-change="searchTextChange(search_query)"></li>
+                                        <li><a href="#" class="panel-refresh" ng-click="refreshContent()"><span class="fa fa-refresh"></span></a></li>
+                                        </ul>
+                                </div>
+                            </div>
+
+                            <div class="panel-body">
+                                <div class="col-md-2">Show records per page </div>
+                                <div class="col=md-10">
+                                    <select class="form-control" style="width:100px;" ng-model="viewby" ng-change="setItemsPerPage(viewby)">
+                                        <option>5</option>
+                                        <option>10</option>
+                                        <option>20</option>
+                                        <option>30</option>
+                                        <option>40</option>
+                                        <option>50</option>
+                                    </select>
+                                </div>
+                                <div></div><br />
+                                 <table class="table table-responsive" cellspacing="0">
+                                    <thead>
+                                        <tr>
+                                            <th>Description</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody ng-repeat="Loading in filterdData = (data.slice(((currentPage-1)*itemsPerPage), ((currentPage)*itemsPerPage)))">
+                                        <tr id="view{{Loading.LoadingTypeID}}">
+                                            <td hidden>
+                                                {{Loading.LoadingTypeID}}
+                                            </td>
+                                            <td>
+                                                {{Loading.Description}}
+                                            </td>
+                                            <td>
+                                                <div  class="fa fa-edit btn btn-success"  ng-click="edit(Loading)"> Edit</div>&nbsp;&nbsp;
+                                                <div  class="fa fa-trash-o btn btn-danger" ng-click="Delete(Loading)"> Delete</div>
+                                            </td>
+                                        </tr>
+                                        <tr id="edit{{Loading.LoadingTypeID}}" hidden>
+                                            <td hidden>
+                                                <input type="text"
+                                                       hidden class="form-control"
+                                                       value="{{Loading.LoadingTypeID}}"
+                                                       ng-model="Loading.LoadingTypeID">
+                                            </td>
+                                            <td>
+                                                <input type="text"
+                                                       value=" {{Loading.Description}}"
+                                                       ng-model="Loading.Description" class="form-control" style="width:100%" ng-required="true" />
+                                                <span class="help-block" style="color:red" ng-show="!Loading.Description">Required Field *</span>
+                                            </td>
+                                            <td>
+                                                <div class="fa fa-save btn btn-info" ng-disabled="!Loading.Description" ng-click="update(Loading)"> Update</div>&nbsp;&nbsp;
+                                                <div  class="fa fa-times btn btn-default" ng-click="cancel(Loading)"> Cancel</div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <pagination class="pull-left pagination-sm" total-items="totalItems" ng-model="currentPage" max-size="maxSize" boundary-links="true" rotate="false" num-pages="numPages" items-per-page="itemsPerPage"></pagination>
+                            </div>
+                        </div>
+
+                        <div class="tab-pane" id="tab-second">
+
+                            
+                            <form class="form-horizontal col-md-10" role="form">
+                                <ng-form name="LoadingExcessType">
+
+                                    <div class="form-group">
+                                        <label class="col-md-4 control-label">Description</label>
+                                        <div class="col-md-4">
+                                            <input type="text" name="inputDescription" placeholder="Enter Loading / Excess Type Description" ng-model="Description" class="form-control" style="width:100%" ng-required="true" />
+                                            <span class="help-block" style="color:red" ng-show="LoadingExcessType.inputDescription.$error.required">Required Field *</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-md-4 control-label"></label>
+                                        <div class="col-md-8">
+                                            <div class="btn btn-primary" ng-disabled="!LoadingExcessType.$valid" ng-click="save()">Save <span class="fa fa-floppy-o fa-right"></span></div>
+                                            <button type="button" class="btn btn-default" ng-click="ClearFields()">Clear<span class="glyphicon glyphicon-erase fa-right"></span></button>
+                                        </div>
+                                    </div>
+
+
+
+
+                                </ng-form>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div id="divLoading" ng-show="showLoader"></div>
+            </div>
+
+
+        </div>

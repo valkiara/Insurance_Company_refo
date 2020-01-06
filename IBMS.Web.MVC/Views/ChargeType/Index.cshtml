@@ -1,0 +1,175 @@
+﻿@{
+    ViewBag.Title = "Charge Type";
+}
+
+<style>
+    .form-control {
+        width: 100%;
+    }
+</style>
+
+<script src="~/Scripts/ng/Controllers/ChargeTypeController.js"></script>
+<script src="~/Scripts/ng/Services/ChargeTypeService.js"></script>
+
+<script>
+    function checkInputRate(rateVal) {
+        var regEx = /^[0-9]+\.?[0-9]*$/;
+        if (regEx.test(rateVal.value) == false) {
+            rateVal.value = rateVal.value.substring(0, rateVal.value.length - 1);
+        }
+    }
+</script>
+
+<div class="breadcrumb-line">
+    <ul class="breadcrumb">
+        <li><a href="/Dashboard/Index"><i class="icon-home2 position-left"></i>Home</a></li>
+        <li>Master Details</li><li>Claim</li>
+        <li class="active"><b>Charge Type</b></li>
+    </ul>
+</div>
+
+<div ng-app="IBMSAPP" ng-controller="ChargeTypeController" ng-init="init()" ng-cloak>
+
+
+        <div class="page-content-wrap">
+            <div class="panel panel-default tabs">
+
+                <ul class="nav nav-tabs" role="tablist">
+                    <li class="active" id="tabView"><a href="#tab-first" role="tab" data-toggle="tab">View</a></li>
+                    <li id="tabEdit"><a href="#tab-second" role="tab" data-toggle="tab">New</a></li>
+                </ul>
+
+                <div class="panel-body tab-content">
+
+                    <div class="tab-pane active" id="tab-first">
+
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">
+                                    <strong>Charge Type</strong>
+                                </h3>
+                                <ul class="panel-controls">
+                                    <li><input type="text" style="font-size: 12px;width: 100%;border-radius: 0px;margin-right:2px;" class="form-control" placeholder="Search Charge Type ..." ng-model="search_query" ng-change="searchTextChange(search_query)"></li>
+                                    <li><a href="#" ng-click="refreshContent()"><span class="fa fa-refresh"></span></a></li>
+                                   
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="panel-body">
+                            <div class="col-md-2">Show records per page </div>
+                            <div class="col=md-10">
+                                <select class="form-control" style="width:100px;" ng-model="viewby" ng-change="setItemsPerPage(viewby)">
+                                    <option>5</option>
+                                    <option>10</option>
+                                    <option>20</option>
+                                    <option>30</option>
+                                    <option>40</option>
+                                    <option>50</option>
+                                </select>
+                            </div>
+                            <div></div><br />
+                            <table class="table table-responsive" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th>Charge Type Name</th>
+                                        <th>Percentage</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody ng-repeat="Charge in filterdData = (data.slice(((currentPage-1)*itemsPerPage), ((currentPage)*itemsPerPage)))">
+                                    <tr id="view{{Charge.ChargeTypeID}}">
+                                        <td hidden>
+                                            {{Charge.ChargeTypeID}} 
+                                        </td>
+                                        <td>
+                                            {{Charge.ChargeTypeName}}
+                                        </td>
+                                        <td>
+                                            {{Charge.Percentage}}
+                                        </td>
+                                        <td>
+                                            <div  class="fa fa-edit btn btn-success"  ng-click="edit(Charge)"> Edit</div>&nbsp;&nbsp;
+                                            <div  class="fa fa-trash-o btn btn-danger" ng-click="Delete(Charge)"> Delete</div>
+                                        </td>
+                                    </tr>
+                                    <tr id="edit{{Charge.ChargeTypeID}}" hidden>
+                                        <td hidden>
+                                            <input type="text" hidden class="form-control"
+                                                   value="{{Charge.ChargeTypeID}}"
+                                                   ng-model="Charge.ChargeTypeID">
+                                        </td>
+                                        <td>
+                                            <input type="text" style="font-size: 12px;width: 100%;border-radius: 0px;margin-right:2px;" class="form-control"
+                                                   value="{{Charge.ChargeTypeName}}"
+                                                   ng-model="Charge.ChargeTypeName"
+                                                   ng-required="true">
+                                            <span class="help-block" style="color:red" ng-show="!Charge.ChargeTypeName">Required Field *</span>
+                                        </td>
+                                        <td>
+                                            <input type="number" style="font-size: 12px;width: 100%;border-radius: 0px;margin-right:2px;" class="form-control"
+                                                   value="{{Charge.Percentage}}"
+                                                   ng-model="Charge.Percentage"
+                                                   ng-required="true"
+                                                   onkeyup="checkInputRate(this);"
+                                                   min="0">
+
+                                            <span class="help-block" style="color:red" ng-show="!Charge.Percentage">Required Field *</span>
+                                        </td>
+                                        <td>
+                                            <div class="fa fa-save btn btn-info"  ng-disabled="!(Charge.Percentage && Charge.ChargeTypeName)" ng-click="update(Charge)"> Update</div>&nbsp;
+                                            <div ng-click="cancel(Charge)" class="fa fa-times btn btn-default"> Cancel</div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <pagination class="pull-left pagination-sm" total-items="totalItems" ng-model="currentPage" max-size="maxSize"  boundary-links="true" rotate="false" num-pages="numPages" items-per-page="itemsPerPage"></pagination>
+                        </div>
+                    </div>
+
+                    <div class="tab-pane" id="tab-second">
+
+                        
+                        <form class="form-horizontal col-md-10" role="form">
+                            <ng-form name="ChargeType">
+
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label">Charge Type Name</label>
+                                    <div class="col-md-4">
+                                        <input type="text" name="inputChargetype" class="form-control" style="width:100%" ng-model="ChargeTypeName" ng-required="true" />
+                                        <span class="help-block" style="color:red" ng-show="ChargeType.inputChargetype.$error.required">Required Field *</span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label">Percentage</label>
+                                    <div class="col-md-4">
+                                        <input type="number" class="form-control" name="inputPercentage" ng-model="Percentage" style="width:100%" ng-required="true" onkeyup="checkInputRate(this);" min="0" />
+                                        <span class="help-block" style="color:red" ng-show="ChargeType.inputPercentage.$error.required">Required Field *</span>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label"></label>
+                                    <div class="col-md-8">
+                                        <div  class="btn btn-primary" ng-disabled="!ChargeType.$valid" ng-click="Save()">Save <span class="fa fa-floppy-o fa-right"></span></div>
+                                        <div class="glyphicon glyphicon-refresh btn  btn-default"
+                                             ng-click="ClearFields()">
+                                            Clear<i class="icon-arrow-right14 position-right"></i>
+                                        </div>
+                                     </div>
+                                </div>
+
+
+
+
+                            </ng-form>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div id="divLoading" ng-show="showLoader"></div>
+        </div>
+
+
+    </div>
+

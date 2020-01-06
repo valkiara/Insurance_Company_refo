@@ -1,0 +1,228 @@
+﻿@{
+
+    Layout = "~/Views/Shared/_index.cshtml";
+    ViewBag.Title = "Claim Payment";
+}
+
+<script src="//code.jquery.com/jquery-1.10.2.js"></script>
+<script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+<script src="~/Scripts/ng/IBMSApp.js"></script>
+<script src="~/Scripts/ng/Controllers/ClaimPaymentController.js"></script>
+<script src="~/Scripts/ng/Services/ClaimPaymentService.js"></script>
+
+<div class="breadcrumb-line">
+    <ul class="breadcrumb">
+        <li><a href="/Dashboard/Index"><i class="icon-home2 position-left"></i>Home</a></li>
+        <li>Master Details</li>
+        <li class="active"><b>Claim Payment</b></li>
+    </ul>
+</div>
+<div ng-app="IBMSApp">
+    <div ng-controller="ClaimPaymentController" ng-init="init()" ng-cloak>
+        <div class="page-content-wrap">
+            <div class="panel panel-default tabs">
+
+                <ul class="nav nav-tabs" role="tablist">
+                    <li class="active" id="tabView"> <a href="#tab-first" role="tab" data-toggle="tab">View</a></li>
+                    <li id="tabEdit"><a href="#tab-second" role="tab" data-toggle="tab">New</a></li>
+                    @*<li><a href="#tab-third" role="tab" data-toggle="tab">Edit</a></li>*@
+                </ul>
+                <div class="panel-body tab-content">
+                    <div class="tab-pane active" id="tab-first">
+
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">
+                                    <strong>Claim Payment</strong>
+                                </h3>
+                                <ul class="panel-controls">
+                                    @*<li><input type="text" style="font-size: 12px;width: 100%;border-radius: 0px;margin-right:2px;" class="form-control" placeholder="Search Claim Payment ..." ng-model="search_query"></li>*@
+                                    <li><a href="#" class="panel-refresh" ng-click="refresh()"><span class="fa fa-refresh"></span></a></li>
+                                    <li><a href="#" class="panel-remove"><span class="fa fa-times"></span></a></li>
+                                </ul>
+                            </div>
+                        </div>
+                                    <div class="panel-body">
+                                        @*Show <select ng-model="viewby" ng-change="setItemsPerPage(viewby)"><option>5</option><option>10</option><option>20</option><option>30</option><option>40</option><option>50</option></select>
+                                        <br /><br />*@
+
+                                        <table class="table table-bordered table-striped dataTable" cellspacing="0" width="100%">
+                                            <thead>
+                                                <tr>
+                                                    <th>Claim Payment ID</th>
+                                                    <th>Claim Recording ID</th>
+                                                    <th>Claim Amount</th>
+                                                    <th>Paid</th>
+                                                    <th>Notes</th>
+                                                    <th>Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr ng-repeat="CH in availableClaimPayment">
+                                                    <td>
+                                                        {{CH.ClaimPaymentID}}
+                                                    </td>
+                                                    <td>
+                                                        {{CH.ClaimRecordingID}}
+                                                    </td>
+                                                    <td>
+                                                        {{CH.ClaimAmount}}
+                                                    </td>
+                                                    <td>
+                                                        {{CH.PaidAmount}}
+                                                    </td>
+                                                    <td>
+                                                        {{CH.Notes}}
+                                                    </td>
+                                                    <td>
+                                                        <button class="fa fa-edit btn-sm btn-success" ng-click="edit(CH)"></button>&nbsp;&nbsp;
+                                                        <button class="fa fa-trash-o btn-sm btn-danger" ng-click="delete(CH)"></button>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                        <pagination class="pull-left" total-items="totalItems" ng-model="currentPage" max-size="maxSize" class="pagination-sm" boundary-links="true" rotate="false" num-pages="numPages" items-per-page="itemsPerPage"></pagination>
+                                        @*{{availableClaimPayment}}*@
+                                    </div>
+                                </div>
+
+                                <div class="tab-pane " id="tab-second">
+                                    <ng-form name="ClaimPaymentForm">
+                                        <form class="form-horizontal col-md-10" role="form">
+
+                                            <div class="form-group">
+                                                <label class="col-md-2 control-label">Payment Date</label>
+                                                <div class="col-md-4">
+                                                    {{paymentDate | date:'dd/mm/yyyy'}}
+                                                    @* <input type="date" ng-model="paymentDate" class="form-control" ng-required="true" style="width:80%" />*@
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label class="col-md-2 control-label">Claim Amount </label>
+                                                <div class="col-md-4">
+                                                    <input type="text" ng-model="claimAmount" class="form-control" ng-required="true" style="width:80%" readonly="readonly" />
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label class="col-md-2 control-label">Pay Amount</label>
+                                                <div class="col-md-4">
+                                                    <input type="number" ng-model="payAmount" class="form-control" style="width:80%" />
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <input type="checkbox" ng-checked="true" ng-model="paymentType" ng-false-value="false" ng-true-value="true" /> Final Payment
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label class="col-md-2 control-label">Cheque No</label>
+                                                <div class="col-md-4">
+                                                    <input type="text" placeholder="Enter Cheque No" ng-model="chequeNo" class="form-control"  style="width:80%" />
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <button type="submit" class="btn btn-primary" ng-click="addPayment()" ng-disabled="ClaimPaymentForm.$invalid">Add Payment</button>
+                                                    <br /> <br />
+                                                </div>
+                                            </div>
+
+                                            @*<input type="checkbox" ng-model="myvar" />*@
+
+                                            <div class="form-group">
+                                                <label class="col-md-2 control-label"></label>
+
+                                                <table ng-show="addpayment" class="text-center col-md-5" style="text-align:left;" border="1">
+                                                    <thead style="background-color:lightsteelblue;">
+                                                        <tr>
+                                                            <th>Date</th>
+                                                            <th>Paid</th>
+                                                            <th>Cheque No</th>
+                                                            <th>Payment Type</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr ng-repeat="CHL in claimHeaderLine">
+                                                            <td>
+                                                                {{paymentDate | date:'medium'}}
+                                                            </td>
+                                                            <td>
+                                                                {{CHL.PaidAmount}}
+                                                            </td>
+                                                            <td>
+                                                                {{CHL.ChequeNo}}
+                                                            </td>
+                                                            <td>
+                                                                {{CHL.IsFinal}}
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                                @*<label class="col-sm-1">&nbsp;&nbsp;&nbsp;</label>*@
+                                                @*<table class="col-md-3" style="text-align:left;" border="1">
+                                    <thead style="background-color:lightsteelblue;">
+                                        <tr>
+                                            <th>Payment Type</th>
+                                        </tr>
+                                        </thead>
+                                    <tbody>
+                                        <tr ng-repeat="CH in claimHeader">
+                                            <td>
+                                                {{CH.paymentType}}
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>*@
+                                            </div>
+
+                                            <div ng-show="addpayment" class="form-group">
+                                                <label class="col-md-3 control-label">Total</label>
+                                                <div class="col-md-8">
+                                                    <input type="text" placeholder="Total Paid" ng-model="tpay" />
+                                                    <br /><br /><br />
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label class="col-md-2 control-label">Notes </label>
+                                                <div>
+                                                    <input type="text" placeholder="Notes" class="form-control" style="width:80%" ng-model="notes" />
+                                                    <br /> <br />
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label class="col-md-2 control-label"></label>
+                                                <div class="col-md-1">
+                                                    <button type="submit" class="btn btn-primary" ng-click="save()">{{claimHeader.ClaimPaymentID ? "Update" : "Create"}}</button>
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <button type="submit" class="btn btn-primary" ng-click="cancel()">Cancel</button>
+                                                </div>
+                                            </div>
+
+
+                                        </form>
+                                    </ng-form>
+                                </div>
+                           
+                
+                 </div>
+
+
+                           
+                        </div>
+
+
+
+
+
+
+
+
+
+                    </div>
+                    
+               </div>
+
+                </div>
+           

@@ -1,0 +1,123 @@
+﻿
+@{
+    Layout = "~/Views/Shared/_index.cshtml";
+}
+
+<style>
+    .form-control {
+        width: 100%;
+    }
+</style>
+
+<script src="~/Scripts/ng/Excel/Excel.js"></script>
+<script src="~/Scripts/ng/Services/AgentListService.js"></script>
+<script src="~/Scripts/ng/Controllers/AgentListController.js"></script>
+
+<div class="breadcrumb-line">
+    <ul class="breadcrumb">
+        <li><a href="/Dashboard/Index"><i class="icon-home2 position-left"></i>Home</a></li>
+        <li>Enquiries</li>
+        <li class="active"><b>Agent List</b></li>
+    </ul>
+</div>
+
+    <div ng-app="IBMSAPP" ng-controller="AgentListController" ng-init="init()" ng-cloak>
+
+
+    <div class="page-content-wrap">
+        <div class="panel panel-default tabs">
+            <ul class="nav nav-tabs" role="tablist">
+                <li class="active" id="tabView"><a href="#tab-first" role="tab" data-toggle="tab">View</a></li>
+            </ul>
+            <div class="panel-body tab-content">
+                <div class="tab-pane active" id="tab-first">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+
+                            <h3 class="panel-title">
+                                <strong>Agent List</strong>
+                            </h3>
+                            <ul class="panel-controls">
+                                <li><input type="text" style="font-size: 12px;width: 100%;border-radius: 0px;margin-right:2px;" class="form-control" placeholder="Search Agent Name......" ng-model="search_query"  ng-change="searchTextChange(search_query)"></li>
+                                @*<li><a href="#" class="panel-refresh" ng-click="refreshContent()"><span class="fa fa-refresh"></span></a></li>*@
+                            </ul>
+                            </div>
+                    </div>
+
+                    <div class="panel-body">
+                        <label class="col-md-2">Show records per page </label>
+                        <div class="col=md-10">
+                            <select class="form-control" style="width:100px;" ng-model="viewby" ng-change="setItemsPerPage(viewby)">
+                                <option>5</option>
+                                <option>10</option>
+                                <option>20</option>
+                                <option>30</option>
+                                <option>40</option>
+                                <option>50</option>
+                            </select>
+                        </div>
+                        <div></div><br />
+                        <table class="table table-responsive" cellspacing="0" id="list">
+                            <thead>
+                                <tr>
+                                    <th>Agent Name</th>
+                                    <th>Address</th>
+                                    <th>Rate Value</th>
+                                </tr>
+                            </thead>
+                            <tbody ng-repeat="Agent in filterdData = (data.slice(((currentPage-1)*itemsPerPage), ((currentPage)*itemsPerPage)))">
+                                <tr id="view{{Agent.AgentID}}">
+                                    <td hidden>
+                                        {{Agent.AgentID}}
+                                    </td>
+                                    <td hidden>
+                                        {{Agent.CompanyID}}
+                                    </td>
+                                    <td>
+                                        {{Agent.AgentName}}
+                                    </td>
+                                    <td>
+                                        {{Agent.Address1}},{{Agent.Address2}},{{Agent.Address3}}
+                                    </td>
+                                    <td>
+                                        {{Agent.RateValue}}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <pagination class="pull-left pagination-sm" total-items="totalItems" ng-model="currentPage" max-size="maxSize" boundary-links="true" rotate="false" num-pages="numPages" items-per-page="itemsPerPage"></pagination>
+                        
+                        <table class="table table-striped dataTable" id="listHidden" hidden>
+                            <thead>
+                                <tr>
+                                    <th>Agent Name</th>
+                                    <th>Address</th>
+                                    <th>Rate Value</th>
+                                </tr>
+                            </thead>
+                            <tbody ng-repeat="agent in Agent">
+                                <tr id="view{{Agent.AgentID}}">
+                                    <td>
+                                        {{agent.AgentName}}
+                                    </td>
+                                    <td>
+                                        {{agent.Address1}},{{agent.Address2}},{{agent.Address3}}
+                                    </td>
+                                    <td>
+                                        {{agent.RateValue}}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        
+                        
+                        
+                        <button style="border-radius: 0px;width:19%;" class="btn btn-danger pull-right" ng-click="exportToExcel('#listHidden')">Export to Excel</button>
+                     </div>
+                    </div>
+
+                    </div>
+                </div>
+        <div id="divLoading" ng-show="showLoader"></div>
+        </div>
+        </div>

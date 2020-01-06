@@ -1,0 +1,1124 @@
+﻿
+@{
+    ViewBag.Title = "Insurance company";
+}
+
+@*@Scripts.Render("~/Scripts/angular.min.js")
+@Scripts.Render("~/Scripts/ng/IBMSApp.js")*@
+@Scripts.Render("~/Scripts/ng/Services/TClientRequestService.js")
+@Scripts.Render("~/Scripts/ng/Controllers/TClientRequestControler.js")
+
+<style>
+    .form-control {
+        min-width: 100%;
+        border-radius: 0px;
+    }
+</style>
+<script type="text/javascript">
+    function n() {
+
+    }
+
+    function showDialog() {
+
+    }
+</script>
+
+<div class="breadcrumb-line">
+    <ul class="breadcrumb">
+        <li><a href="/Dashboard/Index"><i class="icon-home2 position-left"></i>Home</a></li>
+        <li>Transaction</li>
+        <li class="active"><b>Client Request</b></li>
+    </ul>
+</div>
+
+<div ng-app="IBMSAPP" ng-controller="ClentRequestController" ng-cloak>
+    {{message}}
+    <div ng-click="init()" hidden>sfsdgdf</div>
+    <!-- START MODAL INS SUB CLASS SCOPE PREVIEW -->
+    <div class="modal fade" id="iconPreview" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="col-md-6">
+                                <h3>Scope Details</h3>
+                            </div>
+                            <input type="text"
+                                   class="form-control col-md-6"
+                                   placeholder="Search  ..."
+                                   ng-model="search_scope_query" />
+                        </div>
+                    </div>
+
+                    <div class="row" style="margin-top:10px;">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th hidden>In/Sub Class ID</th>
+                                    <th hidden>In/Class</th>
+                                    <th>Insurance Class</th>
+                                    <th>Insurance Sub Class</th>
+                                    <th>Scope Description</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+
+                            <!--<tr  >-->
+                            <tr ng-repeat="ScopeInsClass in ScopeInsClasses|filter:search_scope_query">
+                                <td hidden>{{ScopeInsClass.InsuranceClassCode}}</td>
+                                <td hidden>{{ScopeInsClass.InsuranceSubClassID}}</td>
+                                <td>{{ScopeInsClass.InsuranceClassCode}}</td>
+                                <td>{{ScopeInsClass.InsuranceSubClassID}}</td>
+                                <td>{{ScopeInsClass.Description}}</td>
+                                <td>
+                                    <input type="checkbox"
+                                           class="icheckbox"
+                                           ng-model="ScopeInsClass.isChecked" />
+                                    {{ScopeInsClass.isChecked}}
+                                </td>
+
+
+
+                            </tr>
+
+
+
+
+                        </table>
+
+
+
+                        <div class="modal-footer">
+                            <button class="btn btn-success pull-right" ng-click="AddScopeToList(ScopeInsClasses)"><span class="fa fa-plus"></span>&nbsp;&nbsp;&nbsp;Add</button>
+
+                            <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- END MODAL ICON PREVIEW -->
+    <!-- START MODAL ADDED INS SUB CLASS ADDED SCOPE PREVIEW -->
+    <div class="modal fade" id="addedScopeList" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="col-md-6">
+                                <h3>Added Scope Details</h3>
+                            </div>
+                            <input type="text" class="form-control col-md-6" placeholder="Search  ..." ng-model="search_added_scope_query" />
+                        </div>
+                    </div>
+
+                    <div class="row" style="margin-top:10px;">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th hidden>In/Sub Class ID</th>
+                                    <th hidden>In/Class</th>
+                                    <th>Insurance Class</th>
+                                    <th>Insurance Sub Class</th>
+                                    <th>Scope Description</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+
+                            <!--<tr  >-->
+                            <tr ng-repeat="ScopeInsClass in AddedInsClassesScopesByInsSubClassID|filter:search_added_scope_query">
+                                <td hidden>{{ScopeInsClass.InsuranceClassCode}}</td>
+                                <td hidden>{{ScopeInsClass.InsuranceSubClassID}}</td>
+
+                                <td>{{ScopeInsClass.InsuranceClassCode}}</td>
+                                <td>{{ScopeInsClass.InsuranceSubClassID}}</td>
+                                <td>{{ScopeInsClass.Description}}</td>
+                                <td hidden><input type="checkbox" class="icheckbox" ng-model="ScopeInsClass.isChecked" />{{ScopeInsClass.isChecked}}</td>
+
+
+
+                            </tr>
+
+
+
+
+                        </table>
+
+
+
+                        <div class="modal-footer" >
+                            <button class="btn btn-success pull-right" style="display:none" ng-click="AddScopeToList(ScopeInsClasses)"><span class="fa fa-plus"></span>&nbsp;&nbsp;&nbsp;Add</button>
+
+                            <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- END MODAL ICON PREVIEW -->
+    <!-- START MODAL ADDED INS SUB CLASS PROPERTIES PREVIEW -->
+    <div class="modal fade" id="addedPropList" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="panel panel-default tabs" >
+                    <ul class="nav nav-tabs" role="tablist">
+                        <li id="first" class="active"><a href="#tab-first_prop" role="tab" data-toggle="tab">New</a></li>
+                        <li id="second"><a href="#tab-second_prop" role="tab" data-toggle="tab">View</a></li>
+
+                    </ul>
+                    <div class="panel-body tab-content" >
+                        <div class="tab-pane" id="tab-second_prop">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">
+                                        <input type="text" style="font-size: 12px;width: 100%;border-radius: 0px;margin-right:2px;" class="form-control" placeholder="Search Request ..." ng-model="search_RequestList_query">
+                                    </h3>
+                                    <ul class="panel-controls">
+                                        <li><a href="#" ng-click="refreash()" class="panel-refresh"><span class="fa fa-refresh"></span></a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="panel-body">
+
+                                <div class="row" style="margin-top:10px;">
+                                    <table class="table table-responsive">
+                                        <thead>
+                                            <tr>
+                                                <th hidden>In/Sub Class ID</th>
+                                             
+                                                <th>Insurance Class</th>
+                                                <th>Insurance Sub Class</th>
+                                                <th>Property ID</th>
+                                                <th>Property Description</th>
+                                                <th>VAT No</th>
+                                                <th>BR No</th>
+                                                <th>SVAT No</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+
+                                        <!--<tr  >-->
+                                        <tr ng-repeat="pisc in AddedPropertiesInsClass|filter:search_added_propeties_query">
+                                         
+                                            <td hidden>{{pisc.addedinsClassID}}</td>
+                                            <td>{{pisc.addedinsClass}}</td>
+                                            <td>{{pisc.addedInsSubClass}}</td>
+                                            <td>{{pisc.ClientPropertyID}}</td>
+
+                                            <td>{{pisc.ClientPropertyName}}</td>
+                                            <td>{{pisc.VATNo}}</td>
+                                            <td>{{pisc.BRNo}}</td>
+
+                                            <td>{{pisc.SVATNo}}</td>
+                                            <td><button class="btn btn-danger" 
+                                                        style="font-size:10px;width:80px;padding:1px;" 
+                                                        ng-click="removeProprty(pisc)">Remove</button>
+</td>
+
+
+                                        </tr>
+
+
+
+
+                                    </table>
+
+
+
+                                    <div class="modal-footer">
+                                        
+                                        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+                                    </div>
+                                </div>
+
+
+
+
+
+
+
+
+
+                            </div>
+                        </div>
+                        <div class="tab-pane active" id="tab-first_prop" >
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <h5 class="panel-title">Property Details</h5>
+                                    <h3 class="panel-title"></h3>
+                                    <ul class="panel-controls">
+                                        <li><a href="#" class="panel-refresh" ng-click="clearPrpoert()"><span class="fa fa-refresh"></span></a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="panel-body" style="background-color:transparent;font-size:10px;">
+
+
+
+                                <div class="row form-horizontal">
+                                    <div class="form-group">
+                                        <label class="col-md-4 control-label">Added SubIns Class</label>
+                                        <div class="col-md-8" ng-model="addedinsClassID">
+                                           {{currentInsSubClass.Description}}
+                                        </div>
+                                        <input type="text" ng-model="addedinsClassID" style="display:none;" value="{{}}"/>
+                                        <div class="col-md-8" style="display:none">
+                                            <select class="col-md-12 form-control " ng-model="addedinsClassIDold">
+                                                <option ng-repeat="reqList in requestList"
+                                                        value="{{reqList.insSubClassID}}">
+                                                    {{reqList.InsSubClass}}
+                                                </option>
+                                            </select>
+                                        </div>
+
+                                    </div>
+                                    <div class="form-group">
+
+                                        <label class="col-md-4 control-label">Property/Vehicle ID</label>
+                                        <div class="col-md-8">
+                                            <input type="text" class="form-control" ng-model="pID" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+
+                                        <label class="col-md-4 control-label">Property Description</label>
+                                        <div class="col-md-8">
+                                            <input type="text" class="form-control" ng-model="pName" value="{{pName}}"/>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+
+                                        <label class="col-md-4 control-label">VAT No</label>
+                                        <div class="col-md-8">
+                                            <input type="text" class="form-control" ng-model="VATNo" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+
+                                        <label class="col-md-4 control-label">BRNo</label>
+                                        <div class="col-md-8">
+                                            <input type="text" class="form-control" ng-model="BRNo" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+
+                                        <label class="col-md-4 control-label">SVAT No</label>
+                                        <div class="col-md-8">
+                                            <input type="text" class="form-control" ng-model="SVATNo" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+
+                                        <label class="col-md-4 control-label"></label>
+                                        <div class="col-md-8">
+                                            <button class="btn btn-success pull-right" ng-click="AddPropertyToList()">
+                                                Add
+
+                                            </button>
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+
+
+
+
+
+
+
+                <div class="modal-body" hidden>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="col-md-6">
+                                <h3>Added Property  Details</h3>
+                            </div>
+                            <input type="text" class="form-control col-md-6" placeholder="Search  ..." ng-model="search_added_propeties_query" />
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- END MODAL ICON PREVIEW -->
+    <!-- START MODAL INS/SubClass PREVIEW -->
+    <div class="modal fade" id="LoadInsClassMain" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="col-md-6">
+                                <h3>Load Insurance Sub  Class</h3>
+                            </div>
+                            <input type="text" class="form-control col-md-6" placeholder="Search  ..." 
+                                   ng-model="search_sub_insclass_query" />
+                        </div>
+                    </div>
+
+                    <div class="row" style="margin-top:10px;">
+                        <div class="form-group" style="margin-bottom:10px;">
+                            <label class="col-md-4 control-label">Select Insurance  Class</label>
+                            <div class="col-md-8">
+                                <select class="col-md-12 form-control " ng-model="iClass"
+                                       
+                                        ng-options="iClass.InsuranceClassID as iClass.Description for iClass in InsClass"
+                                        ng-change="loadSubInsClass(iClass)"></select>
+                            </div>
+                        </div>
+                        <br />
+                        <table class="table table-striped" style="font-size:10px;margin-top:10px;">
+                            <thead>
+                                <tr>
+                                    <th hidden>In/Sub Class ID</th>
+                                    <th>In/Class</th>
+                                    <th>In/Sub Class</th>
+
+                                    <th colspan="2">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!--<tr  >-->
+                                <tr ng-repeat="INS in InsSubClass| filter:search_sub_insclass_query" id="view{{INS.InsuranceSubClassID}}">
+                                    <td hidden>{{INS.InsuranceSubClassID}}</td>
+                                    <td hidden>{{INS.InsuranceClassID}}</td>
+                                    <td>{{INS.InsuranceClassCode}}</td>
+
+                                    <td>{{INS.Description}}</td>
+                                    <td colspan="2">
+                                        <button  class="btn btn-info" style="width:60px;padding:1px;display:none" ng-click="loadScope(INS)">
+                                            Scope
+                                        </button>
+                                        &nbsp;  &nbsp;  &nbsp;
+                                        <button class="btn btn-success" style="width:60px;padding:1px;" ng-click="addClass(INS)">
+                                            Add
+                                        </button>
+
+                                    </td>
+
+
+                                </tr>
+
+
+
+                            </tbody>
+
+                        </table>
+
+
+
+
+
+
+
+
+                        <div class="modal-footer">
+
+                            <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- END MODAL ICON PREVIEW -->
+    @*<ul >
+        <li><i class="fa fa-adjust" onClick="showDialog()"></i> fa-adjust</li>
+        </ul>
+
+
+        <button class="btn btn-primary" onClick="noty({ text: 'Successful action', layout: 'topRight', type: 'success' });">Confirm</button>*@
+    <div class="page-content-wrap">
+
+        <div class="panel panel-default tabs" style="background-color:transparent!important">
+            <ul class="nav nav-tabs" role="tablist">
+                <li id="first1" class="active"><a href="#tab-first" role="tab" data-toggle="tab">New</a></li>
+                <li id="second"><a href="#tab-second" role="tab" data-toggle="tab">View</a></li>
+            </ul>
+            <div class="panel-body tab-content" style="background-color:transparent!important">
+                <div class="tab-pane" id="tab-second" style="background-color:transparent!important">
+
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">
+                                <input type="text" style="font-size: 12px;width: 100%;border-radius: 0px;margin-right:2px;" class="form-control" placeholder="Search Request ..." ng-model="search_RequestList_query">
+                            </h3>
+                            <ul class="panel-controls">
+
+                                <li><a href="#" ng-click="refreash()" class="panel-refresh"><span class="fa fa-refresh"></span></a></li>
+
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="panel-body">
+
+
+                        <table class="table .table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Client Name</th>
+                                    <th>Introduced By</th>
+                                    <th>Request Date</th>
+                                    <th>Quatation Created</th>
+                                    @*<th>Contact No</th>
+                                        <th>Email</th>
+                                        <th>Fax</th>*@
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                                <tr id="view{{myReqList.ClientRequestHeaderID}}" ng-repeat="myReqList in MyReqLists| filter:search_RequestList_query">
+                                    <td hidden>{{myReqList.CompanyID}} </td>
+                                    <td hidden>{{myReqList.ClientRequestHeaderID}}</td>
+
+                                    <td>{{myReqList.ClientName}}</td>
+                                    <td>{{myReqList.PartnerName}}</td>
+                                    <td>{{myReqList.RequestedDate}}</td>
+                                    <td>{{myReqList.IsQuotationCreated}}</td>
+                                    <td>
+                                        <button class="btn btn-info " ng-disabled="myReqList.IsQuotationCreated==true" style="width:70px;padding:1px;" ng-click="editMyReq(myReqList)">Edit</button>&nbsp;&nbsp;
+                                        <button class="btn btn-info  " ng-disabled="myReqList.IsQuotationCreated==false" style="width:70px;padding:1px;background-color:#1caf9a;border:0px;" ng-click="editMyReq(myReqList)">View</button>&nbsp;&nbsp;
+
+                                        <button ng-disabled="myReqList.IsQuotationCreated==true" class="btn btn-success" ng-click="MakeQuatation(myReqList)">Make Quatation</button>&nbsp;&nbsp;
+
+                                        <button class="btn btn-danger " hidden ng-click="Delete(myReqList)">Delete</button>
+                                    </td>
+
+
+                                </tr>
+
+
+
+                            </tbody>
+
+                        </table>
+
+
+
+
+
+
+
+
+
+
+
+
+                    </div>
+
+                </div>
+                <div class="tab-pane active" id="tab-first" style="background-color:transparent!important">
+
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h5 class="panel-title">Customer Request From</h5>
+                            <h3 class="panel-title"></h3>
+                            <ul class="panel-controls">
+
+                                <li><a href="#" class="panel-refresh" ng-click="refresh()"><span class="fa fa-refresh"></span></a></li>
+
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="panel-body" style="background-color:transparent">
+
+                        <form id="validate" role="form" class="form-horizontal" @*action="javascript:alert('Form #validate submited')"*@>
+
+                            <div class="row">
+                                <div class="col-md-7">
+                                    <div class="form-group" hidden>
+                                        <label class="col-md-4 control-label">Company/ParentCompany</label>
+                                        <div class="col-md-8">
+                                            <select class="col-md-12 form-control " data-live-search="true" ng-model="comp">
+                                                <option ng-repeat="comp in Company"
+                                                        value="{{comp.CompanyID}}">
+                                                    {{comp.CompanyName}}
+                                                </option>
+
+                                            </select>
+
+
+
+                                        </div>
+
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-md-4 control-label">Introduced By</label>
+                                        <div class="col-md-8">
+
+                                            <select class="col-md-12 form-control " name="PartnerID" ng-model="partner"
+                                                    ng-options="partner.PartnerID as partner.PartnerName for partner in Partners"></select>
+
+
+
+                                        </div>
+
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-4 control-label">Bussiness Unit</label>
+                                        <div class="col-md-8">
+                                            <select class="col-md-12 form-control " ng-model="BUnit"
+                                                    ng-options="BUnit.BusinessUnitID as BUnit.BusinessUnit for BUnit in BUnits"></select>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-md-4 control-label"></label>
+                                        <div class="col-md-8">
+                                            <div class="btn btn-default bg-info" ng-click="LoadInsDetails()">Load Insurance Details</div>
+                                        </div>
+                                    </div>
+
+
+
+                                    <div class="form-group">
+                                        <div class="col-md-12">
+                                            <!-- START INFO PANEL -->
+                                            <div class="panel panel-info">
+                                                <div class="panel-heading">
+                                                    <h3 class="panel-title">Added Information</h3>
+                                                </div>
+                                                <div class="panel-body">
+                                                    <table class="table table-striped">
+                                                        <thead style="font-size:10px;">
+                                                            <tr>
+                                                                <th hidden>In/Sub Class ID</th>
+                                                                <th>In/Class</th>
+                                                                <th>In/Sub Class</th>
+                                                                <th hidden> Property Description</th>
+                                                                <th>Action</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <!--<tr  >-->
+                                                            <tr ng-repeat="reqList in requestList| filter:search_sub_insclass_query" id="view{{reqList.insSubClassID}}">
+                                                                <td hidden>{{reqList.inslassID}}</td>
+                                                                <td hidden>{{reqList.insSubClassID}}</td>
+                                                                <td hidden>{{reqList.propertyID}}</td>
+                                                                <td>{{reqList.InsClass}}</td>
+                                                                <td>{{reqList.InsSubClass}}</td>
+                                                                <td hidden>{{reqList.ProertDiscription}}</td>
+
+                                                                <td>
+                                                                    <button class="btn btn-info" style="font-size:10px;width:80px;padding:1px;" ng-click="loadAddedScope(reqList)">
+                                                                        Scope
+                                                                    </button>
+                                                                    <button class="btn btn-warning" style="font-size:10px;width:80px;padding:1px;" ng-click="loadAddedProperties(reqList)">
+                                                                        Properties
+                                                                    </button>
+                                                                    <button class="btn btn-danger" style="font-size:10px;width:80px;padding:1px;" ng-click="remove(reqList)">Remove</button>
+                                                                </td>
+                                                            </tr>
+
+
+
+                                                        </tbody>
+
+                                                    </table>
+
+
+
+                                                </div>
+
+                                            </div>
+                                            <!-- END INFO PANEL -->
+                                        </div>
+
+
+
+                                    </div>
+
+
+
+
+                                </div>
+                                <div class="col-md-5">
+
+                                    <!-- START Customer Information PANEL -->
+                                    <div class="panel panel-primary " style="border:0px;background-color:transparent!important" >
+                                        <div class="panel-heading">
+                                            <h3 class="panel-title">Customer Information</h3>
+
+                                        </div>
+                                        <div class="panel-body" style="background-color:transparent!important">
+
+                                            <div class="form-group">
+                                                <label class="col-md-4 control-label">Request Date</label>
+                                                <div class="col-md-4">
+                                                    <div class="form-control">
+                                                        {{RequestedDate}}
+
+
+                                                    </div>
+                                                </div>
+                                                <label class="col-md-2 control-label">Existing customer</label>
+                                                <div class="col-md-2">
+                                                    <label class="switch switch-small">
+                                                        <input type="checkbox" checked value="0" ng-model="isNewCustomer" />
+                                                        <span></span>
+                                                    </label>
+                                                </div>
+
+
+
+
+                                            </div>
+
+                                            <div class="form-group" ng-show="isNewCustomer">
+                                                <label class="col-md-4 control-label">Choose Customer</label>
+                                                <div class="col-md-8">
+                                                    <select ng-options="client.ClientID as client.ClientName for client in Clients"
+                                                            ng-change="LoadClientByID(client)"
+                                                            ng-model="ClientID" class="form-control"></select>
+                                                </div>
+
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-4 control-label">Customer Name</label>
+                                                <div class="col-md-8">
+                                                    <input type="text" name="cusName" class="validate[required] form-control" ng-model="cusName" value="Some text value..." />
+                                                    <span class="help-block">required Field</span>
+
+                                                </div>
+
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-4 control-label">Address </label>
+                                                <div class="col-md-8">
+                                                    <input type="text" class="form-control" ng-model="Address1" value="password" />
+                                                </div>
+
+                                            </div>
+
+                                            <div class="form-group" hidden>
+                                                <label class="col-md-4 control-label">Address  Line 2</label>
+                                                <div class="col-md-8">
+                                                    <input type="text" class="form-control" ng-model="Address2" value="password" />
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group" hidden>
+                                                <label class="col-md-4 control-label">Address Line 3</label>
+                                                <div class="col-md-8">
+                                                    <input type="text" class="form-control" ng-model="Address3" value="password" />
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group">
+
+                                                <label class="col-md-4 control-label">Date Of Birth</label>
+                                                <div class="col-md-8 row input-group date datepicker" data-date="{{DOB }}"
+                                                     data-date-format="mm/dd/yyyy" ng-model="DOB">
+
+                                                    <input type="text" ng-style="{'background-color': data.backgroundCol}"
+                                                           id="dp-3" class="col-md-4  form-control  " value="{{DOB }}" />
+                                                    
+                                               
+                                                    
+                                                    <span class="input-group-addon add-on" style="display:none">
+                                                        <span class="glyphicon glyphicon-calendar"></span>
+                                                    </span>
+                                                </div>
+
+
+
+
+
+                                                
+
+
+
+
+
+
+
+
+
+
+                                            </div>
+                                            <div class="form-group">
+
+                                                <label class="col-md-4 control-label">NIC</label>
+                                                <div class="col-md-8">
+                                                    <input type="text" class=" form-control"
+                                                           maxlength="10"
+                                                           ng-model="NIC" />
+                                                    <span class="help-block">Required, number</span>
+                                                </div>
+
+
+
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-4 control-label">Mobile No</label>
+                                                <div class="col-md-8">
+                                                    <input type="text" class="form-control"
+                                                           maxlength="10"
+                                                           ng-model="mobileNo" />
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-md-4 control-label">Fixed Line</label>
+                                                <div class="col-md-8">
+                                                    <input type="text" class=" form-control"
+                                                           maxlength="10"
+                                                           ng-model="fixedLine" />
+                                                </div>
+
+
+
+                                            </div>
+
+                                            <div class="form-group">
+
+                                                <label class="col-md-4 control-label">E-Mail</label>
+                                                <div class="col-md-8">
+                                                    <input type="text" name="email" class="validate[required] form-control" ng-model="email" />
+                                                    <span class="help-block">required email</span>
+                                                </div>
+
+                                            </div>
+                                            <div class="form-group" id="isAVIVA" ng-show="isAVIVA">
+                                                <label class="col-md-4 control-label">AVIVA/BUPA</label>
+                                                <div class="col-md-8">
+                                                    <div class="panel panel-default">
+                                                        <div class="panel-body">
+
+                                                            <div class="form-group" style="font-size:10px;">
+                                                                <label class="col-md-2 control-label">Resident Country</label>
+                                                                <div class="col-md-4">
+                                                                    <select class="col-md-12 form-control " data-live-search="true" ng-model="homeCountry">
+                                                                        <option ng-repeat="Country in Countries"
+                                                                                value="{{Country.CountryID}}">
+                                                                            {{Country.CountryName}}
+                                                                        </option>
+
+                                                                    </select>
+                                                                </div>
+                                                                <label class="col-md-2 control-label">Home Country</label>
+                                                                <div class="col-md-4">
+                                                                    <select class="form-control " data-live-search="true" ng-model="residentCountry">
+                                                                        <option ng-repeat="Country in Countries"
+                                                                                value="{{Country.CountryID}}">
+                                                                            {{Country.CountryName}}
+                                                                        </option>
+
+                                                                    </select>
+                                                                </div>
+
+
+
+                                                            </div>
+
+
+                                                            <div class="form-group" style="font-size:10px;">
+                                                                <label class="col-md-2 control-label">Inspection Date</label>
+                                                                <div class="col-md-10">
+                                                                    <div class="input-group date datepicker" data-date="05/07/2014"
+                                                                         data-date-format="dd-mm-yyyy" ng-model="inspectionType">
+                                                                        <input type="text" id="dp-2" class="form-control  " value="05/07/2014" />
+                                                                        <span class="input-group-addon add-on"><span class="glyphicon glyphicon-calendar"></span></span>
+                                                                    </div>
+
+                                                                </div>
+
+                                                            </div>
+                                                            <div class="form-group" style="font-size:10px;">
+
+                                                                <label class="col-md-2 control-label">Family Discount</label>
+                                                                <div class="col-md-10">
+                                                                    <input type="text" class="form-control  " ng-model="fDiscount" />
+
+                                                                </div>
+
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+
+
+
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label class="col-md-4 control-label">File Upload</label>
+                                                <div class="col-md-8">
+                                                    <div class="panel panel-default">
+                                                        <div class="panel-body">
+                                                            <h3> Click/Drag File to upload</h3>
+                                                            <div action="#" class="dropzone dropzone-mini"></div>
+                                                        </div>
+                                                    </div>
+                                                    @*<input type="file" multiple class="btn-success" data-preview-file-type="any" />*@
+                                                </div>
+                                            </div>
+
+
+
+                                        </div>
+
+                                    </div>
+                                    <!-- END Insurance Class  PANEL -->
+
+
+                                </div>
+                                <div class="col-md-12" style="margin-bottom:10px;">
+
+
+
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+
+                                <button class="btn btn-primary pull-right" ng-if="isUpdate===false && IsQuotationCreated==false" id="add" ng-click="Save()">Save Changes <span class="fa fa-floppy-o fa-right"></span></button>
+                                <button class="btn btn-primary pull-right" ng-if="isUpdate===true && IsQuotationCreated==false" id="update" ng-click="Update()" style="margin-right:10px">Update Changes <span class="fa fa-floppy-o fa-right"></span></button>&nbsp;&nbsp;&nbsp;
+                            </div>
+                            <div class="form-group">
+
+                                <!-- START SIMPLE PANELS -->
+                                <div class="row">
+                                    <div class="col-md-3" hidden>
+                                        <!-- START Insurance Class PANEL -->
+                                        <div class="panel panel-primary " style="height:450px; overflow: scroll;">
+                                            <div class="panel-heading">
+                                                <h3 class="panel-title">Ins Class</h3>
+                                                <input type="text"
+                                                       style="float:right;font-size: 12px;width: 50%;border-radius: 0px;margin-right:2px;"
+                                                       class="form-control"
+                                                       placeholder="Search  ..." ng-model="search_insclass_query">
+                                            </div>
+                                            <div class="panel-body">
+                                                <table class="table table-striped" style="font-size:10px;">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>In/Class Name</th>
+                                                            <th>Code</th>
+
+                                                        </tr>
+                                                    </thead>
+
+                                                    <tbody>
+                                                        <!--<tr  >-->
+                                                        <tr ng-repeat="InsClas in InsClass| filter:search_insclass_query"
+                                                            id="view{{InsClas.InsuranceClassID}}"
+                                                            ng-click="loadSubInsClass(InsClas)" style="cursor: pointer;">
+                                                            <td hidden>{{InsClas.BusinessUnitID}} </td>
+                                                            <td hidden>{{InsClas.InsuranceClassID}}</td>
+                                                            <td>{{InsClas.Description}}</td>
+                                                            <td>{{InsClas.InsuranceCode}}</td>
+
+                                                        </tr>
+                                                    </tbody>
+
+                                                </table>
+
+
+
+
+                                            </div>
+
+                                        </div>
+                                        <!-- END Insurance Class  PANEL -->
+
+                                    </div>
+                                    <div class="col-md-5" hidden>
+                                        <!-- START Sub Ins Class PANEL -->
+                                        <div class="panel panel-primary" style="height:450px; overflow: scroll;">
+                                            <div class="panel-heading">
+                                                <h3 class="panel-title">Ins Sub Class</h3>
+                                                <input type="text" style="float:right;font-size: 12px;width: 50%;border-radius: 0px;margin-right:2px;"
+                                                       class="form-control" placeholder="Search  ..." ng-model="search_sub_insclass_query">
+
+                                            </div>
+                                            <div class="panel-body">
+                                                <table class="table table-striped" style="font-size:10px;">
+                                                    <thead>
+                                                        <tr>
+                                                            <th hidden>In/Sub Class ID</th>
+                                                            <th>In/Class</th>
+                                                            <th>In/Sub Class</th>
+
+                                                            <th colspan="2">Action</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <!--<tr  >-->
+                                                        <tr ng-repeat="INS in InsSubClass| filter:search_sub_insclass_query" id="view{{INS.InsuranceSubClassID}}">
+                                                            <td hidden>{{INS.InsuranceSubClassID}}</td>
+                                                            <td hidden>{{INS.InsuranceClassID}}</td>
+                                                            <td>{{INS.InsuranceClassCode}}</td>
+
+                                                            <td>{{INS.Description}}</td>
+                                                            <td colspan="2">
+                                                                <button class="btn btn-info" 
+                                                                        style="width:60px;padding:1px;" 
+                                                                        ng-click="loadScope(INS)">
+                                                                    Scope
+                                                                </button>
+                                                                &nbsp;  &nbsp;  &nbsp;
+                                                                <button class="btn btn-success" style="width:60px;padding:1px;" ng-click="addClass(INS)">
+                                                                    Add
+                                                                </button>
+
+                                                            </td>
+
+
+                                                        </tr>
+
+
+
+                                                    </tbody>
+
+                                                </table>
+
+                                            </div>
+
+                                        </div>
+                                        <!-- END  Sub Ins Class PANEL -->
+                                    </div>
+                                    <div class="col-md-4" hidden>
+                                        <!-- START Porperty PANEL -->
+                                        <div class="panel panel-primary" style="height:450px; overflow: scroll;">
+                                            <div class="panel-heading">
+                                                <h3 class="panel-title">Property Details</h3>
+
+                                            </div>
+                                            <div class="panel-body" style="font-size:10px;">
+                                                <div class="form-group">
+
+                                                    <label class="col-md-4 control-label">Added SubIns Class</label>
+                                                    <div class="col-md-8">
+                                                        <select class="col-md-12 form-control " ng-model="addedinsClassID">
+                                                            <option ng-repeat="reqList in requestList"
+                                                                    value="{{reqList.insSubClassID}}">
+                                                                {{reqList.InsSubClass}}
+                                                            </option>
+
+                                                        </select>
+                                                    </div>
+
+
+
+                                                </div>
+
+                                                <div class="form-group">
+
+
+                                                    <label class="col-md-4 control-label">Property/Vehicle ID</label>
+                                                    <div class="col-md-8">
+                                                        <input type="text" class="form-control" ng-model="pID" />
+                                                    </div>
+
+                                                </div>
+
+                                                <div class="form-group">
+
+
+                                                    <label class="col-md-4 control-label">Property Description</label>
+                                                    <div class="col-md-8">
+                                                        <input type="text" class="form-control" ng-model="pName" />
+                                                    </div>
+
+                                                </div>
+
+
+                                                <div class="form-group">
+
+
+                                                    <label class="col-md-4 control-label">VAT No</label>
+                                                    <div class="col-md-8">
+                                                        <input type="text" class="form-control" ng-model="VATNo" />
+                                                    </div>
+
+                                                </div>
+                                                <div class="form-group">
+
+
+                                                    <label class="col-md-4 control-label">BRNo</label>
+                                                    <div class="col-md-8">
+                                                        <input type="text" class="form-control" ng-model="BRNo" />
+                                                    </div>
+
+                                                </div>
+
+
+                                                <div class="form-group">
+
+
+                                                    <label class="col-md-4 control-label">SVAT No</label>
+                                                    <div class="col-md-8">
+                                                        <input type="text" class="form-control" ng-model="SVATNo" />
+                                                    </div>
+
+                                                </div>
+
+
+                                                <div class="form-group">
+
+
+                                                    <label class="col-md-4 control-label"></label>
+                                                    <div class="col-md-8">
+
+                                                        <button class="btn btn-success pull-right" ng-click="AddPropertyToList()">
+                                                            Add
+
+                                                        </button>
+
+                                                    </div>
+
+                                                </div>
+
+
+
+                                            </div>
+
+                                        </div>
+                                        <!-- END Porperty PANEL -->
+
+                                    </div>
+
+                                </div>
+
+
+                                <!-- END SIMPLE PANELS -->
+
+
+                            </div>
+
+
+
+                        </form>
+
+
+                    </div>
+
+
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+</div>
+

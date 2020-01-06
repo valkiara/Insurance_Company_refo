@@ -1,0 +1,6 @@
+
+Log Entry : 
+08/05/2019 12:16:55 PM
+Error in: http://localhost:39705/api/ClientRequest/getAllHistoryClientRequestsByBUID.
+Error Message:String was not recognized as a valid DateTime.
+__________________________

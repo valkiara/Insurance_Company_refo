@@ -1,0 +1,943 @@
+﻿
+@{
+    ViewBag.Title = "Manage Client Request";
+    Layout = "~/Views/Shared/_index.cshtml";
+}
+
+<style>
+    .form-control {
+        width: 100%;
+    }
+
+    .set-header {
+        background-color: #1caf9a;
+        height: 30px;
+        padding: 2px;
+        /*margin-bottom: 15px;*/
+    }
+
+    .set-header-property {
+        background-color: #e47080;
+        height: 30px;
+        padding: 2px;
+        /*margin-bottom: 15px;*/
+    }
+
+    .set-header-scope {
+        background-color: #e4a670;
+        height: 30px;
+        padding: 2px;
+        /*margin-bottom: 15px;*/
+    }
+    /*------------------Popup---------------------*/
+    @@media screen and (max-width: 1024px) {
+        .app-modal-window-property .modal-dialog {
+            width: 95%;
+        }
+
+        /*.app-modal-window-scopes .modal-dialog {
+            width: 95%;
+        }*/
+    }
+
+    @@media screen and (min-width: 1024px) {
+        .app-modal-window-property .modal-dialog {
+            width: 80%;
+        }
+
+        /*.app-modal-window-scopes .modal-dialog {
+            width: 70%;
+        }*/
+    }
+    /*------------------Popup---------------------*/
+</style>
+
+<script src="~/Scripts/ng/Services/ClientRequestService.js"></script>
+<script src="~/Scripts/ng/Controllers/ClientRequestController.js"></script>
+<script src="~/Scripts/ng/Services/QuotationService.js"></script>
+<script src="~/Scripts/ng/Services/PolicyInfoRecService.js"></script>
+
+<script type="text/javascript">
+    function IsNumber(evt) {
+        evt = (evt) ? evt : window.event;
+        var charCode = (evt.which) ? evt.which : evt.keyCode;
+        if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+            return false;
+        }
+        return true;
+    }
+
+    function checkInputRate(rateVal) {
+        var regEx = /^[0-9]+\.?[0-9]*$/;
+        if (regEx.test(rateVal.value) == false) {
+            rateVal.value = rateVal.value.substring(0, rateVal.value.length - 1);
+        }
+    }
+</script>
+
+<div class="breadcrumb-line">
+    <ul class="breadcrumb">
+        <li><a href="/Dashboard/Dashboard"><i class="icon-home2 position-left"></i>Home</a></li>
+        <li>Transaction</li>
+        <li>Customer</li>
+        <li class="active"><b>Customer Request</b></li>
+    </ul>
+</div>
+
+<div class="content" ng-app="IBMSAPP">
+    <div ng-controller="ClientRequestController" ng-init="init()" ng-cloak>
+        <div class="page-content-wrap">
+            <div class="panel panel-default tabs">
+                <ul class="nav nav-tabs" role="tablist">
+                    <li id="list-tab-1" class="active"><a href="#tab-1" role="tab" data-toggle="tab" ng-click="activateClientRequestListTab()">View</a></li>
+                    <li id="list-tab-2"><a href="#tab-2" role="tab" data-toggle="tab" ng-click="activateNewClientRequestTab()">New</a></li>
+                    <li id="list-tab-3">
+                        <a href="#tab-3" role="tab" data-toggle="tab" ng-click="activateQuotationTab()">Received Quotation</a>
+                    </li>
+                </ul>
+                <div class="panel-body tab-content">
+                    <div class="tab-pane active" id="tab-1">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">
+                                    <strong>Customer Requests</strong>
+                                </h3>
+                                <ul class="panel-controls">
+                                    <li><input type="text" style="font-size: 12px;width: 100%;border-radius: 0px;margin-right:2px;" class="form-control" placeholder="Search Customer Request ..." ng-model="search_query" ng-change="searchTextChange(search_query)"></li>
+                                    <li><a href="#" ng-click="refreshContent()"><span class="fa fa-refresh"></span></a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="panel-body">
+                            <div class="col-md-2">Show records per page </div>
+                            <div class="col=md-10">
+                                <select class="form-control" style="width:100px;"
+                                        ng-model="viewby"
+                                        ng-change="setItemsPerPage(viewby)">
+                                    <option>10</option>
+                                    <option>20</option>
+                                    <option>30</option>
+                                    <option>40</option>
+                                    <option>50</option>
+                                </select>
+                            </div>
+                            <div><br></div>
+                            <table class="table table-responsive" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th>Quotation No</th>
+                                        <th>Client Name</th>
+                                        <th>Introduced By</th>
+                                        <th>Requested Date</th>
+                                        @*<th>Is Quotation Created</th>*@
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody ng-repeat="ClientRequest in data.slice(((currentPage-1)*itemsPerPage), ((currentPage)*itemsPerPage))">
+                                    <tr id="view{{ClientRequest.ClientRequestHeaderID}}">
+                                        <td>{{ClientRequest.QuotationNo}}</td>
+                                        <td>{{ClientRequest.ClientName}}</td>
+                                        <td>{{ClientRequest.PartnerName}}</td>
+                                        <td>{{ClientRequest.RequestedDate}}</td>
+                                        @*<td><center><span style="font-size:medium" ng-bind-html='ClientRequest.IsQuotationCreated | return_status'></span></center></td>*@
+                                        <td>
+                                            <button class="btn btn-info" ng-disabled="ClientRequest.IsQuotationCreated" style="width:70px;padding:1px;" ng-click="editClientRequest(ClientRequest.ClientRequestHeaderID,ClientRequest.ClientID)">Edit</button>&nbsp;&nbsp;
+                                            <button class="btn btn-info" ng-disabled="!ClientRequest.IsQuotationCreated" style="width:70px;padding:1px;background-color:#1caf9a;border:0px;" ng-click="viewClientRequest(ClientRequest.ClientRequestHeaderID,ClientRequest.ClientID)">View</button>&nbsp;&nbsp;
+                                            <button ng-disabled="ClientRequest.IsQuotationCreated" class="btn btn-success" ng-click="initializeQuotation(ClientRequest.ClientRequestHeaderID)">Make Quotation</button>&nbsp;&nbsp;
+                                            @*<button ng-disabled="ClientRequest.IsQuotationCreated" class="btn btn-success" ng-click="initializeQuotation(ClientRequest.ClientRequestHeaderID)">Received Quotation</button>&nbsp;&nbsp;*@
+                                            <button class="btn btn-success" ng-disabled="ClientRequest.IsReceived" ng-click="loadClientRequestDetailsByID(ClientRequest,flse)">Received Quotation</button>&nbsp;&nbsp;
+                                            <button class="btn btn-success" ng-disabled="!ClientRequest.IsReceived" ng-click="download(ClientRequest.QuotationNo)">Download</button>&nbsp;&nbsp;
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <pagination total-items="totalItems"
+                                        ng-model="currentPage"
+                                        max-size="maxSize"
+                                        class="pagination-sm pull-left"
+                                        boundary-links="true"
+                                        rotate="false"
+                                        num-pages="numPages"
+                                        items-per-page="itemsPerPage"></pagination>
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="tab-2">
+                        <form name="manangeClientRequest" novalidate>
+                            <ng-form name="manageClient" novalidate>
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <h3 class="panel-title">
+                                            <strong>Customer Details</strong>
+                                        </h3>
+                                    </div>
+                                </div>
+                                <div class="panel-body">
+                                    <div class="col-md-4" ng-if="!isCustomerAvailable">
+                                        <div class="form-group">
+                                            <label class="control-label">Select Customer</label>
+                                            <selectize placeholder="Select Customer" options="availableClients" config="{maxItems: 1}" ng-model="cusObj.ClientID" ng-change="loadClientByID(cusObj.ClientID)"></selectize>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4" ng-if="!isCustomerAvailable" style="margin-top:25px;">
+                                        <input type="button" class="btn btn-danger" value="Add New Customer" ng-click="manageCustomer(false,'')" />
+
+                                    </div>
+                                    <div class="row" ng-if="isCustomerAvailable">
+                                        <div class="col-md-6">
+                                            <h3 style="margin-top: 5px;">{{cusObj.ClientName }}</h3>
+                                            <h5 style="color:red">{{cusObj.Email}}</h5>
+                                            <h4>{{cusObj.ClientAddress}}</h4>
+                                            <h6>Phone:&nbsp;{{cusObj.ContactNo}}/{{cusObj.FixedLine}}</h6>
+                                            <h6>NIC:&nbsp;{{cusObj.NIC}}</h6>
+                                            <h6>DOB:&nbsp;{{cusObj.DOB}}</h6>
+                                        </div>
+                                    </div>
+                                    <br />
+                                    <div class="row" ng-if="isCustomerAvailable && !isViewMode">
+                                        <div class="col-md-12">
+                                            <button class="btn btn-primary" ng-click="changeCustomer()">Change Customer</button>
+                                            <button class="btn btn-default" ng-click="manageCustomer(true,cusObj)">Edit Customer</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </ng-form>
+                            <ng-form name="manageClientRequest" novalidate>
+                                <div class="panel panel-default" ng-if="isCustomerAvailable">
+                                    <div class="panel-heading">
+                                        <h3 class="panel-title">
+                                            <strong>Customer Request Details</strong>
+                                        </h3>
+                                    </div>
+                                </div>
+                                <div class="panel-body" ng-if="isCustomerAvailable">
+                                    <div class="row">
+                                        <label class="col-md-2 control-label">Business Unit</label>
+                                        <div class="col-md-5">
+                                            <div class="form-group">
+                                                <b>{{currentUser.BusinessUnitName}}</b>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <br />
+                                    <div class="row">
+                                        <label class="col-md-2 control-label">Source</label>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <selectize placeholder="Select Partner" name="inputPartner" options="availablePartners" config="{maxItems: 1}" ng-model="cusReqObj.PartnerID" ng-required="true"></selectize>
+                                                <span class="help-block" style="color:red" ng-show="manageClientRequest.inputPartner.$error.required">
+                                                    Required Field *
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3" ng-show="cusReqObj.PartnerID == 1 ">
+                                            <selectize name="SelectAccountHandler" placeholder="Select Account Handler" options="availableAgents" config="{maxItems: 1}" ng-model="cusReqObj.AgentID"></selectize>
+                                            <span class="help-block" style="color:red" ng-show="manageClientRequest.SelectAccountHandler.$error.required">Required Field *</span>
+                                        </div>
+                                        <div class="col-md-3" ng-show="cusReqObj.PartnerID == 2 ">
+                                            <selectize name="SelectExecutive" placeholder="Select Executive Name" options="availableloadExecutive" config="{maxItems: 1}" ng-model="cusReqObj.EmployeeID"></selectize>
+                                            <span class="help-block" style="color:red" ng-show="manageClientRequest.SelectExecutive.$error.required">Required Field *</span>
+                                        </div>
+                                        <div class="col-md-3" ng-show="cusReqObj.PartnerID == 3 ">
+                                            <selectize name="SelectAgent" placeholder="Select Agent Name" options="availableAgents" config="{maxItems: 1}" ng-model="cusReqObj.AgentID"></selectize>
+                                            <span class="help-block" style="color:red" ng-show="manageClientRequest.SelectAgent.$error.required">Required Field *</span>
+                                        </div>
+                                        <div class="col-md-3" ng-show="cusReqObj.PartnerID == 4 ">
+                                            <selectize name="SelectIntroducer" placeholder="Select Introducer" options="availableIntroducers" config="{maxItems: 1}" ng-model="cusReqObj.IntroducerID"></selectize>
+                                            <span class="help-block" style="color:red" ng-show="manageClientRequest.SelectIntroducer.$error.required">Required Field *</span>
+                                        </div>
+                                    </div>
+                                    <br />
+                                    <div class="row">
+                                        <label class="col-md-2 control-label">Requested Date</label>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <div class="input-group">
+                                                    <input type="text"
+                                                           name="selectRequestedDate"
+                                                           class="form-control date"
+                                                           ng-click="reqDate=true"
+                                                           datepicker-popup="dd/MM/yyyy"
+                                                           ng-model="cusReqObj.RequestedDate"
+                                                           is-open="reqDate"
+                                                           datepicker-options="dateOptions"
+                                                           placeholder="Requested Date"
+                                                           @*min-date="currentDate"*@
+                                                           @*max-date="purchaseOrderObj.DatePaid"*@
+                                                           ng-required="true"
+                                                           close-text="Close"
+                                                           @*ng-disabled="purchaseOrderObj.PurchaseOrderStatus=='Closed'"*@>
+                                                    <span class="input-group-btn">
+                                                        <button class="btn btn-default glyphicon glyphicon-calendar" ng-click="reqDate=true;$event.stopPropagation();"></button>
+                                                    </span>
+                                                </div>
+                                                <span class="help-block" style="color:red" ng-show="manageClientRequest.selectRequestedDate.$error.required">
+                                                    Required Field *
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <br />
+                                    <div class="row" hidden>
+                                        <div class="col-md-12 set-header">
+                                            <div class="row">
+                                                <div class="col-md-1" align="center"><h5><b>#</b></h5></div>
+                                                <div class="col-md-4" align="center"><h5><b>Insurance Sub Class</b></h5></div>
+                                                <div class="col-md-3" align="center"><h5><b>Properties</b></h5></div>
+                                                <div class="col-md-3" align="center"><h5><b>Scopes</b></h5></div>
+                                                <div class="col-md-1" align="center"></div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12" ng-repeat="cusReq in cusReqObj.ClientRequestLineDetails" style="background-color:#d9f7f7">
+                                            <ng-form name="manageClientReqLine" novalidate>
+                                                <div class="row">
+                                                    <div class="col-md-1">
+                                                        <div class="panel-body no-padding" align="center">
+                                                            <h6 label>{{$index+1}}</h6>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <div class="panel-body no-padding" style="align-content:center">
+                                                            <selectize placeholder="Select Ins Sub Class" name="inputInsSubClass" options="availableInsSubClasses" config="{maxItems: 1}" ng-model="cusReq.InsSubClassID" ng-change="insSubClassChange($index)"></selectize>
+                                                            <span class="help-block" style="color:red" ng-show="manageClientReqLine.inputInsSubClass.$error.required">
+                                                                Required Field *
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <div class="panel-body no-padding" align="center">
+                                                            <button type="button" class="btn btn-danger" ng-click="manageProperties($index)">Manage Properties</button>
+                                                            <input type="text" ng-model="propertyValidateTemp" ng-show="false" />
+                                                            <span ng-if="cusReq.ClientPropertyDetails.length>0"><i style="color:green" class="glyphicon glyphicon-ok"></i></span>
+                                                            <span ng-if="cusReq.ClientPropertyDetails.length==0"><i style="color:red" class="glyphicon glyphicon-remove"></i></span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <div class="panel-body no-padding" align="center">
+                                                            <button type="button" class="btn btn-warning" ng-click="manageScopes($index,cusReq.InsSubClassID)">Manage Scopes</button>
+                                                            <input type="text" ng-model="scopeValidateTemp" ng-show="false" />
+                                                            <span ng-if="cusReq.ClientRequestInsSubClassScopeDetails.length>0"><i style="color:green" class="glyphicon glyphicon-ok"></i></span>
+                                                            <span ng-if="cusReq.ClientRequestInsSubClassScopeDetails.length==0"><i style="color:red" class="glyphicon glyphicon-remove"></i></span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-1">
+                                                        <div class="panel-body no-padding" ng-if="$index>0">
+                                                            <button type="button" class="btn btn-default" ng-click="deleteItem($index)">
+                                                                <span class="glyphicon glyphicon-remove-circle"></span>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </ng-form>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <br />
+                                            <div class="row">
+                                                <div class="col-md-1">
+                                                    <div class="panel-body no-padding" align="center">
+                                                        <button type="button" class="btn btn-default" ng-click="addItem()">
+                                                            <span class="glyphicon glyphicon-plus"></span>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <br />
+                                    <div class="row">
+                                        <div class="col-md-12 modal-footer">
+                                            <button class="btn btn-primary" ng-disabled="!manageClientRequest.$valid" ng-show="isClientReqAddMode && !isViewMode" ng-click="saveCustomerRequest()">Save Customer Request<span class="fa fa-floppy-o fa-right"></span></button>
+                                            <button class="btn btn-primary" ng-disabled="!manageClientRequest.$valid" ng-show="!isClientReqAddMode && !isViewMode" ng-click="updateCustomerRequest()">Update Customer Request<span class="fa fa-floppy-o fa-right"></span></button>
+                                            <button class="btn btn-default" ng-click="cancelCustomerRequest()">Cancel</button>
+                                        </div>
+                                    </div>
+                                    <br />
+                                </div>
+                            </ng-form>
+                        </form>
+                    </div>
+                    <div class="tab-pane" id="tab-3">
+                        <div ng-if="!isQuotationEditMode" style="padding-top:10px;">
+                            <center><span class="label label-danger" style="font-size:small;">Please select any quotation from the list</span></center>
+                        </div>
+                        <div ng-if="isQuotationEditMode">
+                            <form name="manangeQuotation" novalidate>
+                                <ng-form name="viewClient" novalidate>
+                                    <div class="panel panel-default">
+                                        <div class="panel-heading">
+                                            <h3 class="panel-title">
+                                                <strong>Quotation Details</strong>
+                                            </h3>
+                                        </div>
+                                    </div>
+                                    <div class="panel-body">
+                                        <div class="row">
+                                            <div class="col-md-5">
+                                                <h3 style="margin-top: 5px;">{{cusObj.ClientName }}</h3>
+                                                <h5 style="color:red">{{cusObj.Email}}</h5>
+                                                <h4>{{cusObj.ClientAddress}}</h4>
+                                                <h6>Phone:&nbsp;{{cusObj.ContactNo}}/{{cusObj.FixedLine}}</h6>
+                                                <h6>NIC:&nbsp;{{cusObj.NIC}}</h6>
+                                                <h6>DOB:&nbsp;{{cusObj.DOB}}</h6>
+                                            </div>
+                                            <div class="col-md-5" style="border:double">
+                                                <div class="contact-info">
+                                                    <div class="row">
+                                                        <div class="col-md-6">
+                                                            <p>
+                                                                <medium><b>Quotation No</b></medium>
+                                                                <br>{{quotationHeaderObj.QuotationNo}}
+                                                            </p>
+                                                            <p>
+                                                                <medium><b>Client Request No</b></medium>
+                                                                <br>{{quotationHeaderObj.ClientRequestHeaderID}}
+                                                            </p>
+                                                            <p>
+                                                                <medium><b>Quotation Status</b></medium>
+                                                                <br>{{quotationHeaderObj.QuotationStatusCodeDescription}} &nbsp;&nbsp;
+                                                                <a href="" ng-click="manageQuotationStatus(quotationHeaderObj.QuotationStatusCode)"><span title="Edit Quotation Status" style="font-size:medium" class="glyphicon glyphicon-edit"></span></a>
+                                                            </p>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <p>
+                                                                <medium><b>Business Unit</b></medium>
+                                                                <br>{{cusReqObj.BusinessUnitName}}
+                                                            </p>
+                                                            <p>
+                                                                <medium><b>Introduced By</b></medium>
+                                                                <br>{{cusReqObj.PartnerName}}
+                                                            </p>
+                                                            <p>
+                                                                <medium><b>Requested Date</b></medium>
+                                                                <br>{{cusReqObj.RequestedDate}}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <button style="width:110px; font-size : 12px;" class="btn btn-success" ng-disabled="quotationHeaderObj.QuotationStatusCode == 'QR' || quotationHeaderObj.QuotationStatusCode == 'CA' ||quotationHeaderObj.QuotationStatusCode == 'QP' ||quotationHeaderObj.QuotationStatusCode == 'QNC' ||quotationHeaderObj.QuotationStatusCode == 'NA' ||quotationHeaderObj.QuotationStatusCode == 'CA'" ng-show="isQuotationViewMode" ng-click="loadProposalForm(quotationHeaderObj)">Proposal Form</button>
+
+                                            </div>
+                                        </div>
+                                        <div class="row">
+
+                                        </div>
+                                    </div>
+                                </ng-form>
+                                <ng-form name="manageClientRequest" novalidate>
+                                    <div class="panel panel-default">
+                                        <div class="panel-heading">
+                                            <h3 class="panel-title">
+                                                <strong>Customer Quotation Received Detail</strong>
+                                            </h3>
+                                        </div>
+                                    </div>
+                                    <div class="panel-body">
+                                        <div class="row">
+                                            <div class="col-lg-12 set-header">
+                                                <div class="row">
+                                                    <div class="col-sm-1" align="center">
+                                                        <h5>
+                                                            <b>#</b>
+                                                        </h5>
+                                                    </div>
+                                                    <div class="col-md-2" align="center">
+                                                        <h5>
+                                                            <b>Insuarnce Class</b>
+                                                        </h5>
+                                                    </div>
+                                                    <div class="col-md-2" align="center">
+                                                        <h5>
+                                                            <b>Insuarnce Sub Class</b>
+                                                        </h5>
+                                                    </div>
+                                                    <div class="col-md-3" align="center">
+                                                        <h5>
+                                                            <b>Insurance Company</b>
+                                                        </h5>
+                                                    </div>
+
+                                                    <div class="col-md-2" align="center">
+                                                        <h5>
+                                                            <b>Received Date</b>
+                                                        </h5>
+                                                    </div>
+                                                    <div class="col-md-1" align="center">
+
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-12" ng-repeat="quotationLine in receievedQuotations" style="background-color:#d9f7f7">
+                                                <ng-form name="manageClientReqLine" novalidate>
+                                                    <div class="row">
+                                                        <div class="col-sm-1">
+                                                            <div class="panel-body no-padding" align="center">
+                                                                <h6 label>{{$index+1}}</h6>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <div class="panel-body no-padding" align="center">
+                                                                <select name="selectCompany" class="form-control" ng-model="quotationLine.InsuranceClassID"
+                                                                        ng-options="ins.InsuranceClassID as ins.InsuranceCode for ins in availableInsClass"
+                                                                        @*ng-change="LoadInsSubClass(quotationLine.InsuranceClassID)"*@
+                                                                        ng-required="true">
+                                                                    <option value="">--Select Insurance Class--</option>
+                                                                </select><span class="help-block" style="color:red" ng-show="insSubData.selectCompany.$error.required">Required Field *</span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <div class="panel-body no-padding" align="center">
+                                                                <select name="selectInsuranceClass" id="insclas"
+                                                                        class="form-control" ng-model="quotationLine.InsuranceSubClassID" style="width:100%"
+                                                                        ng-options="InsuranceClass.InsuranceSubClassID as InsuranceClass.Description for InsuranceClass in availableInsuranceClass"
+                                                                        ng-required="true"
+                                                                        ">
+                                                                    <option value="">--Select a Insurance Class--</option>
+                                                                </select>
+                                                                @*<selectize name="selectInsuranceClass" placeholder="Select Insurance" options="availableInsuranceClass" config="{maxItems: 1}" ng-model="quotationLine.InsuranceSubClassID" ng-change="getInsChargeType(quotationHeaderObj.QuotationHeaderID,policyInfoRecObj.InsuranceCompanyID)" ng-required="true"></selectize>*@
+                                                                <span class="help-block" style="color:red" ng-show="managePolicyInfoRecording.SelectPremiumIncludingTaxCurrency.$error.required">Required Field *</span>
+                                                            </div>
+                                                        </div>
+
+
+
+                                                        <div class="col-md-3">
+                                                            <div class="panel-body no-padding" align="center">
+                                                                <selectize name="SelectInsuranceCompanyID" placeholder="Select Insurance Company" options="availableQuoteInfoInsCompanys" config="{maxItems: 1}" ng-model="quotationLine.CompId" ng-change="getInsChargeType(quotationHeaderObj.QuotationHeaderID,policyInfoRecObj.InsuranceCompanyID)" ng-required="true"></selectize>
+                                                                <span class="help-block" style="color:red" ng-show="managePolicyInfoRecording.SelectInsuranceCompanyID.$error.required">Required Field *</span>
+
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="col-md-2">
+
+                                                            <div class="panel-body no-padding" align="center">
+                                                                <input type="text"
+                                                                       id="dob"
+                                                                       @*readonly*@
+                                                                       name="selectDOB"
+                                                                       class="form-control date"
+                                                                       ng-change="textChange()"
+                                                                       ng-click="dob=true"
+                                                                       datepicker-popup="dd/MM/yyyy"
+                                                                       ng-model="quotationLine.RequestedDate"
+                                                                       is-open="dob"
+                                                                       datepicker-options="dateOptions"
+                                                                       placeholder="Date of requested"
+                                                                       @*min-date="currentDate"*@
+                                                                       @*max-date="purchaseOrderObj.DatePaid"*@
+                                                                       ng-required="true"
+                                                                       close-text="Close" />
+                                                            </div>
+                                                        </div>
+
+
+
+                                                        <div class="col-md-2">
+                                                            <div class="panel-body no-padding">
+                                                                <input type="file" class="form-control" id="file" name="file" ng-model="quotationLine.File" multiple onchange="angular.element(this).scope().receivedDoc(this)" />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </ng-form>
+                                            </div>
+                                            <br />
+                                        </div>
+                                    </div>
+                                </ng-form>
+                                <div class="row">
+                                    <div class="col-md-12 modal-footer">
+                                        <button class="btn btn-primary" @*ng-disabled="!manageSelectedInsCompany.$valid"*@ ng-show="!isQuotationViewMode" ng-click="receiveQuotation()">Update Quotation<span class="fa fa-floppy-o fa-right"></span></button>
+                                        <button class="btn btn-default" ng-click="cancelQuotation()">Cancel</button>
+                                    </div>
+                                </div>
+                                <br />
+
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div id="divLoading" ng-show="showLoader"></div>
+        <script type="text/ng-template" id="ngTemplateCustomer">
+            <div class="modal-header bg-primary" style="background-color:#1caf9a !important">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true" ng-click="cancel()">x</button>
+                <h4>{{mode}} Customer</h4>
+            </div>
+            <div class="modal-body">
+                <ng-form name="manageCustomer" novalidate>
+                    <div class="content">
+                        <div class="row">
+                            <div class="row">
+                                <label class="col-sm-3 control-label">Title</label>
+                                <div class="col-md-9">
+                                    <div class="form-group">
+                                        <selectize placeholder="" name="inputTitle" options="availableTitle" config="{maxItems: 1}" ng-model="customerObj.TitleID">
+                                        </selectize>
+
+                                    </div>
+                                </div>
+                            </div>
+                            <label class="col-md-3 control-label">Customer Name</label>
+                            <div class="col-md-9">
+                                <div class="form-group">
+                                    <input type="text" placeholder="Customer Name" name="inputCustomerName" ng-model="customerObj.ClientName" class="form-control" ng-required="true" />
+                                    <span class="help-block" style="color:red" ng-show="manageCustomer.inputCustomerName.$error.required">Required Field *</span>
+                                </div>
+                            </div>
+                        </div>
+                        <br />
+                        <div class="row">
+                            <label class="col-md-3 control-label">Address</label>
+                            <div class="col-md-9">
+                                <div class="form-group">
+                                    <input type="text" placeholder="Address" name="inputAddress" ng-model="customerObj.ClientAddress" class="form-control" ng-required="true" />
+                                    <span class="help-block" style="color:red" ng-show="manageCustomer.inputAddress.$error.required">Required Field *</span>
+                                </div>
+                            </div>
+                        </div>
+                        <br />
+                        <div class="row">
+                            <label class="col-md-3 control-label">District</label>
+                            <div class="col-md-9">
+                                <div class="form-group">
+                                    @*<input type="text" placeholder="District" name="inputDistrict" ng-model="customerObj.inputOtherDetails" class="form-control" />*@
+                                    @*<span class="help-block" style="color:red" ng-show="manageCustomer.inputAddress.$error.required">Required Field *</span>*@
+                                    <selectize placeholder="" name="inputDistrict" options="availableinputDistrict" config="{maxItems: 1}" ng-model="customerObj.DistrictId">
+                                    </selectize>
+                                </div>
+                            </div>
+                        </div>
+                        <br />
+                        <div class="row">
+                            <label class="col-md-3 control-label">Customer Type</label>
+                            <div class="col-md-9">
+                                <select id="select" class="col-md-12 form-control" name="inputAgent" ng-model="customerObj.CustomerType">
+                                    <option value="">--Select a Customer Type--</option>
+                                    <option value="Individual">  Individual</option>
+                                    <option value="Organizational"> Institution</option>
+                                </select>
+                            </div>
+                        </div><br />
+
+                        <div class="row" ng-show="customerObj.CustomerType == 'Individual' ">
+                            <label class="col-md-3 control-label">Customer NIC</label>
+                            <div class="col-md-9">
+                                <input type="text" class="form-control" maxlength="12" name="NIC" ng-model="customerObj.NIC" ng-pattern="/^[0-9]{9}[vVxX]|[0-9]{12}$/" ng-change="generateNICLength(AgentNIC)" />
+                                <span class="help-block" style="color:red" ng-show="manageCustomer.NIC.$error.pattern">Incorrect NIC Number</span>
+                            </div>
+                        </div>
+
+                        <br />
+
+                        <div class="row" ng-show="customerObj.CustomerType == 'Organizational' ">
+                            <label class="col-md-3 control-label">Customer BR No</label>
+                            <div class="col-md-9">
+                                <input type="text" class="form-control" ng-model="customerObj.BRNo" name="BRNo" />
+                            </div>
+                        </div>
+
+                        <br /><br />
+                        @*<div class="row">
+                                <label class="col-md-3 control-label">NIC</label>
+                                <div class="col-md-9">
+                                    <div class="form-group">
+                                        <input type="text" placeholder="NIC" name="inputNIC" maxlength="12" ng-model="customerObj.NIC" class="form-control" @*ng-required="true" ng-pattern="/^[0-9]{9}[vVxX]|[0-9]{12}$/" ng-change="generateNICLength(customerObj.NIC)" />
+                                        @*<span class="help-block" style="color:red" ng-show="manageCustomer.inputNIC.$error.pattern">Incorrect NIC Number</span>
+
+                                    </div>
+                                </div>
+                            </div>
+                            <br />*@
+                        <div class="row">
+                            <label class="col-md-3 control-label">PPID</label>
+                            <div class="col-md-9">
+                                <div class="form-group">
+                                    <input type="text" placeholder="PPID" name="inputPPID" ng-model="customerObj.PPID" class="form-control" />
+                                </div>
+                            </div>
+                        </div>
+                        <br />
+
+                        <div class="row">
+                            <label class="col-md-3 control-label">Date of Birth</label>
+                            <div class="col-md-9">
+                                <div class="form-group">
+                                    <div class="input-group">
+                                        <input type="text"
+                                               @*readonly*@
+                                               name="selectDOB"
+                                               class="form-control date"
+                                               ng-click="dob=true"
+                                               datepicker-popup="dd/MM/yyyy"
+                                               ng-model="customerObj.DOB"
+                                               is-open="dob"
+                                               datepicker-options="dateOptions"
+                                               placeholder="Date of birth"
+                                               @*min-date="currentDate"*@
+                                               @*max-date="purchaseOrderObj.DatePaid"*@
+                                               @*ng-required="true"*@
+                                               close-text="Close"
+                                               @*ng-disabled="purchaseOrderObj.PurchaseOrderStatus=='Closed'"*@>
+                                        <span class="input-group-btn">
+                                            <button class="btn btn-default glyphicon glyphicon-calendar" ng-click="dob=true;$event.stopPropagation();"></button>
+                                        </span>
+                                    </div>
+                                    @*<span class="help-block" style="color:red" ng-show="manageCustomer.selectDOB.$error.required">
+                                            Required Field *
+                                        </span>*@
+                                </div>
+                            </div>
+                        </div>
+                        <br />
+
+                        <div class="row">
+                            <label class="col-md-3 control-label">Contact No</label>
+                            <div class="col-md-9">
+                                <div class="form-group">
+                                    <input type="text" placeholder="Contact No" name="inputContactNo" maxlength="10" ng-model="customerObj.ContactNo" class="form-control" @*ng-required="true"*@ onkeypress="return IsNumber(event)" ng-pattern="/^\d{10}$/" />
+                                    <span class="help-block" style="color:red" ng-show="manageCustomer.inputContactNo.$error.pattern">Incorrect Contact Number</span>
+                                    @*<span class="help-block" style="color:red" ng-show="manageCustomer.inputContactNo.$error.required">Required Field *</span>*@
+                                </div>
+                            </div>
+                        </div>
+                        <br />
+                        <div class="row">
+                            <label class="col-md-3 control-label">Fixed Line</label>
+                            <div class="col-md-9">
+                                <div class="form-group">
+                                    <input type="text" placeholder="Fixed Line" name="inputFixedLine" maxlength="10" ng-model="customerObj.FixedLine" class="form-control" @*ng-required="true"*@ onkeypress="return IsNumber(event)" ng-pattern="/^\d{10}$/" />
+                                    <span class="help-block" style="color:red" ng-show="manageCustomer.inputFixedLine.$error.pattern">Incorrect Fixed Line</span>
+                                    @*<span class="help-block" style="color:red" ng-show="manageCustomer.inputFixedLine.$error.required">Required Field *</span>*@
+                                </div>
+                            </div>
+                        </div>
+                        <br />
+                        <div class="row">
+                            <label class="col-md-3 control-label">Email</label>
+                            <div class="col-md-9">
+                                <div class="form-group">
+                                    <input type="email" name="inputEmail" placeholder="Email" ng-model="customerObj.Email" class="form-control" @*ng-required="true"*@ />
+                                    <span class="error" ng-show="manageCustomer.inputEmail.$error.email" style="color:red">
+                                        Invalid Email
+                                    </span>
+                                    @*<span class="help-block" style="color:red" ng-show="manageCustomer.inputEmail.$error.required">
+                                            Required Field *
+                                        </span>*@
+                                </div>
+                            </div>
+                        </div>
+                        <br />
+
+
+                        @*<div class="row">
+                                <label class="col-md-3 control-label">Family Discount</label>
+                                <div class="col-md-9">
+                                    <div class="form-group">
+                                        <input type="number" placeholder="Family Discount" ng-model="customerObj.FamilyDiscount" class="form-control" onkeyup="checkInputRate(this);" min="0">
+                                    </div>
+                                </div>
+                            </div>*@
+                        <br />
+
+                        <div class="row">
+                            <label class="col-md-3 control-label">Home Country</label>
+                            <div class="col-md-9">
+                                <div class="form-group">
+                                    <selectize placeholder="Select Country" name="inputHomeCountry" options="availableHomeCountries" config="{maxItems: 1}" ng-model="customerObj.HomeCountryID">
+
+                                    </selectize>
+
+                                </div>
+                            </div>
+                        </div>
+                        <br />
+                        <div class="row">
+                            <label class="col-md-3 control-label">Resident Country</label>
+                            <div class="col-md-9">
+                                <div class="form-group">
+                                    <selectize placeholder="Select Country" name="inputResidentCountry" options="availableResidentCountries" config="{maxItems: 1}" ng-model="customerObj.ResidentCountryID" @*ng-required="true"*@>
+                                    </selectize>
+
+                                    @*<span class="help-block" style="color:red" ng-show="manageCustomer.inputResidentCountry.$error.required">
+                                            Required Field *
+                                        </span>*@
+                                </div>
+                            </div>
+                        </div>
+                        <br />
+                        <div class="row">
+                            <label class="col-md-3 control-label">Other</label>
+                            <div class="col-md-9">
+                                <div class="form-group">
+                                    <input type="text" placeholder="Other" name="inputOtherDetails" ng-model="customerObj.Other" class="form-control" />
+                                    @*<span class="help-block" style="color:red" ng-show="manageCustomer.inputAddress.$error.required">Required Field *</span>*@
+                                </div>
+                            </div>
+                        </div>
+                        <br />
+
+                        <div class="row">
+                            <label class="col-md-3 control-label">Additional Note</label>
+                            <div class="col-md-9">
+                                <div class="form-group">
+                                    <textarea rows="3" class="form-control" placeholder="Additional Note" ng-model="customerObj.AdditionalNote"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <br />
+
+                        <div class="row">
+                            <div class="col-md-12 modal-footer">
+                                <button class="btn btn-primary" ng-disabled="!manageCustomer.$valid" ng-show="!isEditMode" ng-click="saveCustomerDetails()">Add Customer</button>
+                                <button class="btn btn-primary" ng-disabled="!manageCustomer.$valid" ng-show="isEditMode" ng-click="updateCustomerDetails()">Edit Customer</button>
+                                <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+                </ng-form>
+            </div>
+            <div id="divLoading" ng-show="showLoader"></div>
+        </script>
+        <script type="text/ng-template" id="ngTemplateProperty">
+            <div class="modal-header bg-primary" style="background-color:#1caf9a !important">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true" ng-click="cancel()">x</button>
+                <h4>Manage Properties</h4>
+            </div>
+            <div class="modal-body">
+                <ng-form name="manageProperty" novalidate>
+                    <div class="content">
+                        <div class="row">
+                            <div class="col-md-11 set-header-property">
+                                <div class="row">
+                                    <div class="col-md-1" align="center"><h5><b>#</b></h5></div>
+                                    <div class="col-md-10" align="center"><h5><b>Property Name</b></h5></div>
+                                    @*<div class="col-md-3" align="center"><h5><b>BR No</b></h5></div>
+                                        <div class="col-md-3" align="center"><h5><b>VAT No</b></h5></div>*@
+                                    <div class="col-md-1" align="center"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-11" ng-repeat="property in clientPropertyDetailsTemp" style="background-color:#f5eaec">
+                                <ng-form name="manageClientProperty" novalidate>
+                                    <div class="row">
+                                        <div class="col-md-1">
+                                            <div class="panel-body no-padding" align="center">
+                                                <h6 label>{{$index+1}}</h6>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3"></div>
+                                        <div class="col-md-4">
+                                            <div class="panel-body no-padding" style="align-content:center">
+                                                <input type="text" align="center" placeholder="Propert Name" name="inputPropertyName" ng-model="property.ClientPropertyName" class="form-control" @*ng-required="true"*@ />
+                                                @*<span class="help-block" style="color:red" ng-show="manageClientProperty.inputPropertyName.$error.required">
+                                                        Required Field *
+                                                    </span>*@
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3"></div>
+
+                                        <div class="col-md-1">
+                                            <div class="panel-body no-padding" ng-if="$index>0">
+                                                <button type="button" class="btn btn-default" ng-click="deleteProperty($index)">
+                                                    <span class="glyphicon glyphicon-remove-circle"></span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </ng-form>
+                            </div>
+                            <div class="col-md-11">
+                                <br />
+                                <div class="row">
+                                    <div class="col-md-1">
+                                        <div class="panel-body no-padding" align="center">
+                                            <button type="button" class="btn btn-default" ng-click="addProperty()">
+                                                <span class="glyphicon glyphicon-plus"></span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12 modal-footer">
+                                <button class="btn btn-primary" ng-disabled="!manageProperty.$valid" ng-click="savePropertyDetails()">Done</button>
+                                <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+                </ng-form>
+            </div>
+            <div id="divLoading" ng-show="showLoader"></div>
+        </script>
+        <script type="text/ng-template" id="ngTemplateScopes">
+            <div class="modal-header bg-primary" style="background-color:#1caf9a !important">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true" ng-click="cancel()">x</button>
+                <h4>Manage Scopes</h4>
+            </div>
+            <div class="modal-body">
+                <ng-form name="manageScopes" novalidate>
+                    <div class="content">
+                        <div class="row">
+                            <div class="col-md-10 set-header-scope">
+                                <div class="row">
+                                    <div class="col-md-1" align="center"><h5><b>#</b></h5></div>
+                                    <div class="col-md-8" align="center"><h5><b>Insurance Sub Class Scope</b></h5></div>
+                                    <div class="col-md-1" align="center"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-10" ng-repeat="scope in insSubClassScopeDetailsTemp" style="background-color:#ffeed0">
+                                <ng-form name="manageInsSubClassScope" novalidate>
+                                    <div class="row">
+                                        <div class="col-md-1">
+                                            <div class="panel-body no-padding" align="center">
+                                                <h6 label>{{$index+1}}</h6>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-8">
+                                            <div class="panel-body no-padding" style="align-content:center">
+                                                <selectize placeholder="Select Ins Sub Class Scope" name="inputInsSubClassScope" options="availableInsSubClassScopes" config="{maxItems: 1}" ng-model="scope.CommonInsScopeID" ng-required="true"></selectize>
+                                                <span class="help-block" style="color:red" ng-show="manageInsSubClassScope.inputInsSubClassScope.$error.required">
+                                                    Required Field *
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-1">
+                                            <div class="panel-body no-padding" ng-if="$index>0">
+                                                <button type="button" class="btn btn-default" ng-click="deleteScope($index)">
+                                                    <span class="glyphicon glyphicon-remove-circle"></span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </ng-form>
+                            </div>
+                            <div class="col-md-10">
+                                <br />
+                                <div class="row">
+                                    <div class="col-md-1">
+                                        <div class="panel-body no-padding" align="center">
+                                            <button type="button" class="btn btn-default" ng-click="addScope()">
+                                                <span class="glyphicon glyphicon-plus"></span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12 modal-footer">
+                                <button class="btn btn-primary" ng-disabled="!manageScopes.$valid" ng-click="saveScopeDetails()">Done</button>
+                                <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+                </ng-form>
+            </div>
+            <div id="divLoading" ng-show="showLoader"></div>
+        </script>
+    </div>
+</div>

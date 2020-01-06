@@ -1,0 +1,28 @@
+
+Log Entry : 
+11/19/2019 12:43:28 PM
+Error in: http://localhost:39705/api/ClientRequest/GetAllRequestsByBusinessUnitID.
+Error Message:System.NullReferenceException: Object reference not set to an instance of an object.
+   at IBMS.Service.TransactionData.ManageClientRequest.GetAllRequestsByBusinessUnitID(Int32 businessUnitID) in G:\Basith Working\IBMS V2\IBS\IBMS.Service\TransactionData\ManageClientRequest.cs:line 5922
+__________________________
+
+Log Entry : 
+11/19/2019 12:48:42 PM
+Error in: http://localhost:39705/api/ClientRequest/GetAllRequestsByBusinessUnitID.
+Error Message:System.NullReferenceException: Object reference not set to an instance of an object.
+   at IBMS.Service.TransactionData.ManageClientRequest.GetAllRequestsByBusinessUnitID(Int32 businessUnitID) in G:\Basith Working\IBMS V2\IBS\IBMS.Service\TransactionData\ManageClientRequest.cs:line 5922
+__________________________
+
+Log Entry : 
+11/19/2019 12:49:32 PM
+Error in: http://localhost:39705/api/ClientRequest/GetAllRequestsByBusinessUnitID.
+Error Message:System.NullReferenceException: Object reference not set to an instance of an object.
+   at IBMS.Service.TransactionData.ManageClientRequest.GetAllRequestsByBusinessUnitID(Int32 businessUnitID) in G:\Basith Working\IBMS V2\IBS\IBMS.Service\TransactionData\ManageClientRequest.cs:line 5922
+__________________________
+
+Log Entry : 
+11/19/2019 12:50:03 PM
+Error in: http://localhost:39705/api/ClientRequest/GetAllRequestsByBusinessUnitID.
+Error Message:System.NullReferenceException: Object reference not set to an instance of an object.
+   at IBMS.Service.TransactionData.ManageClientRequest.GetAllRequestsByBusinessUnitID(Int32 businessUnitID)
+__________________________

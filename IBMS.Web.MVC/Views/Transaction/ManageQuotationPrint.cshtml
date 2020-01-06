@@ -1,0 +1,154 @@
+﻿
+@{
+    ViewBag.Title = "ManageQuotationPrint";
+    Layout = "~/Views/Shared/_index.cshtml";
+}
+<script src="~/Scripts/ng/Controllers/QuotationPrintController.js"></script>
+<script src="~/Scripts/ng/Services/QuotationService.js"></script>
+
+<div class="breadcrumb-line">
+    <ul class="breadcrumb">
+        <li><a href="/Dashboard/Index"><i class="icon-home2 position-left"></i>Home</a></li>
+        <li>Transaction</li>
+        <li>Quotation</li>
+        <li class="active"><b>Manage Quotation</b></li>
+        <li class="active"><b>Quotation</b></li>
+    </ul>
+</div>
+
+<div class="content" ng-app="IBMSAPP">
+    <div ng-controller="QuotationPrintController" ng-init="init()" ng-cloak>
+        <div class="col-md-12">
+            <div class="panel-body" >
+                <section class="content-header">
+                    <h1>
+                       Quotation
+                        <small ng-bind=""></small>
+                    </h1>
+
+                </section>
+                @* <span ng-bind="invoiceData.ReferenceNo"></span>*@
+
+
+            </div>
+
+
+
+        </div>
+
+        <div class="col-md-12">
+            <div class="panel-body">
+
+                <div class="panel panel-flat" id="printable" name="printableArea">
+
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <h2 class="page-header">
+                                <i class="fa fa-globe"></i> Senerathna Insurance Borkers
+                                <small class="pull-right">Date: @DateTime.Now</small>
+                            </h2>
+                        </div>
+                        <!-- /.col -->
+                    </div>
+
+                    <div class="row invoice-info">
+                        <div class="col-sm-4 invoice-col">
+
+                            <address>
+                                <strong>Senarathne Insurance Brokers (PVT) Ltd</strong><br>
+                                4th Floor <br />
+                                Liberty Plaza <br />
+                                Colombo 03<br>
+                                Sri Lanka.<br />
+                                Tel : 01125730047<br />
+                                Fax : <br />
+                            </address>
+                        </div>
+                        <!-- /.col -->
+                        <div class="col-sm-4 invoice-col">
+
+                        </div>
+                        <!-- /.col -->
+                        <div class="col-sm-4 invoice-col">
+                            <b>Quotation: </b><b ng-bind=""></b>
+                            <br>
+                            <b>Date       :</b> @DateTime.Now.Date.ToShortDateString()<br><br />
+                            @*<b>Terms      : </b> <input type="text" name="terms" ng-model="invoiceData.Terms" ng-required="true">
+                                <span class="help-block" style="color:red" ng-show="admissionInvoice.terms.$error.required">Required Field *</span>
+                                <br><br>*@
+                            @*<b>Cust Id: </b>
+                                <input type="text" name="customerId" ng-model="paymentObj.Poli" ng-required="true">
+                                <span class="help-block" style="color:red" ng-show="admissionInvoice.customerId.$error.required">Required Field *</span>
+                                <br>*@
+
+                        </div>
+
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">
+                                    <strong>Quotation Slip</strong>
+                                </h3>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h3 style="margin-top: 5px;">Client Name:{{quotationHeaderObj.ClientName}}</h3>
+                                <h3 style="margin-top: 5px;">Client ID:{{quotationHeaderObj.ClientID }}</h3>
+                                <div class="col-md-11" ng-repeat="debitNote in quotationHeaderObj.QuotationLineDetails" style="background-color:#d9f7f7">
+                                <h3 style="margin-top: 5px;">Policy:{{debitNote.InsuranceSubClassDescription}}</h3>
+                                <h3 style="margin-top: 5px;">Type of Cover:{{debitNote.ClientID }}</h3>
+                                <h3 style="margin-top: 5px;">Use of vehicle:{{debitNote.ClientName}}</h3>
+                                <h3 style="margin-top: 5px;">Type of Vehicle:{{debitNote.ClientID }}</h3>
+                                <h3 style="margin-top: 5px;">Insured:{{debitNote.ClientName}}</h3>
+                                <h3 style="margin-top: 5px;">Period of Insurance:{{debitNote.ClientID }}</h3>
+                                <h3 style="margin-top: 5px;">Sum insured:{{debitNote.ClientName}}</h3>
+                                <h3 style="margin-top: 5px;">Description of the Vehicle:{{debitNote.ClientID }}</h3>
+                                <h3 style="margin-top: 5px;">Scope of cover:{{debitNote.ClientID }}</h3>
+                               <h3 style="margin-top: 5px;">Extensions:{{debitNote.ClientID }}</h3>
+                               <h3 style="margin-top: 5px;">Voluntary Excess:{{debitNote.ClientID }}</h3>
+                               <h3 style="margin-top: 5px;">Earned NCB Years:{{debitNote.ClientID }}</h3>
+                            </div>
+                           </div>
+                            <br />
+                           
+
+
+
+                                
+                        </div>
+                   
+
+
+                    <!-- /.col -->
+                </div>
+
+                <!-- Table row -->
+               
+
+               
+
+                <!-- this row will not appear when printing -->
+                @*<div class="row no-print">
+                        <div class="col-xs-12">
+
+                            <div class="btn btn-primary" ng-disabled="!admissionInvoice.$valid" ng-click="Save()" ng-show="!isUpdate"><span class="fa fa-print"></span>Print</div>
+                        </div>
+                    </div>*@
+
+
+
+            </div>
+                <button class="btn btn-primary" ng-click="printDiv('printable');">Print Div</button>
+
+            <div class="panel-body">
+
+            </div>
+        </div>
+
+
+
+
+    </div>
+</div>
+

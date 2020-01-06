@@ -1,0 +1,77 @@
+﻿@{
+    ViewBag.Title = "Perfect IBS | Login";
+    Layout = null;
+}
+<title>Perfect IBS</title>
+
+<link href="~/Content/css/theme-default.css" rel="stylesheet" />
+<link href="~/Content/css/custom.css" rel="stylesheet" />
+<script src="~/Scripts/angular.min.js"></script>
+<script src="~/Scripts/ng/IBMSApp.js"></script>
+<script src="~/Scripts/ng/Services/LoginService.js"></script>
+<script src="~/Scripts/ng/Controllers/LoginControler.js"></script>
+
+<style>
+    .form-control {
+        width: 100%;
+        border-radius: 0px;
+    }
+</style>
+
+<div class="login-container lightmode lightSpeedIn" style="background-image: url('../../Content/img/loginbg.png'); "  ng-app="LoginApp" 
+     ng-controller="LoginControler" ng-init="init()" ng-cloak>
+    <div class="login-box animated fadeInDown" >
+        <img class="login-body" style=";margin-top:0px!important" src="~/Content/img/logo/SENELogo.png" alt="SENARATHNE" />
+        <div style="color:#ffffff"></div>
+        <div class="login-body" >
+            <center><div class="login-title"><strong>Welcome </strong>, Please login</div></center>
+            <center><div style="color:red; font-size:13px;"><b>{{messege}}</b></div></center>
+            <form name="loginForm" class="form-horizontal">
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <input type="text" class="form-control" ng-change="textChange()" ng-model="loginData.UserName" placeholder="Username" ng-required="true" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <input type="password" class="form-control" ng-model="loginData.Password" placeholder="Password" ng-required="true" />
+                    </div>
+                </div>
+                <div class="form-group" id="dropdown">
+                    <div class="col-md-12">
+                        <select name="selectCompany" class="form-control" ng-model="loginData.BusinessUnitID" ng-options="BU.BusinessUnitID as BU.BusinessUnit for BU in availableBU" ng-required="isBusinessUnitAvailable" ng-show="isBusinessUnitAvailable">
+                            <option value="">--Select a Business Unit--</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    @*<div class="col-md-6">
+                            <div style="color:#FFF; font-size:16px">{{messege}}</div>
+                            <a href="#" class="btn btn-link btn-block">Forgot your password?</a>
+                        </div>*@
+                    <div class="col-md-3"></div>
+                    <div class="col-md-6">
+                        <button class="btn btn-info btn-block" ng-disabled="!loginForm.$valid" ng-click="login()">Log In</button>
+                    </div>
+                    <div class="col-md-3"></div>
+                </div>
+            </form>
+        </div>
+        <div class="login-footer">
+            <center>
+                <div style="color:#2A4642">
+                    <b>&copy; 2018 Perfect Business Solution Pvt Ltd.</b>
+                </div>
+            </center>
+            <center>
+                <div style="color:#2A4642">
+                    <b>Version 1.00.01.01 &reg;</b>
+                </div>
+            </center>
+        </div>
+    </div>
+    <div id="divLoading" ng-show="showLoader"></div>
+</div>
+
+
+

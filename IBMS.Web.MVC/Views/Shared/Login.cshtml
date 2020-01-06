@@ -1,0 +1,33 @@
+﻿
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+    <!-- META SECTION -->
+    <title>Perfect IBS</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+     @*@Styles.Render("~/Content/css/theme-default.css")*@
+    <link href="~/Content/css/theme-default.css" rel="stylesheet" />
+    <link rel="icon" href="Content/img/favicon.ico" type="image/x-icon" />
+    <!-- END META SECTION -->
+    <!-- CSS INCLUDE
+    <link rel="stylesheet" type="text/css" id="theme" href="Content/css/theme-default.css" />-->
+    <!-- EOF CSS INCLUDE -->
+</head>
+<body style="background-color:#000;height:5000px" >
+    
+        @RenderBody()
+    
+    @Scripts.Render("~/Scripts/jquery-1.10.2.min.js")
+    @Scripts.Render("~/Scripts/angular.min.js")
+    @Scripts.Render("~/Scripts/ng/testAPI.js")
+    @Scripts.Render("~/Scripts/ng/Services/LoginService.js")
+    @Scripts.Render("~/Scripts/ng/Controllers/LoginControler.js")
+
+
+</body>
+</html>
+
+
+

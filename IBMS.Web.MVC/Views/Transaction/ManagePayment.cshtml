@@ -1,0 +1,604 @@
+﻿
+@{
+    ViewBag.Title = "Manage Payment";
+}
+
+<style>
+    .set-header {
+        background-color: #1caf9a;
+        height: 50px;
+        padding: 2px;
+    }
+
+    .set-header-pir {
+        background-color: #e4a670;
+        height: 30px;
+        padding: 2px;
+    }
+
+    .set-header-pic {
+        background-color: #e47080;
+        height: 30px;
+        padding: 2px;
+    }
+    /*------------------Popup---------------------*/
+    @@media screen and (min-width: 1024px) {
+        .app-modal-window-pir .modal-dialog {
+            width: 100%;
+        }
+
+        .app-modal-window-pic .modal-dialog {
+            width: 100%;
+        }
+    }
+
+    @@media screen and (max-width: 1024px) {
+        .app-modal-window-pir .modal-dialog {
+            width: 100%;
+        }
+
+        .app-modal-window-pic .modal-dialog {
+            width: 100%;
+        }
+    }
+    /*------------------Popup---------------------*/
+
+    .form-control[disabled], .form-control[readonly] {
+        color: #000000 !important;
+    }
+</style>
+
+<script src="~/Scripts/ng/Services/PaymentService.js"></script>
+<script src="~/Scripts/ng/Controllers/PaymentController.js"></script>
+
+<script type="text/javascript">
+    function IsNumber(evt) {
+        evt = (evt) ? evt : window.event;
+        var charCode = (evt.which) ? evt.which : evt.keyCode;
+        if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+            return false;
+        }
+        return true;
+    }
+
+    function checkInputRate(rateVal) {
+        var regEx = /^[0-9]+\.?[0-9]*$/;
+        if (regEx.test(rateVal.value) == false) {
+            rateVal.value = rateVal.value.substring(0, rateVal.value.length - 1);
+        }
+    }
+</script>
+
+<div class="breadcrumb-line">
+    <ul class="breadcrumb">
+        <li><a href="/Dashboard/Index"><i class="icon-home2 position-left"></i>Home</a></li>
+        <li>Transaction</li><li>Payment</li>
+        <li class="active"><b>Manage Payment</b></li>
+    </ul>
+</div>
+
+<div class="content" ng-app="IBMSAPP">
+    <div ng-controller="PaymentController" ng-init="init()" ng-cloak>
+        <div class="page-content-wrap">
+            <div class="panel panel-default tabs">
+                <ul class="nav nav-tabs" role="tablist">
+                    <li id="list-tab-1" class="active"><a href="#tab-1" role="tab" data-toggle="tab" ng-click="activatePaymentListTab()">View</a></li>
+                    <li id="list-tab-2"><a href="#tab-2" role="tab" data-toggle="tab" ng-click="activatePaymentTab()">New</a></li>
+                </ul>
+                <div class="panel-body tab-content">
+                    <div class="tab-pane active" id="tab-1">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">
+                                    <strong>Payment Details</strong>
+                                </h3>
+                                <ul class="panel-controls">
+                                    <li><input type="text" style="font-size: 12px;width: 100%;border-radius: 0px;margin-right:2px;" class="form-control" placeholder="Search Client Request ..." ng-model="search_query" ng-change="searchTextChange(search_query)"></li>
+                                    <li><a href="#" ng-click="refreshContent()"><span class="fa fa-refresh"></span></a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="panel-body">
+                            <div class="col-md-2">Show records per page </div>
+                            <div class="col=md-10">
+                                <select class="form-control" style="width:100px;"
+                                        ng-model="viewby"
+                                        ng-change="setItemsPerPage(viewby)">
+                                    <option>10</option>
+                                    <option>20</option>
+                                    <option>30</option>
+                                    <option>40</option>
+                                    <option>50</option>
+                                </select>
+                            </div>
+                            <div><br></div>
+                            <table class="table table-responsive" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th>Debit Note ID</th>
+                                        <th>Vehicle No</th>
+                                        <th>Client Name</th>
+                                        <th>Policy Number</th>
+                                        <th>Payment Amount</th>
+                                        <th>Created Date</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody ng-repeat="payment in data.slice(((currentPage-1)*itemsPerPage), ((currentPage)*itemsPerPage))">
+                                    <tr id="view{{payment.PaymentID}}">
+                                        <td>{{payment.PaymentID}}</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td>{{payment.ClientName}}</td>
+                                        <td>{{payment.PaymentAmount | number:2}}</td>
+                                        <td>{{payment.CreatedDate}}</td>
+                                        <td>
+                                            <button class="btn btn-success" @*ng-disabled="ClientRequest.IsQuotationCreated"*@ style="width:100px;padding:1px;" ng-click="editPayment(payment.PaymentID)">Edit Payment</button>&nbsp;&nbsp;
+                                            <button class="btn btn-success" @*ng-disabled="ClientRequest.IsQuotationCreated"*@ style="width:100px;padding:1px;" ng-click="LoadReciept(payment.PaymentID)">Payment Recipt</button>&nbsp;&nbsp;
+                                             
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <pagination total-items="totalItems" 
+                                        ng-model="currentPage"
+                                        max-size="maxSize"
+                                        class="pagination-sm pull-left"
+                                        boundary-links="true"
+                                        rotate="false"
+                                        num-pages="numPages"
+                                        items-per-page="itemsPerPage"></pagination>
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="tab-2">
+                        <form name="managePaymentDetails" novalidate>
+                            <ng-form name="manageClient" novalidate>
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <h3 class="panel-title">
+                                            <strong>Manage Payment</strong>
+                                        </h3>
+                                    </div>
+                                </div>
+                                <div class="panel-body">
+                                    <div class="col-md-4" ng-if="!isCustomerAvailable">
+                                        <div class="form-group">
+                                            <label class="control-label">Select Customer</label>
+                                            <selectize placeholder="Select Customer" options="availableClients" config="{maxItems: 1}" ng-model="cusObj.ClientID" ng-change="loadClientByID(cusObj.ClientID,false)"></selectize>
+                                        </div>
+                                    </div>
+                                    <div class="row" ng-if="isCustomerAvailable">
+                                        <div class="col-md-6">
+                                            <h3 style="margin-top: 5px;">{{cusObj.ClientName }}</h3>
+                                            <h5 style="color:red">{{cusObj.Email}}</h5>
+                                            <h4>{{cusObj.ClientAddress}}</h4>
+                                            <h6>Phone:&nbsp;{{cusObj.ContactNo}}/{{cusObj.FixedLine}}</h6>
+                                            <h6>NIC:&nbsp;{{cusObj.NIC}}</h6>
+                                            <h6>DOB:&nbsp;{{cusObj.DOB}}</h6>
+                                        </div>
+                                    </div>
+                                    <br />
+                                    <div class="row" ng-if="isCustomerAvailable && isPaymentAddMode">
+                                        <div class="col-md-12">
+                                            <button class="btn btn-primary" ng-click="changeCustomer()">Change Customer</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </ng-form>
+                            <ng-form name="manageDebitNote" novalidate>
+                                <div class="panel panel-default" ng-if="isCustomerAvailable">
+                                    <div class="panel-heading" >
+                                        <h3 class="panel-title">
+                                            <strong>Manage Debit Note</strong>
+                                        </h3>
+                                    </div>
+                                </div>
+                                <div class="panel-body" ng-if="isCustomerAvailable">
+                                    <div class="row">
+                                        <div class="col-md-11 set-header">
+                                            <div class="row">
+                                                <div class="col-md-1" align="center"><h5><b>#</b></h5></div>
+                                                <div class="col-md-3" align="center"><h5><b>Policy Number</b></h5></div>
+                                                <div class="col-md-3" align="center"><h5><b>Total Non Commission Premium</b></h5></div>
+                                                <div class="col-md-2" align="center"><h5><b>Total Gross Premium</b></h5></div>
+                                                <div class="col-md-2" align="center"><h5><b>Policy Info</b></h5></div>
+                                                <div class="col-md-1" align="center"></div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-11" ng-repeat="debitNote in paymentObj.DebitNoteList" style="background-color:#d9f7f7">
+                                            <ng-form name="manageDebitNoteDetails" novalidate>
+                                                <div class="row">
+                                                    <div class="col-md-1">
+                                                        <div class="panel-body no-padding" align="center">
+                                                            <h6 label>{{$index+1}}</h6>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <div class="panel-body no-padding" style="align-content:center">
+                                                            <selectize placeholder="Select Policy Info Record" name="selectPolicyInfoRecord" options="availablePolicyInfoRecordings" config="{maxItems: 1}" ng-model="debitNote.PolicyInfoRecID" ng-change="loadPolicyDetails(debitNote.PolicyInfoRecID)" ng-required="true"></selectize>
+                                                            <span class="help-block" style="color:red" ng-show="managePolicyInfo.selectPolicyInfoRecord.$error.required">
+                                                                Required Field *
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <div class="panel-body no-padding" style="align-content:center">
+                                                            <input type="text" @*ng-model="debitNote.TotalNonCommissionPremium"*@ value="{{debitNote.TotalNonCommissionPremium | number : 2}}" ng-required="true" ng-disabled="true" class="form-control" style="width:100%" placeholder="Total Non Commission Premium" />
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-2">
+                                                        <div class="panel-body no-padding" align="center">
+                                                            <input type="text" @*ng-model="debitNote.TotalGrossPremium | number : 2"*@ value="{{debitNote.TotalGrossPremium | number : 2}}" ng-required="true" ng-disabled="true" class="form-control" style="width:100%" placeholder="Total Gross Premium" />
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-2">
+                                                        <div class="panel-body no-padding" align="center">
+                                                            <button type="button" class="btn btn-warning" ng-click="managePolicyInfoRecordings($index)">Manage</button>
+                                                            <input type="text" ng-model="policyInfoValidateTemp" @*ng-required="debitNote.PolicyInfoPaymentList.length==0"*@ ng-show="false" />
+                                                            @*<span ng-if="debitNote.PolicyInfoPaymentList.length>0"><i style="color:green" class="glyphicon glyphicon-ok"></i></span>
+                            <span ng-if="debitNote.PolicyInfoPaymentList.length==0"><i style="color:red" class="glyphicon glyphicon-remove"></i></span>*@
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-1">
+                                                        <div class="panel-body no-padding" ng-if="$index>0">
+                                                            <button type="button" class="btn btn-default" ng-click="deleteItem($index)">
+                                                                <span class="glyphicon glyphicon-remove-circle"></span>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </ng-form>
+                                        </div>
+                                        <div class="col-md-11">
+                                            <br />
+                                            <div class="row">
+                                                <div class="col-md-1">
+                                                    <div class="panel-body no-padding" align="center">
+                                                        <button type="button" class="btn btn-default" ng-click="addItem()">
+                                                            <span class="glyphicon glyphicon-plus"></span>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <div class="panel-body no-padding" align="left">
+                                                    <h3 label style="color:red"><b>Total Premium : {{paymentObj.Cuurency}} {{paymentObj.PaymentAmount | number : 2}}</b></h3>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="panel-body no-padding" align="center">
+                                                    <h3 label style="color:red"><b>Total Payments : {{paymentObj.Cuurency}} {{paymentObj.TotalPayments | number : 2}}</b></h3>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="panel-body no-padding" align="right">
+                                                    <h3 label style="color:red"><b>Pending Payments : {{paymentObj.Cuurency}} {{paymentObj.PendingPayments | number : 2}}</b></h3>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <br />
+                                    <div class="row">
+                                        <div class="col-md-12 modal-footer">
+                                            <button class="btn btn-primary" ng-disabled="!managePaymentDetails.$valid" ng-show="isPaymentAddMode" ng-click="savePayment()">Save Payment<span class="fa fa-floppy-o fa-right"></span></button> 
+                                            <button class="btn btn-primary" @*ng-disabled="!managePaymentDetails.$valid"*@ ng-show="!isPaymentAddMode" ng-click="updatePayment()">Update Payment<span class="fa fa-floppy-o fa-right"></span></button>
+                                            <button class="btn btn-default" ng-click="cancelPayment()">Cancel</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </ng-form>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div id="divLoading" ng-show="showLoader"></div>
+        <script type="text/ng-template" id="ngTemplatePolicyInfo">
+            <div class="modal-header bg-primary" style="background-color:#1caf9a !important">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true" ng-click="cancel()">x</button>
+                <h4>Manage Policy Information</h4>
+            </div>
+            <div class="modal-body">
+                <ng-form name="managePolicyInformation" novalidate>
+                    <div class="content">
+                        <div class="row">
+                            <div class="col-md-12 set-header">
+                                <div class="row">
+                                    <div class="col-md-1" align="center"><h5><b>#</b></h5></div>
+                                    <div class="col-sm-2" align="center"><h5><b>Payment Method</b></h5></div>
+                                    <div class="col-sm-1" align="center"><h5><b>Bank</b></h5></div>
+                                    <div class="col-sm-1" align="center"><h5><b>Cheque/Draft No</b></h5></div>
+                                    <div class="col-sm-1" align="left"><h5><b>Cheque Date</b></h5></div>
+                                    <div class="col-sm-1" align="left"><h5><b>Payment Date</b></h5></div>
+                                    <div class="col-sm-1" align="left"><h5><b>Payments</b></h5></div>
+                                    <div class="col-sm-1" align="left"><h5><b>Currency Type</b></h5></div>
+                                    <div class="col-sm-1" align="left"><h5><b>Exchange Rate</b></h5></div>
+                                    @*<div class="col-sm-1" align="center"></div>*@
+                                </div>
+                            </div>
+                            <div class="col-md-12" ng-repeat="bankObj in policyInfoPaymentListTemp" style="background-color:#ffeed0">
+                                <ng-form name="managePolicyInfo" novalidate>
+                                    <div class="row">
+                                        <div class="col-sm-1">
+                                            <div @*class="panel-body no-padding"*@ align="center">
+                                                <h6 label>{{$index+1}}</h6>
+                                            </div>
+                                        </div>
+
+                                        @*<div class="row">
+        <label class="col-md-3">Select Payment Method</label>*@
+                                        <div class="col-sm-2">
+                                            <div @*class="panel-body no-padding" style="align-content:center"*@ align="center">
+                                                <selectize placeholder="Payment Method" name="inputPayment" options="availablePaymentMethodss" config="{maxItems: 1}" ng-model="bankObj.PaymentMethodID" ng-change="loadPaymentByID(bankObj.PaymentMethodID)" ng-required="true" style="width: 50%"></selectize>
+                                                <span class="help-block" style="color:red" ng-show="managePayment.inputPayment.$error.required">
+                                                    Required Field *
+                                                </span>
+                                            </div>
+                                        </div>
+                                        @*</div>*@
+                                        @*<div class="col-md-3">
+            <div class="panel-body no-padding" style="align-content:center">
+                <selectize placeholder="Select Policy Info Record" name="selectPolicyInfoRecord" options="availablePolicyInfoRecList" config="{maxItems: 1}" ng-model="policyInfoPayment.PolicyInfoRecID" ng-required="true"></selectize>
+                <span class="help-block" style="color:red" ng-show="managePolicyInfo.selectPolicyInfoRecord.$error.required">
+                    Required Field *
+                </span>
+            </div>
+        </div>*@
+                                        @*<div class="row" ng-show="IsBankVisible">*@
+                                        @*<label class="col-md-3">Select Bank</label>*@
+                                        <div class="col-sm-1">
+                                            <div @*class="panel-body no-padding" style="align-content:flex-end"*@ align="center">
+                                                <selectize placeholder="Select Bank"  name="inputBank" options="availableBankss" config="{maxItems: 1}" ng-model="bankObj.BankID" ng-change="loadBankByID(bankObj.BankID)" ng-required="true" style="width: 50%"></selectize>
+                                                <span class="help-block" style="color:red" ng-show="managePayment.inputBank.$error.required">
+                                                    Required Field *
+                                                </span>
+                                            </div>
+                                        </div>
+                                        @*</div>*@
+                                        @*<div class="col-md-3">
+            <div class="panel-body no-padding" style="align-content:center">
+                <input type="number" name="inputNonCommissionPremium" placeholder="Non Commission Premium" ng-model="policyInfoPayment.NonCommissionPremium" class="form-control" onkeyup="checkInputRate(this);" min="0" ng-required="true" style="width:100%">
+                <span class="help-block" style="color:red" ng-show="managePolicyInfo.inputNonCommissionPremium.$error.required">
+                    Required Field *
+                </span>
+            </div>
+        </div>*@
+                                        @*<div class="col-md-2">
+            <div class="panel-body no-padding" style="align-content:center">
+                <input type="number" name="inputGrossPremium" placeholder="Gross Premium" ng-model="policyInfoPayment.GrossPremium" class="form-control" onkeyup="checkInputRate(this);" min="0" ng-required="true" style="width:100%">
+                <span class="help-block" style="color:red" ng-show="managePolicyInfo.inputGrossPremium.$error.required">
+                    Required Field *
+                </span>
+            </div>
+        </div>*@
+                                        @*<div class="row" ng-show="IsTextBoxvisible">*@
+                                        @*<label class="col-md-3">Cheque/Draft No</label>*@
+                                        <div class="col-sm-1">
+                                            <div @*class="panel-body no-padding"*@ style="align-content:center">
+                                                <input type="text" placeholder="" style="width: 100%" name="inputDraftNo" ng-model="bankObj.DraftNo" class="form-control" ng-required="true"  />
+                                                <span class="help-block" style="color:red" ng-show="managePayment.inputDraftNo.$error.required">Required Field *</span>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-1">
+                                            <div @*class="panel-body no-padding"*@ style="align-content:center">
+                                                <div class="input-group">
+                                                    <input style="width: 50%"
+                                                           type="text"
+                                                           name="PaymentDate"
+                                                           class="form-control date"
+                                                           ng-click="coverChequeDateViews=true"
+                                                           datepicker-popup="MM/dd/yyyy"
+                                                           ng-model="bankObj.RequestingDate"
+                                                           is-open="coverChequeDateViews"
+                                                           datepicker-options="dateOptions"
+                                                           placeholder="Cheque Date"
+                                                           @*min-date="policyInfoRecObj.PeriodOfCoverFromDate"*@
+                                                           ng-required="true"
+                                                           close-text="Close">
+                                                    <span class="input-group-btn">
+                                                        <button class="btn btn-default glyphicon glyphicon-calendar" ng-click="coverChequeDateViews=true;$event.stopPropagation();"></button>
+                                                    </span>
+                                                </div>
+                                                <span class="help-block" style="color:red" ng-show="managePayment.RecordingDate.$error.required">
+                                                    Required Field *
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-1">
+                                            <div @*class="panel-body no-padding"*@ style="align-content:center">
+                                                <div class="input-group">
+                                                    <input type="text"
+                                                           readonly
+                                                           name="PaymentDate"
+                                                           class="form-control date"
+                                                           style="width: 50%"
+                                                           ng-click="coverPaymentDateViews=true"
+                                                           datepicker-popup="MM/dd/yyyy"
+                                                           ng-model="bankObj.PaymentDate"
+                                                           is-open="coverPaymentDateViews"
+                                                           datepicker-options="dateOptions"
+                                                           placeholder="Payment Date"
+                                                           @*min-date="policyInfoRecObj.PeriodOfCoverFromDate"*@
+                                                           ng-required="true"
+                                                           close-text="Close">
+                                                    <span class="input-group-btn">
+                                                        <button class="btn btn-default glyphicon glyphicon-calendar" ng-click="coverPaymentDateViews=true;$event.stopPropagation();"></button>
+                                                    </span>
+                                                </div>
+                                                <span class="help-block" style="color:red" ng-show="managePayment.PaymentDate.$error.required">
+                                                    Required Field *
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-1">
+                                            <div @*class="panel-body no-padding"*@ style="align-content:center">
+                                                <input type="text" placeholder="" style="width: 100%" name="inputDraftNo" ng-model="bankObj.BankAmount" class="form-control" ng-required="true" />
+                                                <span class="help-block" style="color:red" ng-show="managePayment.inputDraftNo.$error.required">Required Field *</span>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-1">
+                                            <div @*class="panel-body no-padding"*@ style="align-content:center">
+                                                <selectize name="SelectSumAssuredCurrency" style="width: 60%" placeholder="Select Currency" options="availableCurrenciess" config="{maxItems: 1}" ng-model="bankObj.currencyType" ng-required="true"></selectize>
+                                                <span class="help-block" style="color:red" ng-show="managePayment.SelectSumAssuredCurrency.$error.required">
+                                                    Required Field *
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-1">
+                                            <div @*class="panel-body no-padding"*@ style="align-content:center">
+                                                <input type="number" style="width: 100%" name="inputExchangeRate" placeholder="ExchangeRate" ng-model="bankObj.ExchangeRate" class="form-control" onkeyup="checkInputRate(this);" min="0" inputExchangeRate >
+                                                <span class="help-block" style="color:red" ng-show="managePayment.inputExchangeRate.$error.required">
+                                                    Required Field *
+                                                </span>
+                                            </div>
+                                        </div>
+                                        @*<div class="col-sm-1">
+                                            <div class="panel-body no-padding" style="align-content:center">
+                                                <input type="number" name="inputAmount" placeholder="Amount" ng-model="bankObj.PaymentAmount" class="form-control" onkeyup="checkInputRate(this);" min="0">
+                                                <span class="help-block" style="color:red" ng-show="managePayment.inputAmount.$error.required">
+                                                    Required Field *
+                                                </span>
+                                            </div>
+                                        </div>*@
+
+                                        @*</div>*@
+                                        @*<div class="col-md-2">
+            <div class="panel-body no-padding" style="align-content:center">
+                <button type="button" class="btn btn-danger" ng-click="managePolicyInfoChargeDetails($index)">Manage</button>
+                <input type="text" ng-model="policyChargeValidateTemp" ng-required="policyInfoPayment.PolicyInfoChargeList.length==0" ng-show="false" />
+                <span ng-if="policyInfoPayment.PolicyInfoChargeList.length>0"><i style="color:green" class="glyphicon glyphicon-ok"></i></span>
+                <span ng-if="policyInfoPayment.PolicyInfoChargeList.length==0"><i style="color:red" class="glyphicon glyphicon-remove"></i></span>
+            </div>
+        </div>*@
+                                        <div class="col-md-1" ng-if="$index>0">
+                                            <div class="panel-body no-padding">
+                                                <button type="button" class="btn btn-default" ng-click="deletePolicyInfoDetails($index)">
+                                                    <span class="glyphicon glyphicon-remove"></span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </ng-form>
+                            </div>
+                            <div class="col-md-12">
+                                <br />
+                                <div class="row">
+                                    <div class="col-md-1">
+                                        <div class="panel-body no-padding" align="center">
+                                            <button type="button" class="btn btn-default" ng-click="addPolicyInfoDetails()">
+                                                <span class="glyphicon glyphicon-plus"></span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <br />
+                        <div class="row">
+                            <div class="col-md-12 modal-footer">
+                                <button class="btn btn-primary" ng-disabled="!managePolicyInformation.$valid" ng-click="savePolicyInfoDetails()">Add</button>
+                                <button class="btn btn-default" ng-click="cancel()">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </ng-form>
+            </div>
+            <div id="divLoading" ng-show="showLoader"></div>
+        </script>
+        <script type="text/ng-template" id="ngTemplatePolicyInfoCharge">
+            <div class="modal-header bg-primary" style="background-color:#1caf9a !important">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true" ng-click="cancel()">x</button>
+                <h4>Manage Policy Info Charge</h4>
+            </div>
+            <div class="modal-body">
+                <ng-form name="managePolicyChargeInformation" novalidate>
+                    <div class="content">
+                        <div class="row">
+                            <div class="col-md-12 set-header-pic">
+                                <div class="row">
+                                    <div class="col-md-1" align="center"><h5><b>#</b></h5></div>
+                                    <div class="col-md-4" align="center"><h5><b>Currency Type</b></h5></div>
+                                    <div class="col-md-3" align="center"><h5><b>Exchange Rate</b></h5></div>
+                                    <div class="col-md-3" align="center"><h5><b>Payment Amount</b></h5></div>
+                                    <div class="col-md-1" align="center"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-12" ng-repeat="policyInfoCharge in policyInfoChargeListTemp" style="background-color:#ffeed0">
+                                <ng-form name="managePolicyChargeInfo" novalidate>
+                                    <div class="row">
+                                        <div class="col-md-1">
+                                            <div class="panel-body no-padding" align="center">
+                                                <h6 label>{{$index+1}}</h6>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="panel-body no-padding" style="align-content:center">
+                                                <selectize name="SelectSumAssuredCurrency" placeholder="Select Currency" options="availableCurrenciess" config="{maxItems: 1}" ng-model="policyInfoCharge.SumAssuredCurrencyTypeID" ng-required="true"></selectize>
+                                                <span class="help-block" style="color:red" ng-show="managePolicyChargeInfo.selectChargeType.$error.required">
+                                                    Required Field *
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="panel-body no-padding" style="align-content:center">
+                                                <input type="number" name="inputAmount" placeholder="Amount" ng-model="policyInfoCharge.Amount" class="form-control" onkeyup="checkInputRate(this);" min="0" ng-required="true" style="width:100%">
+                                                <span class="help-block" style="color:red" ng-show="managePolicyChargeInfo.inputAmount.$error.required">
+                                                    Required Field *
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="panel-body no-padding" style="text-align:center">
+                                                <input type="number" name="inputPaymentAmount" placeholder="Payment Amount" ng-model="policyInfoCharge.PaymentAmount" class="form-control" onkeyup="checkInputRate(this);" min="0" ng-required="true" style="width:100%">
+                                                @*<label for="PIC-{{$index}}">
+                                                    <input type="checkbox" ng-model="policyInfoCharge.IsCR" name="IsCR" id="PIC-{{$index}}" />
+                                                </label>*@
+                                                <span class="help-block" style="color:red" ng-show="managePolicyChargeInfo.inputPaymentAmount.$error.required">
+                                                    Required Field *
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-1" ng-if="$index>0">
+                                            <div class="panel-body no-padding">
+                                                <button type="button" class="btn btn-default" ng-click="deletePolicyInfoChargeDetails($index)">
+                                                    <span class="glyphicon glyphicon-remove"></span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </ng-form>
+                            </div>
+                            <div class="col-md-12">
+                                <br />
+                                <div class="row">
+                                    <div class="col-md-1">
+                                        <div class="panel-body no-padding" align="center">
+                                            <button type="button" class="btn btn-default" ng-click="addPolicyInfoChargeDetails()">
+                                                <span class="glyphicon glyphicon-plus"></span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <br />
+                        <div class="row">
+                            <div class="col-md-12 modal-footer">
+                                <button class="btn btn-primary" ng-disabled="!managePolicyChargeInformation.$valid" ng-click="savePolicyInfoChargeDetails()">Add</button>
+                                <button class="btn btn-default" ng-click="cancel()">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </ng-form>
+            </div>
+            <div id="divLoading" ng-show="showLoader"></div>
+        </script>
+    </div>
+</div>
+
+
+
+

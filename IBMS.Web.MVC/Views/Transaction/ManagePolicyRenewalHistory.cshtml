@@ -1,0 +1,407 @@
+﻿
+@{
+    ViewBag.Title = "ManagePolicyRenewalHistory";
+    Layout = "~/Views/Shared/_index.cshtml";
+}
+
+<style>
+    .form-control[disabled], .form-control[readonly] {
+        color: #000000 !important;
+    }
+
+    .set-header {
+        background-color: #1caf9a;
+        height: 30px;
+        padding: 2px;
+        /*margin-bottom: 15px;*/
+    }
+</style>
+
+<script src="~/Scripts/ng/Services/PolicyRenewalHistoryService.js"></script>
+<script src="~/Scripts/ng/Controllers/PolicyRenewalHistoryController.js"></script>
+
+<script type="text/javascript">
+    function IsNumber(evt) {
+        evt = (evt) ? evt : window.event;
+        var charCode = (evt.which) ? evt.which : evt.keyCode;
+        if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+            return false;
+        }
+        return true;
+    }
+
+    function checkInputRate(rateVal) {
+        var regEx = /^[0-9]+\.?[0-9]*$/;
+        if (regEx.test(rateVal.value) == false) {
+            rateVal.value = rateVal.value.substring(0, rateVal.value.length - 1);
+        }
+    }
+</script>
+
+<div class="breadcrumb-line">
+    <ul class="breadcrumb">
+        <li><a href="/Dashboard/Index"><i class="icon-home2 position-left"></i>Home</a></li>
+        <li>Transaction</li>
+        <li>Policy</li>
+        <li class="active"><b>Policy Renewal History</b></li>
+    </ul>
+</div>
+
+<div class="content" ng-app="IBMSAPP">
+    <div ng-controller="PolicyRenewalHistoryController" ng-init="init()" ng-cloak>
+        <div class="page-content-wrap">
+            <div class="panel panel-default tabs">
+                <ul class="nav nav-tabs" role="tablist">
+                    <li id="list-tab-1" class="active"><a href="#tab-1" role="tab" data-toggle="tab" ng-click="activatePolicyInfoRecListTab()">View</a></li>
+                    <li id="list-tab-2"><a href="#tab-2" role="tab" data-toggle="tab" ng-click="activatePolicyInfoRecTab()">New</a></li>
+                </ul>
+                <div class="panel-body tab-content">
+                    <div class="tab-pane active" id="tab-1">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">
+                                    <strong>Policy Renewal Information Details</strong>
+                                </h3>
+                                <ul class="panel-controls">
+                                    <li><input type="text" style="font-size: 12px;width: 100%;border-radius: 0px;margin-right:2px;" class="form-control" placeholder="Search Policy Renewal History ..." ng-model="search_query" ng-change="searchTextChange(search_query)"></li>
+                                    <li><a href="#" ng-click="refreshContent()"><span class="fa fa-refresh"></span></a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        @*<div class="panel-body">
+                                <div class="col-md-2">Show records per page </div>
+                                <div class="col=md-10">
+                                    <select class="form-control" style="width:100px;"
+                                            ng-model="viewby"
+                                            ng-change="setItemsPerPage(viewby)">
+                                        <option>10</option>
+                                        <option>20</option>
+                                        <option>30</option>
+                                        <option>40</option>
+                                        <option>50</option>
+                                    </select>
+                                </div>
+                                <div><br></div>
+                                <table class="table table-responsive" cellspacing="0">
+                                    <thead>
+                                        <tr>
+                                            <th>Policy Info Rec ID</th>
+                                            <th>Renewal Date</th>
+                                            <th>Notification Date</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody ng-repeat="policyRenHis in data.slice(((currentPage-1)*itemsPerPage), ((currentPage)*itemsPerPage))">
+                                        <tr id="view{{policyRenHis.PolicyRenewalHistoryID}}">
+                                            <td>{{policyRenHis.PolicyInfoRecID}}</td>
+                                            <td>{{policyRenHis.RenewalDate}}</td>
+                                            <td>{{policyRenHis.NotificationDate}}</td>
+                                            <td>
+                                                <button class="btn btn-success"  style="width:150px;padding:1px;" ng-click="editPolicyRenewalHistroy(policyRenHis.PolicyRenewalHistoryID,policyRenHis.PolicyInfoRecID)">Edit Policy Renewal</button>&nbsp;&nbsp;
+
+                                            </td>
+                                        </tr>
+                                    </tbody>
+
+                                </table>
+                                <pagination total-items="totalItems"
+                                            ng-model="currentPage"
+                                            max-size="maxSize"
+                                            class="pagination-sm pull-left"
+                                            boundary-links="true"
+                                            rotate="false"
+                                            num-pages="numPages"
+                                            items-per-page="itemsPerPage"></pagination>
+                            </div>*@
+
+
+
+                        <div class="panel-body">
+
+                            <div class="col-md-2">Show records per page </div>
+                            <div class="col=md-10">
+                                <select class="form-control" style="width:100px;"
+                                        ng-model="viewby"
+                                        ng-change="setItemsPerPage(viewby)">
+                                    <option>10</option>
+                                    <option>20</option>
+                                    <option>30</option>
+                                    <option>40</option>
+                                    <option>50</option>
+                                </select>
+                            </div>
+                            <div><br></div>
+                            <table class="table table-responsive" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th hidden>Policy ID</th>
+                                        <th>Policy Number</th>
+                                        <th hidden>Quotation Header ID</th>
+                                        <th>Customer Name</th>
+                                        <th>Expiry Date</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody ng-repeat="policyInfoRec in data.slice(((currentPage-1)*itemsPerPage), ((currentPage)*itemsPerPage))">
+                                    <tr id="view{{policyInfoRec.PolicyInfoRecID}}">
+                                        <td hidden>{{policyInfoRec.PolicyInfoRecID}}</td>
+                                        <td>{{policyInfoRec.PolicyNumber}}</td>
+                                        <td hidden>{{policyInfoRec.QuotationHeaderID}}</td>
+                                        <td>{{policyInfoRec.CustomerName}}</td>
+                                        <td>{{policyInfoRec.PeriodOfCoverToDate}}</td>
+                                        <td>
+                                            <button class="btn btn-success" @*ng-disabled="ClientRequest.IsQuotationCreated"*@ style="width:100px;padding:1px;" ng-click="editPolicyRenewalHistroy(policyInfoRec.PolicyInfoRecID,policyInfoRec.QuotationHeaderID)">Renew Policy</button>&nbsp;&nbsp;
+                                        </td>
+                                    </tr>
+
+                                </tbody>
+
+                            </table>
+
+                            <pagination total-items="totalItems"
+                                        ng-model="currentPage"
+                                        max-size="maxSize"
+                                        class="pagination-sm pull-left"
+                                        boundary-links="true"
+                                        rotate="false"
+                                        num-pages="numPages"
+                                        items-per-page="itemsPerPage"></pagination>
+                        </div>
+
+                    </div>
+                    <div class="tab-pane" id="tab-2">
+                        <form name="manangePolicyInformationRecording" novalidate>
+                            <ng-form name="manageClient" novalidate>
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <h3 class="panel-title">
+                                            <strong>Policy Info Recording Details</strong>
+                                        </h3>
+                                    </div>
+                                </div>
+                                <div class="panel-body">
+                                    <div class="col-md-5" ng-if="!isQuotationAvailable">
+                                        <div class="form-group">
+                                            <label class="control-label">Select Policy Info Recording</label>
+                                            <selectize placeholder="Select Policy Info Recording" options="availableQuotationHeaders" config="{maxItems: 1}" ng-model="quotationHeaderObj.PolicyInfoRecID" ng-change="loadQuotationDetailsByID(quotationHeaderObj.PolicyInfoRecID)"></selectize>
+                                        </div>
+                                    </div>@*{{quotationHeaderObj}}*@
+                                    <div class="row" ng-if="isQuotationAvailable">
+                                        <div class="col-md-5">
+                                            <h3 style="margin-top: 5px;">{{cusObj.ClientName }}</h3>
+                                            <h5 style="color:red">{{cusObj.Email}}</h5>
+                                            <h4>{{cusObj.ClientAddress}}</h4>
+                                            <h6>Phone:&nbsp;{{cusObj.ContactNo}}/{{cusObj.FixedLine}}</h6>
+                                            <h6>NIC:&nbsp;{{cusObj.NIC}}</h6>
+                                            <h6>DOB:&nbsp;{{cusObj.DOB}}</h6>
+                                        </div>
+
+
+                                        @*<div class="col-md-5" style="border:double">
+                                                <div class="contact-info">
+                                                    <div class="row">
+                                                        <div class="col-md-6">
+                                                            <p><medium><b>Policy Info Rec No</b></medium><br>{{quotationHeaderObj.PolicyInfoRecID}}</p>
+                                                            <p><medium><b>Policy No</b></medium><br>{{quotationHeaderObj.PolicyNumber}}</p>
+                                                            <p><medium><b>Period Of Cover From Date</b></medium><br>{{quotationHeaderObj.RenewalDate}}</p>
+
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <p><medium><b>Business Unit</b></medium><br>{{cusObj.BusinessUnitName}}</p>
+                                                            <p><medium><b>Introduced By</b></medium><br>{{cusReqObj.PartnerName}}</p>
+                                                            <p><medium><b>Period Of Cover To Date</b></medium><br>{{quotationHeaderObj.NotificationDate}}</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>*@
+                                        @*{{quotationHeaderObj}}*@
+                                    </div>
+                                    <br />
+                                    <div class="row" ng-if="isQuotationAvailable">
+                                        <div class="col-md-12">
+                                            <button class="btn btn-primary" ng-click="changeQuotation()">Change Policy Recoard</button>
+                                        </div>
+                                    </div>
+                                    @*{{cusObj}}
+                                        {{cusReqObj}}*@
+                                </div>
+                            </ng-form>
+                            <ng-form name="managePolicyInfoRecording" novalidate>
+                                <div class="panel panel-default" ng-if="isQuotationAvailable">
+                                    <div class="panel-heading">
+                                        <h3 class="panel-title">
+                                            <strong>Manage Policy Renewal</strong>
+                                        </h3>
+                                    </div>
+                                </div>
+                                <div class="panel-body" ng-if="isQuotationAvailable">
+                                    <br />
+                                    <div class="row">
+                                        <label class="col-md-2 ">Renewal Date</label>
+                                        <div class="col-md-4">
+                                            <div class="input-group">
+                                                <input type="text"
+                                                       readonly
+                                                       name="selectCoverFromDate"
+                                                       class="form-control date"
+                                                       ng-click="coverFromDateView=true"
+                                                       datepicker-popup="dd/MM/yyyy"
+                                                       ng-model="policyInfoRecObj.RenewalDate"
+                                                       is-open="coverFromDateView"
+                                                       datepicker-options="dateOptions"
+                                                       placeholder="Renewal Date"
+                                                       max-date="policyInfoRecObj.NotificationDate"
+                                                       ng-required="true"
+                                                       close-text="Close">
+                                                <span class="input-group-btn">
+                                                    <button class="btn btn-default glyphicon glyphicon-calendar" ng-click="coverFromDateView=true;$event.stopPropagation();"></button>
+                                                </span>
+                                            </div>
+                                            <span class="help-block" style="color:red" ng-show="managePolicyInfoRecording.selectCoverFromDate.$error.required">
+                                                Required Field *
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <br />
+                                    <div class="row">
+                                        <label class="col-md-2 ">Notification Date</label>
+                                        <div class="col-md-4">
+                                            <div class="input-group">
+                                                <input type="text"
+                                                       readonly
+                                                       name="selectNotificationDate"
+                                                       class="form-control date"
+                                                       ng-click="coverNotificationDateView=true"
+                                                       datepicker-popup="dd/MM/yyyy"
+                                                       ng-model="policyInfoRecObj.NotificationDate"
+                                                       is-open="coverNotificationDateView"
+                                                       datepicker-options="dateOptions"
+                                                       placeholder="Notification Date"
+                                                       min-date="policyInfoRecObj.RenewalDate"
+                                                       ng-required="true"
+                                                       close-text="Close">
+                                                <span class="input-group-btn">
+                                                    <button class="btn btn-default glyphicon glyphicon-calendar" ng-click="coverNotificationDateView=true;$event.stopPropagation();"></button>
+                                                </span>
+                                            </div>
+                                            <span class="help-block" style="color:red" ng-show="managePolicyInfoRecording.selectNotificationDate.$error.required">
+                                                Required Field *
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <br />
+
+                                    <div class="row">
+                                        <label class="col-md-2 ">Duration</label>
+                                        <div>
+                                            <div class="col-md-4">
+                                                <div class="input-group">
+                                                    <input type="text"
+                                                           readonly
+                                                           name="selectFromDate"
+                                                           class="form-control date"
+                                                           ng-click="coverRenewalFromDateView=true"
+                                                           datepicker-popup="dd/MM/yyyy"
+                                                           ng-model="policyInfoRecObj.PeriodOfCoverFromDate"
+                                                           is-open="coverRenewalFromDateView"
+                                                           datepicker-options="dateOptions"
+                                                           placeholder="Renewal Date-From"
+                                                           @*max-date="policyInfoRecObj.NotificationDate"*@
+                                                           ng-required="true"
+                                                           close-text="Close">
+                                                    <span class="input-group-btn">
+                                                        <button class="btn btn-default glyphicon glyphicon-calendar" ng-click="coverRenewalFromDateView=true;$event.stopPropagation();"></button>
+                                                    </span>
+                                                </div>
+                                                <span class="help-block" style="color:red" ng-show="managePolicyInfoRecording.selectFromDate.$error.required">
+                                                    Required Field *
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="input-group">
+                                                <input type="text"
+                                                       readonly
+                                                       name="selectToDate"
+                                                       class="form-control date"
+                                                       ng-click="coverToDateView=true"
+                                                       datepicker-popup="dd/MM/yyyy"
+                                                       ng-model="policyInfoRecObj.PeriodOfCoverToDate"
+                                                       is-open="coverToDateView"
+                                                       datepicker-options="dateOptions"
+                                                       placeholder="Renewal Date-To"
+                                                       min-date="policyInfoRecObj.RenewalStartDate"
+                                                       ng-required="true"
+                                                       close-text="Close">
+                                                <span class="input-group-btn">
+                                                    <button class="btn btn-default glyphicon glyphicon-calendar" ng-click="coverToDateView=true;$event.stopPropagation();"></button>
+                                                </span>
+                                            </div>
+                                            <span class="help-block" style="color:red" ng-show="managePolicyInfoRecording.selectToDate.$error.required">
+                                                Required Field *
+                                            </span>
+                                        </div>
+                                    </div>
+
+
+                                    <br />
+
+                                    @*<div class="row">
+                                            <label class="col-md-2 "></label>
+                                            <div class="col-md-4">
+                                                <div><label><input type="checkbox" ng-model="policyInfoRecObj.IsSent" id="isSentCheckbox">&nbsp;&nbsp;Is Sent</label></div>
+                                            </div>
+                                        </div>
+                                        <br />
+
+                                        <div class="row">
+                                            <label class="col-md-2 "></label>
+                                            <div class="col-md-4">
+                                                <div><label><input type="checkbox" ng-model="policyInfoRecObj.IsCancel" id="isCancelCheckbox">&nbsp;&nbsp;Is Cancel</label></div>
+                                            </div>
+                                        </div>
+                                        <br />
+                                        <div class="row">
+                                            <label class="col-md-2 "></label>
+                                            <div class="col-md-6">
+                                                <div><label><input type="checkbox" ng-model="policyInfoRecObj.IsRenewal" id="isRenewal">&nbsp;&nbsp;Is Renewal</label></div>
+                                            </div>
+                                        </div>
+                                        <br />*@
+
+                                    <div class="row">
+                                        <label class="col-md-2">Agent</label>
+                                        <div class="col-md-4">
+                                            <selectize name="SelectAgent" placeholder="Select Agent" options="availableAgents" config="{maxItems: 1}" ng-model="policyInfoRecObj.IntroducerID"></selectize>
+                                        </div>
+                                    </div>
+                                    <br />
+                                    <div class="row">
+                                        <label class="col-md-2">Executive</label>
+                                        <div class="col-md-4">
+                                            <selectize name="SelectAccountExecutive" placeholder="Select Account Executive" options="availableloadExecutive" config="{maxItems: 1}" ng-model="policyInfoRecObj.AccountExecutiveID"></selectize>
+                                        </div>
+                                    </div>
+                                    <br />
+
+
+                                    @*{{policyInfoRecObj}}*@
+                                    <div class="row">
+                                        <div class="col-md-12 modal-footer">
+                                            <button class="btn btn-primary" ng-disabled="!managePolicyInfoRecording.$valid" ng-show="isClientReqAddMode && !isViewMode" ng-click="savePolicyRenewalHistory()">Save Policy Renewal<span class="fa fa-floppy-o fa-right"></span></button>
+                                            <button class="btn btn-primary" ng-show="!isClientReqAddMode && !isViewMode" ng-click="updatePolicyRenewalHistory()">Update Policy Renewal <span class="fa fa-floppy-o fa-right"></span></button>
+                                            <button class="btn btn-default" ng-click="ClearFields()">Cancel</button>
+                                        </div>
+                                    </div>
+                                    <br />
+                                </div>
+                            </ng-form>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="divLoading" ng-show="showLoader"></div>
+    </div>
+</div>
+

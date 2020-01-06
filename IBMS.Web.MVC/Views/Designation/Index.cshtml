@@ -1,0 +1,147 @@
+﻿
+@{
+    ViewBag.Title = "Designation";
+}
+@{
+    Layout = "~/Views/Shared/_index.cshtml";
+}
+
+<script src="~/Scripts/ng/Services/DesignationService.js"></script>
+<script src="~/Scripts/ng/Controllers/DesignationController.js"></script>
+
+<div class="breadcrumb-line">
+    <ul class="breadcrumb">
+        <li><a href="/Dashboard/Dashboard"><i class="icon-home2 position-left"></i>Home</a></li>
+        <li>Master Details</li><li>Company</li>
+        <li class="active"><b>Designation</b></li>
+    </ul>
+</div>
+@*Developed by Rajin*@
+<div class="content" ng-app="IBMSAPP">
+    <div ng-controller="DesignationController" ng-init="init()" ng-cloak>
+        <div class="page-content-wrap">
+            <div class="panel panel-default tabs">
+                <ul class="nav nav-tabs" role="tablist">
+                    <li class="active"><a href="#tab-first" role="tab" data-toggle="tab">View</a></li>
+                    <li><a href="#tab-second" role="tab" data-toggle="tab">New</a></li>
+                    @*<li><a href="#tab-third" role="tab" data-toggle="tab">Edit</a></li>*@
+                </ul>
+                <div class="panel-body tab-content">
+                    <div class="tab-pane active" id="tab-first">
+
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">
+                                    <strong>Designation</strong>
+                                </h3>
+                                <ul class="panel-controls">
+                                    <li><input type="text" style="font-size: 12px;width: 100%;border-radius: 0px;margin-right:2px;" class="form-control" placeholder="Search Designation ..." ng-model="search_query" ng-change="searchTextChange(search_query)"></li>
+                                    <li><a href="#" ng-click="refreshContent()"><span class="fa fa-refresh"></span></a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="panel-body">
+                            <div class="col-md-2">Show records per page </div>
+                            <div class="col=md-10">
+                                <select class="form-control" style="width:100px;" ng-model="viewby" ng-change="setItemsPerPage(viewby)">
+                                    <option>5</option>
+                                    <option>10</option>
+                                    <option>20</option>
+                                    <option>30</option>
+                                    <option>40</option>
+                                    <option>50</option>
+                                </select>
+                            </div>
+                            <div></div><br />
+                            <table class="table table-bordered table-striped dataTable" cellspacing="0" width="100%">
+                                <thead>
+                                    <tr>
+                                        <th hidden>Designation ID</th>
+                                        <th>Designation Name</th>
+                                        <th>Business Unit Name</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody ng-repeat="Designation in data.slice(((currentPage-1)*itemsPerPage), ((currentPage)*itemsPerPage))| filter:search_query">
+                                    <!--<tr  >-->
+                                    <tr id="view{{Designation.DesignationID}}">
+                                        <td hidden>{{Designation.DesignationID}}</td>
+                                        <td>{{Designation.DesignationName}}</td>
+                                        <td>{{Designation.BusinessUnitName}}</td>
+                                        <td>
+                                            <button class="fa fa-edit btn btn-success" style="width:90px;" ng-click="editDES(Designation)">&nbsp;&nbsp;Edit </button>&nbsp;&nbsp;
+                                            <button class="fa fa-trash-o btn btn-danger" style="width:90px;" ng-click="deleteDES(Designation.DesignationID)">&nbsp;&nbsp;Delete </button>
+                                        </td>
+                                    </tr>
+                                    <tr id="edit{{Designation.DesignationID}}" hidden>
+                                        <td hidden>
+                                            <input type="text" hidden class="form-control"
+                                                   value="{{Designation.DesignationID}}"
+                                                   ng-model="Designation.DesignationID">
+                                        </td>
+                                        <td>
+                                            <input type="text" hidden class="form-control" style="width:100%"
+                                                   value="{{Designation.DesignationName}}"
+                                                   ng-model="Designation.DesignationName">
+                                            <span class="help-block" style="color:red" ng-show="!Designation.DesignationName">Required Field *</span>
+                                        </td>
+                                        <td>
+                                            <select name="selectCompany" id="timeZone" class="form-control" style="width:100%" ng-model="Designation.BusinessUnitID" ng-options="BU.BusinessUnitID as BU.BusinessUnit for BU in filteredBusinessUnits" ng-required="true">
+                                                <option value="{{Designation.BusinessUnit}}"></option>
+                                            </select>
+
+                                        </td>
+                                        <td>
+                                            <button class="fa fa-save btn btn-info" ng-disabled="!(Designation.DesignationName)" ng-click="update(Designation)">&nbsp;&nbsp;Update</button>&nbsp;
+                                            <button ng-click="cancel(Designation)" class="fa fa-times btn btn-default">&nbsp;&nbsp;Cancel</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <pagination class="pull-left" total-items="totalItems" ng-model="currentPage" max-size="maxSize" class="pagination-sm" boundary-links="true" rotate="false" num-pages="numPages" items-per-page="itemsPerPage"></pagination>
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="tab-second">
+                        <form class="form-horizontal col-md-10" role="form">
+                            <ng-form name="designationData" novalidate>
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label">Designation Name</label>
+                                    <div class="col-md-8">
+                                        <input type="text" name="inputdesignationname" ng-model="desObj.Designation" class="form-control" value="Some text value..." ng-required="true" /><span class="help-block" style="color:red" ng-show="designationData.inputdesignationname.$error.required">Required Field *</span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label">Business Unit</label>
+                                    <div class="col-md-8">
+                                        <select name="selectBusinessunit" class="form-control"
+                                                ng-model="desObj.BusinessUnit"
+                                                ng-options="BusinessUnit.BusinessUnitID as BusinessUnit.BusinessUnit for BusinessUnit in filteredBusinessUnits" ng-required="true">
+                                            @*<option value="">--Select a Business Unit--</option>*@
+                                        </select>
+                                        <span class="help-block" style="color:red" ng-show="designationData.selectBU.$error.required">Required Field *</span>
+                                    </div>
+                                </div>
+                                <br />
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label"></label>
+                                    <div class="col-md-8">
+                                        <button type="button" class="btn btn-primary" ng-disabled="!designationData.$valid" ng-click="addDesignation()">Add Designation<i class="icon-arrow-right14 position-right"></i></button>
+                                        <div class="glyphicon glyphicon-refresh btn  btn-default"
+                                             ng-click="ClearFields()">
+                                            Clear<i class="icon-arrow-right14 position-right"></i>
+                                        </div>
+                                     </div>
+                                </div>
+                            </ng-form>
+                        </form>
+                    </div>
+                    <div class="tab-pane" id="tab-third">
+                        <p> 3rd</p>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="divLoading" ng-show="showLoader"></div>
+    </div>
+</div>

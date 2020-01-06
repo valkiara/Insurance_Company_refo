@@ -1,0 +1,186 @@
+﻿
+@{
+    Layout = "~/Views/Shared/_index.cshtml";
+}
+
+<style>
+    .form-control {
+        width: 100%;
+    }
+</style>
+
+
+<script src="~/Scripts/ng/Excel/Excel.js"></script>
+<script src="~/Scripts/ng/Services/ClientListService.js"></script>
+<script src="~/Scripts/ng/Controllers/ClientListController.js"></script>
+
+<div class="breadcrumb-line">
+    <ul class="breadcrumb">
+        <li><a href="/Dashboard/Index"><i class="icon-home2 position-left"></i>Home</a></li>
+        <li>Enquiries</li>
+        <li class="active"><b>Client List</b></li>
+    </ul>
+</div>
+
+
+<div ng-app="IBMSAPP" ng-controller="ClientListController" ng-init="init()" ng-cloak>
+
+    <div class="page-content-wrap">
+        <div class="panel panel-default tabs">
+
+            <ul class="nav nav-tabs" role="tablist">
+                <li class="active" id="tabView"><a href="#tab-first" role="tab" data-toggle="tab">View</a></li>
+            </ul>
+
+            <div class="panel-body tab-content">
+                <div class="tab-pane active" id="tab-first">
+
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                           
+                             <h3 class="panel-title">
+                                <strong>Client List</strong>
+                            </h3>
+
+                            <ul class="panel-controls">
+                                <li><input type="text" style="font-size: 12px;width: 100%;border-radius: 0px;margin-right:2px;" class="form-control" placeholder="Search Client. . . . . . . . . . . . ." ng-model="search_query" ng-change="searchTextChange(search_query)"></li>
+                               @* <li><a href="#" class="panel-refresh" ng-click="refreshContent()"><span class="fa fa-refresh"></span></a></li>*@
+                            </ul>
+
+                        </div>
+                        </div>
+
+                    <div class="panel-body">
+
+                        <form class="form-horizontal col-md-12" role="form">
+                            <ng-form name="ClientData">
+
+                                <div class="form-group">
+                                    <label class="col-md-2 control-label">Home Country</label>
+                                    <div class="col-md-3">
+                                        <select name="selectHomeCountry" id="homecountry"
+                                                class="form-control" ng-model="HomeCountryID" style="width:100%"
+                                                ng-options="HomeCountry.CountryID as HomeCountry.CountryName for HomeCountry in availableCountry"
+                                                ng-required="true"
+                                                ng-change="LoadHomeCountry(HomeCountryID)">
+                                            <option value="">--Select a Home Country--</option>
+                                        </select>
+                                        @*<span class="help-block" style="color:red" ng-show="ClientData.selectHomeCountry.$error.required">Required Field *</span>*@
+                                    </div>
+                                    <label class="col-md-2 control-label">Resident Country</label>
+                                    <div class="col-md-3">
+                                        <select name="selectResidentCountry" id="residentcountry"
+                                                class="form-control" ng-model="ResidentCountryID" style="width:100%"
+                                                ng-options="ResidentCountry.CountryID as ResidentCountry.CountryName for ResidentCountry in availableCountry"
+                                                ng-required="true"
+                                                ng-change="LoadResidentCountry(ResidentCountryID)">
+                                            <option value="">--Select a Resident Country--</option>
+                                        </select>
+                                        @*<span class="help-block" style="color:red" ng-show="ClientData.selectResidentCountry.$error.required">Required Field *</span>*@
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="col-md-2">Show records per page </label>
+                                    <div class="col=md-10">
+                                        <select class="form-control" style="width:100px;" ng-model="viewby" ng-change="setItemsPerPage(viewby)">
+                                            <option>5</option>
+                                            <option>10</option>
+                                            <option>20</option>
+                                            <option>30</option>
+                                            <option>40</option>
+                                            <option>50</option>
+                                        </select>
+                                    </div>
+                                    <div></div>
+                                </div>
+                                <br />
+
+                                <table class="table table-responsive" cellspacing="0" id="list">
+                                    <thead>
+                                        <tr>
+                                            <th>Customer Name</th>
+                                            <th>Customer Address</th>
+                                            <th>NIC</th>
+                                            <th>Contact No</th>
+                                            <th>Fixed Line</th>
+                                            <th>Email</th>
+                                            <th>Date of Birth</th>
+                                            
+                                        </tr>
+                                    </thead>
+                                    <tbody ng-repeat="Client in filterdData = (data.slice(((currentPage-1)*itemsPerPage), ((currentPage)*itemsPerPage)))">
+                                        <tr>
+                                            <td>{{Client.ClientName}}</td>
+                                            <td>{{Client.ClientAddress}}</td>
+                                            <td>{{Client.NIC}}</td>
+                                            <td>{{Client.ContactNo}}</td>
+                                            <td>{{Client.FixedLine}}</td>
+                                            <td>{{Client.Email}}</td>
+                                            <td>{{Client.DOB}}</td>
+                                            
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <pagination class="pull-left pagination-sm" total-items="totalItems" ng-model="currentPage" max-size="maxSize" boundary-links="true" rotate="false" num-pages="numPages" items-per-page="itemsPerPage"></pagination>
+                               
+                                <table class="table table-striped dataTable" id="listHidden" hidden>
+                                    <thead>
+                                        <tr>
+                                            <th>Customer Name</th>
+                                            <th>Customer Address</th>
+                                            <th>NIC</th>
+                                            <th>Contact No</th>
+                                            <th>Fixed Line</th>
+                                            <th>Email</th>
+                                            <th>Date Of Birth</th>
+                                            <th>Occupation</th>
+                                            <th>Optional Convers</th>
+                                            <th>Exclu</th>
+                                            <th>MembershipID</th>
+                                            <th>ExtraInt1</th>
+                                            <th>ExtraText</th>
+                                            <th>Premium</th>
+                                            <th>NetPremium</th>
+                                            <th>Deductibles</th>
+                                            <th>DeductionAmount</th>
+                                            <th>OptionalAmount</th>
+                                            <th>LoadingAmount</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody ng-repeat="client in BupaClient">
+                                        <tr>
+                                            <td>{{client.ClientName}}</td>
+                                            <td>{{client.ClientAddress}}</td>
+                                            <td>{{client.NIC}}</td>
+                                            <td>{{client.ContactNo}}</td>
+                                            <td>{{client.FixedLine}}</td>
+                                            <td>{{client.Email}}</td>
+                                            <td>{{client.DOB}}</td>
+                                            <td>{{client.Occupation}}</td>
+                                            <td>{{client.OptionalCovers}}</td>
+                                            <td>{{client.Exclu}}</td>
+                                            <td>{{client.MembershipID}}</td>
+                                            <td>{{client.ExtraInt1}}</td>
+                                            <td>{{client.ExtraText}}</td>
+                                            <td>{{client.Premium}}</td>
+                                            <td>{{client.NetPremium}}</td>
+                                            <td>{{client.Deductibles}}</td>
+                                            <td>{{client.DeductionAmount}}</td>
+                                            <td>{{client.OptionalAmount}}</td>
+                                            <td>{{client.LoadingAmount}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table> 
+                                
+                                 <button style="border-radius: 0px;width:19%;" class="btn btn-danger pull-right" ng-click="exportToExcel('#listHidden')">Export to Excel</button>
+                            </ng-form>
+                            </form>
+                    </div>
+
+                    </div>
+                </div>
+            </div>
+             <div id="divLoading" ng-show="showLoader"></div>
+            </div>
+</div>
+ 
