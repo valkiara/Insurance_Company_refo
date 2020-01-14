@@ -681,8 +681,6 @@ ibmsApp.controller("ManageTransactionsController", function ($scope, $http, $roo
             if (results.status === true) {
                 $scope.availableFrequncytype = [];
 
-
-
                 for (var i = 0; i < results.data.length; i++) {
                     $scope.availableFrequncytype.push({ value: results.data[i].Code, text: results.data[i].Description });
                 }
@@ -691,10 +689,6 @@ ibmsApp.controller("ManageTransactionsController", function ($scope, $http, $roo
                 $scope.availableFrequncytype = [];
             }
         });
-
-
-
-
     };
 
 

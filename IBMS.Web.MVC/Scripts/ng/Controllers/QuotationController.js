@@ -22,8 +22,9 @@ ibmsApp.controller("QuotationController", function ($scope, $http, $rootScope, Q
         var file = $scope.myFile;
         console.log('file is ');
         console.dir(file);
-        var uploadUrl = "//D/";
-        fileUpload.uploadFileToUrl(file, uploadUrl);
+        uploadUrl: "E:\New folder (6)";
+        //var uploadUrl = "//D/";
+        //fileUpload.uploadFileToUrl(file, uploadUrl);
     };
 
     $scope.uploadedDocument = "";

@@ -268,6 +268,7 @@
                                         </div>
                                     </div>
                                 </ng-form>
+
                                 <ng-form name="manageClientRequest" novalidate>
                                     <div class="panel panel-default">
                                         <div class="panel-heading">
@@ -429,6 +430,200 @@
 
                                 </ng-form>
 
+
+                                @*Duplicate Ng form Start*@
+
+                                <ng-form name="manageClientRequest" novalidate>
+                                    <div class="panel panel-default">
+                                        <div class="panel-heading">
+                                            <h3 class="panel-title">
+                                                <strong>Customer Request Response</strong>
+                                            </h3>
+                                        </div>
+                                    </div>
+                                    <div class="panel-body">
+                                        <div class="row">
+                                            <div class="col-lg-12 set-header">
+                                                <div class="row">
+                                                    <div class="col-sm-1" align="center">
+                                                        <h5>
+                                                            <b>#</b>
+                                                        </h5>
+                                                    </div>
+                                                    <div class="col-md-2" align="center">
+                                                        <h5>
+                                                            <b>Insuarnce Class</b>
+                                                        </h5>
+                                                    </div>
+                                                    <div class="col-md-2" align="center">
+                                                        <h5>
+                                                            <b>Insuarnce Sub Class</b>
+                                                        </h5>
+                                                    </div>
+                                                    <div class="col-md-2" align="center">
+                                                        <h5>
+                                                            <b>Insurance Company</b>
+                                                        </h5>
+                                                    </div>
+                                                    <div class="col-sm-2" align="center">
+                                                        <h5>
+                                                            <b>Response Date</b>
+                                                        </h5>
+                                                    </div>
+                                                    <div class="col-md-2" align="center">
+                                                        <h5>
+                                                            <b>Requested Date</b>
+                                                        </h5>
+                                                    </div>
+                                                    <div class="col-md-1" align="center">
+
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-12" ng-repeat="quotationLine in quotationLine.quotations" style="background-color:#d9f7f7">
+                                                <ng-form name="manageClientReqLine" novalidate>
+                                                    <div class="row">
+                                                        <div class="col-sm-1">
+                                                            <div class="panel-body no-padding" align="center">
+                                                                <h6 label>{{$index+1}}</h6>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <div class="panel-body no-padding" align="center">
+                                                                <select name="selectCompany" class="form-control" ng-model="quotationLine.InsuranceClassID"
+                                                                        ng-options="ins.InsuranceClassID as ins.InsuranceCode for ins in availableInsClass"
+                                                                        ng-change="LoadInsSubClass(quotationLine.InsuranceClassID)"
+                                                                        ng-required="true">
+                                                                    <option value="">--Select Insurance Class--</option>
+                                                                </select><span class="help-block" style="color:red" ng-show="insSubData.selectCompany.$error.required">Required Field *</span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <div class="panel-body no-padding" align="center">
+                                                                <select name="selectInsuranceClass" id="insclas"
+                                                                        class="form-control" ng-model="quotationLine.InsuranceSubClassID" style="width:100%"
+                                                                        ng-options="InsuranceClass.InsuranceSubClassID as InsuranceClass.Description for InsuranceClass in availableInsuranceClass"
+                                                                        @*ng-options="InsuranceClass.InsuranceSubClassID as InsuranceClass.Description for InsuranceClass in quotationLine.subInsuranceClasses"*@
+                                                                        ng-required="true"
+                                                                        ">
+                                                                    <option value="">--Select a Insurance Class--</option>
+                                                                </select>
+                                                                @*<selectize name="selectInsuranceClass" placeholder="Select Insurance" options="availableInsuranceClass" config="{maxItems: 1}" ng-model="quotationLine.InsuranceSubClassID" ng-change="getInsChargeType(quotationHeaderObj.QuotationHeaderID,policyInfoRecObj.InsuranceCompanyID)" ng-required="true"></selectize>*@
+                                                                <span class="help-block" style="color:red" ng-show="managePolicyInfoRecording.SelectPremiumIncludingTaxCurrency.$error.required">Required Field *</span>
+                                                            </div>
+
+
+                                                        </div>
+
+
+
+                                                        <div class="col-md-2">
+                                                            <div class="panel-body no-padding" align="center">
+                                                                <selectize name="SelectInsuranceCompanyID" placeholder="Select Insurance Company" options="availableQuoteInfoInsCompanys" config="{maxItems: 1}" ng-model="quotationLine.CompId" ng-change="getInsChargeType(quotationHeaderObj.QuotationHeaderID,policyInfoRecObj.InsuranceCompanyID)" ng-required="true"></selectize>
+                                                                <span class="help-block" style="color:red" ng-show="managePolicyInfoRecording.SelectInsuranceCompanyID.$error.required">Required Field *</span>
+
+                                                            </div>
+                                                        </div>
+
+                                                        
+                                                        <div class="col-md-2">
+
+                                                            <div class="panel-body no-padding" align="center">
+                                                                <input type="text"
+                                                                       id="dob"
+                                                                       @*readonly*@
+                                                                       name="selectDOB"
+                                                                       class="form-control date"
+                                                                       ng-change="textChange()"
+                                                                       ng-click="dob=true"
+                                                                       datepicker-popup="dd/MM/yyyy"
+                                                                       ng-model="quotationLine.RequestedDate"
+                                                                       is-open="dob"
+                                                                       datepicker-options="dateOptions"
+                                                                       placeholder="Date of requested"
+                                                                       @*min-date="currentDate"*@
+                                                                       @*max-date="purchaseOrderObj.DatePaid"*@
+                                                                       ng-required="true"
+                                                                       close-text="Close" />
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-2">
+
+                                                            <div class="panel-body no-padding" align="center">
+                                                                <input type="text"
+                                                                       id="dob"
+                                                                       @*readonly*@
+                                                                       name="selectDOB"
+                                                                       class="form-control date"
+                                                                       ng-change="textChange()"
+                                                                       ng-click="dob=true"
+                                                                       datepicker-popup="dd/MM/yyyy"
+                                                                       ng-model="QuotationRequestedInsCompany.CreatedDate"
+                                                                       is-open="dob"
+                                                                       datepicker-options="dateOptions"
+                                                                       placeholder="Date of requested"
+                                                                       @*min-date="currentDate"*@
+                                                                       @*max-date="purchaseOrderObj.DatePaid"*@
+                                                                       ng-required="true"
+                                                                       close-text="Close" />
+                                                            </div>
+                                                        </div>
+
+
+
+                                                        <div class="col-md-2">
+                                                            @*<div class="panel-body no-padding">
+                                                                <input type="file" class="form-control" id="file" name="file" ng-model="quotationLine.File" multiple onchange="angular.element(this).scope().getDocumentIntoArray(this)" />
+                                                                <button type="button" class="btn btn-default" ng-click="deleteItem($index)" ng-if="$index>0">
+                                                                    <span class="glyphicon glyphicon-remove-circle"></span>
+                                                                </button>*@
+                                                                @*<button type="button" class="btn btn-default" ng-click="sendAttachment($index)" ng-disabled="IsEmailDisable" >*@
+                                                                @*<button type="button" class="btn btn-default" ng-click="sendEmailRequest($index)" ng-disabled="IsEmailDisable">
+                                                                    <span class="glyphicon glyphicon-envelope"></span>
+                                                                </button>
+                                                            </div>*@
+                                                        </div>
+
+                                                        
+                                                        <div class="row">
+                                                            <div class="col">
+
+                                                                @*Qutation Company Price*@
+                                                                <label>
+                                                                    Quation Price:
+                                                                    <input type="text" name="quatationPrice" ng-model="QuotationRequestedInsCompany.status">
+                                                                </label>
+
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+                                                </ng-form>
+                                            </div>
+                                            <br />
+
+                                            <div class="col-md-12">
+                                                <br />
+                                                <div class="row">
+                                                    <div class="col-md-1">
+                                                        <div class="panel-body no-padding" align="center">
+                                                            <button type="button" class="btn btn-default" ng-click="addItem()">
+                                                                <span class="glyphicon glyphicon-plus"></span>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+
+
+                                </ng-form>
+
+                                @*Duplicate Ng form End*@
 
 
 

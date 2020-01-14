@@ -1,0 +1,58 @@
+﻿<html ng-app="tblBody">
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>
+    <script>
+        var myapp = angular.module("myapp", []);
+        myapp.filter('displayPageData', function () {
+            return function (input, start) {
+                start = +start; //parse to int
+                return input.slice(start);
+            }
+        });
+        myapp.controller("myappcont", function ($scope) {
+            $scope.currentPage = 0;
+
+            $scope.students = [
+                { Name: "Kailash", Gender: "Male", Class: "1Std", Section: "A" },
+                { Name: "Kalyan", Gender: "Male", Class: "1Std", Section: "A" },
+                { Name: "Kalyani", Gender: "Female", Class: "1Std", Section: "A" },
+                { Name: "Kamal", Gender: "Male", Class: "2Std", Section: "B" },
+                { Name: "Keshav", Gender: "Male", Class: "2Std", Section: "B" },
+                { Name: "KedarGouri", Gender: "Female", Class: "2Std", Section: "B" },
+                { Name: "test student1", Gender: "male", Class: "1std", Section: "a" },
+                { Name: "Test Student2", Gender: "Male", Class: "2nd", Section: "B" },
+                { Name: "Test Student3", Gender: "Male", Class: "3rd", Section: "C" },
+                { Name: "Test Student4", Gender: "Male", Class: "1Std", Section: "A" },
+                { Name: "Test Student5", Gender: "Male", Class: "2nd", Section: "B" },
+                { Name: "Test Student6", Gender: "Male", Class: "3rd", Section: "C" },
+                { Name: "Test Student7", Gender: "Male", Class: "1Std", Section: "A" },
+                { Name: "Test Student8", Gender: "Male", Class: "2nd", Section: "B" },
+                { Name: "Test Student9", Gender: "Male", Class: "3rd", Section: "C" }];
+        });
+
+    </script>
+    <body ng-controller="myappcont">
+        <table border="1" style="width:80%">
+            <caption>
+                <h2>Student List</h2>
+            </caption>
+            <thead>
+                <tr>
+                    <th>Customer Name</th>
+                    <th>Insurance Type</th>
+                    <th>Expire Date</th>
+                    <th>Dates</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="student in students">
+                    <td>{{student.Name}}</td>
+                    <td>{{student.Gender}}</td>
+                    <td>{{student.Class}}</td>
+                    <td>{{student.Section}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </body>
+</html>
+
+

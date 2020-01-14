@@ -285,7 +285,7 @@
         <AssociationConnector Association="PERFECTIBSModel.FK_tblPartner_tblUser1" />
         <EntityTypeShape EntityType="PERFECTIBSModel.tblDeductionType" Width="1.5" PointX="3.375" PointY="16.75" />
         <EntityTypeShape EntityType="PERFECTIBSModel.tblPilotPremium" Width="1.5" PointX="19.375" PointY="7.75" />
-        <EntityTypeShape EntityType="PERFECTIBSModel.tblPremiumHolderType" Width="1.5" PointX="7.375" PointY="19.75" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblPremiumHolderType" Width="1.5" PointX="7" PointY="19.75" />
         <EntityTypeShape EntityType="PERFECTIBSModel.tblGrpFamilyDetail" Width="1.5" PointX="9.375" PointY="19.75" />
         <EntityTypeShape EntityType="PERFECTIBSModel.PatientAdmission" Width="1.5" PointX="0.75" PointY="19.75" />
         <EntityTypeShape EntityType="PERFECTIBSModel.tblFamilyMember" Width="1.5" PointX="27" PointY="109.875" />
@@ -309,7 +309,7 @@
         <EntityTypeShape EntityType="PERFECTIBSModel.tblPilotPRM" Width="1.5" PointX="9.375" PointY="13.75" />
         <EntityTypeShape EntityType="PERFECTIBSModel.tblClientRHistory" Width="5.5" PointX="19.375" PointY="10.75" />
         <EntityTypeShape EntityType="PERFECTIBSModel.tblClientRenewelRequestHeader" Width="1.5" PointX="11.375" PointY="19.75" />
-        <EntityTypeShape EntityType="PERFECTIBSModel.tblClientRewenelHistory" Width="1.5" PointX="13.375" PointY="20.75" />
+        <EntityTypeShape EntityType="PERFECTIBSModel.tblClientRewenelHistory" Width="1.5" PointX="13.375" PointY="20.75" IsExpanded="true" />
         <EntityTypeShape EntityType="PERFECTIBSModel.tblClientRnlRequestHeader" Width="1.5" PointX="15.375" PointY="20.75" />
         <EntityTypeShape EntityType="PERFECTIBSModel.tblFrequncyDetail" Width="1.5" PointX="19.375" PointY="0.75" />
         <EntityTypeShape EntityType="PERFECTIBSModel.tblTransactionDetail" Width="1.5" PointX="20.375" PointY="18.75" />
