@@ -1,0 +1,50 @@
+﻿using IBMS.Repository;
+using Microsoft.Office.Interop.Excel;
+using System;
+
+SELECT* FROM[tblUser]
+
+SELECT * FROM [tblBussinessUnit]
+
+--ALTER TABLE[tblBussinessUnit]
+--ADD [Account] varchar(150) NULL,
+--    [ERPDB] varchar(50) NULL,
+--    [ERPCustomerCode] varchar(150) NULL;
+
+
+SELECT* FROM[tblClient]
+
+--ALTER TABLE tblClient
+--ADD [PremiumAccept] varchar(2) NULL,
+--    [IsActive] int NOT NULL DEFAULT 1,
+--    [FrequncyID] int NULL,
+--    [FrequncyDID] varchar(50) NULL,
+--    [SeqNo] varchar(50) NULL;
+
+
+SELECT* FROM[tblClientRequestHeader]
+
+
+-- Add fields to the table with default values
+--ALTER TABLE tblClientRequestHeader
+--ADD [Exclusions] float NULL,
+--    [OptionalCovers] varchar(max) NULL,
+--    [Occupation] varchar(250) NULL,
+--    [FrequncyID] int NULL,
+--    [CurrancyID] int NULL,
+--    [MembershipID] varchar(50) NULL,
+--    [SchemeID] int NULL,
+--    [Exclu] varchar(150) NULL,
+--    [GroupID] varchar(50) NULL,
+--    [FPolicyStart] datetime NULL,
+--    [FPolicyEnd] datetime NULL,
+--    [FrequncyDID] varchar(50) NULL,
+--    [IsActive] bit NOT NULL DEFAULT 1, -- Change the default value as needed
+--    [InActiveEffectiveDate] datetime NULL;
+
+
+SELECT* FROM[tblQuotationHeader]
+
+--	-- Add the IsReceived column to the table with a default value
+--ALTER TABLE [tblQuotationHeader]
+--ADD[IsReceived] bit NULL DEFAULT 0; --Change the default value as needed

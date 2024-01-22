@@ -63,6 +63,7 @@
     <Compile Include="Admission_Singapore.cs">
       <DependentUpon>IBMSDataModel.tt</DependentUpon>
     </Compile>
+    <Content Include="dbUpdate.txt" />
     <Compile Include="GenericRepository.cs" />
     <Compile Include="IBMSDataModel.Context.cs">
       <AutoGen>True</AutoGen>
